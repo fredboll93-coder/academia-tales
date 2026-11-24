@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulacros Disponibles - Academia TALES</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.7) 0%, rgba(10, 15, 30, 0.9) 100%), 
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .top-bar {
+      background: rgba(11, 18, 32, 0.85);
+      border: 3px solid rgba(148, 163, 184, 0.15);
+      border-top: 3px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 12px 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .main-card {
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-top: 2px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(148, 163, 184, 0.2);
+    }
+
+    .btn-nav-top {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-nav-top:hover {
+      background: rgba(59, 130, 246, 0.3);
+      color: #fff;
+    }
+
+    /* ESTILOS DE LA VENTANA FLOTANTE (MODAL) */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      position: relative;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+      text-align: center;
+    }
+
+    .modal-close-x {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: rgba(148, 163, 184, 0.12);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .modal-close-x:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #fff;
+    }
+
+    .modal-icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #f8fafc;
+      margin-bottom: 12px;
+    }
+
+    .modal-text {
+      font-size: 13.5px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 25px;
+      text-align: justify;
+      text-justify: inter-word;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .modal-btn-cancel {
+      background: rgba(148, 163, 184, 0.14);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex: 1;
+    }
+
+    .modal-btn-cancel:hover {
+      background: rgba(148, 163, 184, 0.25);
+      color: #fff;
+    }
+
+    .modal-btn {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+      flex: 1;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-container">
+
+    <!-- Barra Superior -->
+    <div class="top-bar">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="logo.png" alt="Logo" style="width: 90px; height: 90px; object-fit: contain; margin-top: -6px;">
+        <div style="margin-top: 5px;">
+          <h2 id="tituloUniversidad" style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #f8fafc;">Simulacros – UNAP</h2>
+          <p style="margin: 0; font-size: 13px; color: #94a3b8;">Academia Tales • Panel del Alumno</p>
+        </div>
+      </div>
+
+      <!-- Botones de navegación rápida, cerrar sesión y volver -->
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="#" id="linkClases" class="btn-nav-top"><i class="fa-solid fa-circle-play"></i> Clases</a>
+        <a href="#" id="linkMateriales" class="btn-nav-top" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-file-pdf"></i> Materiales</a>
+        
+        <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 5px;">
+          <button id="btnCerrarSesion" class="btn-secondary" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); padding: 5px 12px; font-size: 12px;">
+            <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+          </button>
+          <button id="btnVolver" class="btn-secondary" style="padding: 5px 12px; font-size: 12px;">
+            <i class="fa-solid fa-arrow-left"></i> Volver
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel Principal -->
+    <div class="main-card">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 25px; border-bottom: 1px solid rgba(148, 163, 184, 0.1); padding-bottom: 15px;">
+        <i class="fa-solid fa-file-signature" style="font-size: 1.5rem; color: #60a5fa;"></i>
+        <div>
+          <h1 style="font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px;">Exámenes y Simulacros Disponibles</h1>
+          <p style="font-size: 13px; color: #94a3b8;">Selecciona un simulacro para iniciar tu evaluación de admisión.</p>
+        </div>
+      </div>
+
+      <!-- Contenedor de la lista de simulacros -->
+      <div id="contenedorListaSimulacros" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Se llena dinámicamente -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- VENTANA FLOTANTE (MODAL) PARA ALERTAS E INSTRUCCIONES -->
+  <div class="modal-overlay" id="modalAlerta">
+    <div class="modal-box">
+      <button type="button" class="modal-close-x" id="modalCerrarX" title="Cerrar">✕</button>
+      <div class="modal-icon" id="modalIcono">⚠️</div>
+      <h3 class="modal-title" id="modalTitulo">Aviso Importante</h3>
+      <p class="modal-text" id="modalMensaje">Mensaje aquí...</p>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn-cancel" id="modalBtnCancelar" style="display: none;">Cancelar</button>
+        <button type="button" class="modal-btn" id="modalBtnAccion">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    function alumnoAlHabilitadoCheck(alu) {
+      if (!alu) return false;
+      if (alu.habilitado === false || alu.activo === false) return false;
+      return true;
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const siglaUni = urlParams.get('siglas') || urlParams.get('uni') || localStorage.getItem('universidadSeleccionada') || sessionStorage.getItem('uniActual') || 'UNAP';
+
+      const urlSimulacrosActual = `simulacrosAlumno.html?siglas=${encodeURIComponent(siglaUni)}`;
+      const urlClases = `clasesGrabadasAlumno.html?siglas=${encodeURIComponent(siglaUni)}`;
+      const urlMateriales = `materialesAlumno.html?siglas=${encodeURIComponent(siglaUni)}`;
+
+      // Al pulsar la flecha atrás del navegador, mantener o llevar directamente a la ventana de simulacros
+      window.history.pushState({ vistaSimulacros: true }, "", urlSimulacrosActual);
+      window.addEventListener("popstate", () => {
+        window.location.replace(urlSimulacrosActual);
+      });
+
+      // Configurar enlaces rápidos superiores
+      document.getElementById('linkClases').href = urlClases;
+      document.getElementById('linkMateriales').href = urlMateriales;
+
+      // Acción del botón Volver
+      document.getElementById("btnVolver").addEventListener("click", () => {
+        window.location.href = `detalleUniversidad.html?uni=${encodeURIComponent(siglaUni)}`;
+      });
+
+      // Acción del botón Cerrar Sesión
+      document.getElementById("btnCerrarSesion").addEventListener("click", () => {
+        sessionStorage.clear();
+        localStorage.removeItem("usuarioLogueado");
+        window.location.href = "index.html";
+      });
+
+      const contenedor = document.getElementById("contenedorListaSimulacros");
+      let uniData = {};
+      let listaSimulacros = [];
+      let todasUnis = [];
+      let todosSims = [];
+
+      try {
+        const cachedUnis = JSON.parse(sessionStorage.getItem('tales_unis_cache') || 'null');
+        const cachedSims = JSON.parse(sessionStorage.getItem('tales_sims_cache') || 'null');
+        if (Array.isArray(cachedUnis)) todasUnis = cachedUnis;
+        if (Array.isArray(cachedSims)) todosSims = cachedSims;
+      } catch (e) {}
+
+      // Obtener identificación del alumno actual desde la sesión o almacenamiento local
+      let codigoIngresado = String(sessionStorage.getItem('alumnoCodigo') || localStorage.getItem('alumnoCodigo') || "").trim().toLowerCase();
+      let nombreAlumno = "Estudiante";
+
+      let sesion = {};
+      try {
+        sesion = JSON.parse(sessionStorage.getItem('alumnoSesion') || localStorage.getItem('usuarioLogueado') || '{}');
+        if (sesion.nombre || sesion.nombres) nombreAlumno = sesion.nombre || sesion.nombres;
+        if (sesion.codigo && !codigoIngresado) codigoIngresado = String(sesion.codigo).trim().toLowerCase();
+        if (sesion.dni && !codigoIngresado) codigoIngresado = String(sesion.dni).trim().toLowerCase();
+      } catch (e) {}
+
+      let estaMatriculadoEnUniversidad = false;
+
+      function configurarModal({ icono, titulo, mensaje, mostrarCancelar, textoAceptar, onAceptar }) {
+        const modal = document.getElementById("modalAlerta");
+        const modalIcono = document.getElementById("modalIcono");
+        const modalTitulo = document.getElementById("modalTitulo");
+        const modalMensaje = document.getElementById("modalMensaje");
+
+        const cerrarModal = () => {
+          modal.style.display = "none";
+        };
+
+        const oldX = document.getElementById("modalCerrarX");
+        const newX = oldX.cloneNode(true);
+        oldX.parentNode.replaceChild(newX, oldX);
+        newX.onclick = cerrarModal;
+
+        const oldCancel = document.getElementById("modalBtnCancelar");
+        const newCancel = oldCancel.cloneNode(true);
+        oldCancel.parentNode.replaceChild(newCancel, oldCancel);
+        newCancel.style.display = mostrarCancelar ? "inline-block" : "none";
+        newCancel.onclick = cerrarModal;
+
+        const oldAccion = document.getElementById("modalBtnAccion");
+        const newAccion = oldAccion.cloneNode(true);
+        oldAccion.parentNode.replaceChild(newAccion, oldAccion);
+        newAccion.textContent = textoAceptar;
+        newAccion.onclick = onAceptar || cerrarModal;
+
+        modalIcono.textContent = icono;
+        modalTitulo.textContent = titulo;
+        modalMensaje.innerHTML = mensaje;
+        modal.style.display = "flex";
+      }
+
+      function mostrarModalInhabilitado(seccionTexto) {
+        configurarModal({
+          icono: "🚫",
+          titulo: "Alumno Inhabilitado",
+          mensaje: `Hola <b>${nombreAlumno}</b>, tu cuenta figura como <b>alumno inhabilitado</b> para acceder a <b>${seccionTexto}</b> en <b>${uniData.siglas || siglaUni}</b>, ya que solo estás habilitado para rendir simulacro(s). Comunícate con Academia TALES al WhatsApp <b>990 259 827</b>.`,
+          mostrarCancelar: false,
+          textoAceptar: "Aceptar"
+        });
+      }
+
+      document.getElementById("linkClases").addEventListener("click", (e) => {
+        if (!estaMatriculadoEnUniversidad) {
+          e.preventDefault();
+          mostrarModalInhabilitado("Clases Grabadas");
+        }
+      });
+
+      document.getElementById("linkMateriales").addEventListener("click", (e) => {
+        if (!estaMatriculadoEnUniversidad) {
+          e.preventDefault();
+          mostrarModalInhabilitado("Materiales");
+        }
+      });
+
+      function pintarListaSimulacros() {
+        const siglaLim = String(siglaUni).trim().toLowerCase();
+        uniData = {};
+        listaSimulacros = [];
+
+        if (Array.isArray(todasUnis)) {
+          const matchUni = todasUnis.find(u => String(u.siglas || u.nombre || "").trim().toLowerCase() === siglaLim);
+          if (matchUni) uniData = matchUni;
+        }
+
+        if (Array.isArray(todosSims)) {
+          listaSimulacros = todosSims
+            .filter(sim => {
+              const sUni = String(sim.universidad_siglas || sim.universidad || sim.siglas || "").trim().toLowerCase();
+              return sUni === siglaLim;
+            })
+            .sort((a, b) => {
+              const idA = Number(a.id);
+              const idB = Number(b.id);
+              if (!Number.isNaN(idA) && !Number.isNaN(idB) && idA !== idB) {
+                return idA - idB;
+              }
+              const timeA = a.creado_en ? new Date(a.creado_en).getTime() : 0;
+              const timeB = b.creado_en ? new Date(b.creado_en).getTime() : 0;
+              return timeA - timeB;
+            });
+        }
+
+        document.getElementById("tituloUniversidad").textContent = `Simulacros – ${uniData.siglas || siglaUni}`;
+
+        let alumnosUni = uniData.alumnos || uniData.alumnosMatriculados || uniData.matriculados || [];
+        if (typeof alumnosUni === 'string') {
+          alumnosUni = alumnosUni.split(/[\n,;]+/).map(c => c.trim()).filter(Boolean);
+        }
+
+        let alumnoMatriculadoUni = null;
+        if (Array.isArray(alumnosUni)) {
+          if (codigoIngresado) {
+            alumnoMatriculadoUni = alumnosUni.find(a => {
+              if (!a) return false;
+              if (typeof a === 'object') {
+                return String(a.codigo || a.dni || a.id || "").trim().toLowerCase() === codigoIngresado;
+              }
+              return String(a).trim().toLowerCase() === codigoIngresado;
+            });
+          }
+          if (!alumnoMatriculadoUni && nombreAlumno !== "Estudiante") {
+            alumnoMatriculadoUni = alumnosUni.find(a => {
+              if (!a || typeof a !== 'object') return false;
+              const nomReg = String(a.nombres || a.nombre || a.apellidosYnombres || "").trim().toLowerCase();
+              return nomReg && (nomReg.includes(nombreAlumno.toLowerCase()) || nombreAlumno.toLowerCase().includes(nomReg));
+            });
+          }
+        }
+
+        if (alumnoMatriculadoUni && typeof alumnoMatriculadoUni === 'object' && (alumnoMatriculadoUni.nombres || alumnoMatriculadoUni.nombre)) {
+          nombreAlumno = alumnoMatriculadoUni.nombres || alumnoMatriculadoUni.nombre;
+        }
+
+        estaMatriculadoEnUniversidad = Boolean(
+          alumnoMatriculadoUni &&
+          (typeof alumnoMatriculadoUni !== 'object' || alumnoAlHabilitadoCheck(alumnoMatriculadoUni))
+        );
+
+        if (listaSimulacros.length === 0) {
+          contenedor.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; background: rgba(30, 41, 59, 0.4); border: 1px dashed rgba(148, 163, 184, 0.2); border-radius: 14px;">
+              <div style="font-size: 2.2rem; color: #64748b; margin-bottom: 12px;">
+                <i class="fa-solid fa-folder-open"></i>
+              </div>
+              <h3 style="color: #ffffff; font-size: 1.05rem; margin: 0 0 4px 0; font-weight: 600;">Aún no hay simulacros disponibles</h3>
+              <p style="color: #94a3b8; font-size: 0.85rem; margin: 0;">La administración publicará los exámenes de admisión próximamente.</p>
+            </div>
+          `;
+          return;
+        }
+
+        contenedor.innerHTML = "";
+        listaSimulacros.forEach((sim, idx) => {
+          const card = document.createElement("div");
+          card.style.cssText = "background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 14px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; box-sizing: border-box; transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;";
+
+          card.onmouseover = () => {
+            card.style.transform = "translateY(-2px)";
+            card.style.borderColor = "rgba(59, 130, 246, 0.45)";
+            card.style.background = "rgba(30, 41, 59, 0.75)";
+          };
+          card.onmouseout = () => {
+            card.style.transform = "translateY(0)";
+            card.style.borderColor = "rgba(148, 163, 184, 0.15)";
+            card.style.background = "rgba(30, 41, 59, 0.5)";
+          };
+
+          card.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="font-size: 22px; color: #60a5fa;"><i class="fa-solid fa-file-signature"></i></div>
+              <div>
+                <h4 style="margin: 0 0 2px 0; font-size: 15px; color: #f8fafc; font-weight: 600;">${sim.titulo || sim.nombre || 'Simulacro ' + (idx + 1)}</h4>
+                <p style="margin: 0; font-size: 12px; color: #94a3b8;">${sim.descripcion || 'Evaluación de admisión programada.'}</p>
+              </div>
+            </div>
+
+            <button class="btn-rendir" data-idx="${idx}" style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0;" onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'">
+              Rendir Simulacro <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+            </button>
+          `;
+
+          contenedor.appendChild(card);
+        });
+
+        // Evento para los botones de Rendir verificando alumnos habilitados en el simulacro
+        document.querySelectorAll(".btn-rendir").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const index = parseInt(e.currentTarget.getAttribute("data-idx"), 10);
+            const simSeleccionado = listaSimulacros[index];
+
+            let listaAlumnosSim = simSeleccionado.alumnos || simSeleccionado.alumnosHabilitados || simSeleccionado.habilitados || simSeleccionado.codigos || [];
+            if (typeof listaAlumnosSim === 'string') {
+              listaAlumnosSim = listaAlumnosSim.split(/[\n,;]+/).map(c => c.trim()).filter(Boolean);
+            }
+
+            let alumnoEncontrado = null;
+
+            if (codigoIngresado && Array.isArray(listaAlumnosSim)) {
+              alumnoEncontrado = listaAlumnosSim.find(a => {
+                if (!a) return false;
+                if (typeof a === 'object') {
+                  return String(a.codigo || a.dni || a.id || "").trim().toLowerCase() === codigoIngresado;
+                }
+                return String(a).trim().toLowerCase() === codigoIngresado;
+              });
+            }
+
+            if (!alumnoEncontrado && nombreAlumno !== "Estudiante" && Array.isArray(listaAlumnosSim)) {
+              alumnoEncontrado = listaAlumnosSim.find(a => {
+                if (!a || typeof a !== 'object') return false;
+                const nomReg = String(a.nombres || a.nombre || a.apellidosYnombres || "").trim().toLowerCase();
+                return nomReg && (nomReg.includes(nombreAlumno.toLowerCase()) || nombreAlumno.toLowerCase().includes(nomReg));
+              });
+            }
+
+            let estaHabilitado = false;
+            if (alumnoEncontrado) {
+              if (typeof alumnoEncontrado === 'object') {
+                if (alumnoAlHabilitadoCheck(alumnoEncontrado)) {
+                  estaHabilitado = true;
+                  if (alumnoEncontrado.nombres || alumnoEncontrado.nombre) {
+                    nombreAlumno = alumnoEncontrado.nombres || alumnoEncontrado.nombre;
+                  }
+                }
+              } else {
+                estaHabilitado = true;
+              }
+            } else if (Array.isArray(listaAlumnosSim) && listaAlumnosSim.length === 0) {
+              estaHabilitado = true;
+            }
+
+            if (!estaHabilitado) {
+              const simIdKey = simSeleccionado.id ?? index;
+              const alumObj = (alumnoEncontrado && typeof alumnoEncontrado === 'object') ? alumnoEncontrado : null;
+              const nombreMostrar = (alumObj && (alumObj.nombres || alumObj.nombre)) || nombreAlumno;
+
+              let regLocal = null;
+              const clavesPosibles = [
+                String(codigoIngresado || "").trim().toLowerCase(),
+                String(alumObj?.codigo || alumObj?.dni || alumObj?.id || "").trim().toLowerCase(),
+                String(nombreMostrar || "").trim().toLowerCase(),
+                String(alumObj?.codigo || alumObj?.nombres || alumObj?.nombre || "").trim()
+              ].filter(Boolean);
+
+              for (const k of clavesPosibles) {
+                try {
+                  const raw = localStorage.getItem(`resultado_${simIdKey}_${k}`);
+                  if (raw) {
+                    regLocal = JSON.parse(raw);
+                    if (regLocal) break;
+                  }
+                } catch (err) {}
+              }
+
+              const yaRindio = Boolean(
+                (alumObj && (alumObj.rindio === true || alumObj.finalizado === true || typeof alumObj.puntaje === 'number')) ||
+                (regLocal && (regLocal.rindio === true || typeof regLocal.puntaje === 'number'))
+              );
+
+              if (yaRindio) {
+                const puntajeNum = typeof alumObj?.puntaje === 'number'
+                  ? alumObj.puntaje
+                  : (typeof regLocal?.puntaje === 'number' ? regLocal.puntaje : 0);
+                const carreraTxt = alumObj?.carrera || regLocal?.carrera || sesion.carrera || "Sin especificar";
+                const grupoTxt = alumObj?.grupo || regLocal?.grupo || "A";
+                const urlVerAmbos = `ver-simulacro-solucionario.html?uni=${encodeURIComponent(siglaUni)}&id=${encodeURIComponent(simSeleccionado.id ?? index)}`;
+
+                configurarModal({
+                  icono: "🎓",
+                  titulo: "Simulacro Ya Rendido",
+                  mensaje: `
+                    <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; text-align: left;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid rgba(148, 163, 184, 0.12); padding-bottom: 6px;">
+                        <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Alumno</span>
+                        <span style="font-size: 13px; color: #f8fafc; font-weight: 700; text-align: right;">${nombreMostrar}</span>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid rgba(148, 163, 184, 0.12); padding-bottom: 6px;">
+                        <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Carrera</span>
+                        <span style="font-size: 12.5px; color: #e2e8f0; font-weight: 600; text-align: right;">${carreraTxt}</span>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Grupo</span>
+                        <span style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; font-size: 12px; font-weight: 800; padding: 2px 10px; border-radius: 999px;">${grupoTxt}</span>
+                      </div>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.14) 0%, rgba(37, 99, 235, 0.18) 100%); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 14px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                      <span style="font-size: 12px; color: #cbd5e1; font-weight: 700;"><i class="fa-solid fa-award" style="color: #38bdf8; margin-right: 6px;"></i>Puntaje Obtenido</span>
+                      <span style="color: #38bdf8; font-size: 18px; font-weight: 800;">${puntajeNum.toFixed(2)} pts</span>
+                    </div>
+                  `,
+                  mostrarCancelar: true,
+                  textoAceptar: "Ver Simulacro y Solucionario",
+                  onAceptar: () => {
+                    window.location.href = urlVerAmbos;
+                  }
+                });
+
+                const btnAccion = document.getElementById("modalBtnAccion");
+                if (btnAccion) {
+                  btnAccion.innerHTML = `<i class="fa-solid fa-columns" style="margin-right: 6px;"></i>Ver Simulacro y Solucionario`;
+                }
+
+                const btnCancel = document.getElementById("modalBtnCancelar");
+                if (btnCancel) {
+                  btnCancel.textContent = "Aceptar";
+                  btnCancel.style.display = "inline-block";
+                }
+              } else {
+                configurarModal({
+                  icono: "❌",
+                  titulo: "Acceso No Habilitado",
+                  mensaje: `Hola <b>${nombreMostrar}</b>, no estás habilitado para rendir este examen, por favor comunícate con Academia TALES al WhatsApp <b>990 259 827</b> para que te habiliten y puedas rendir este examen. 😊`,
+                  mostrarCancelar: false,
+                  textoAceptar: "Aceptar"
+                });
+              }
+            } else {
+              const siglasUniTexto = uniData.siglas || siglaUni;
+              configurarModal({
+                icono: "📝",
+                titulo: "Indicaciones del Simulacro",
+                mensaje: `Este examen es un Simulacro tipo examen de admisión <b>${siglasUniTexto}</b>, lee detenidamente las instrucciones que están en el examen, recuerda que al desarrollar este examen, podrás ver en qué nivel te encuentras así que debes realizarlo a conciencia.`,
+                mostrarCancelar: true,
+                textoAceptar: "Iniciar Examen",
+                onAceptar: () => {
+                  localStorage.setItem("simulacroActivoIdx", index);
+                  sessionStorage.setItem("simulacroActivoId", simSeleccionado.id ?? index);
+                  window.location.href = `examen.html?uni=${encodeURIComponent(siglaUni)}&id=${encodeURIComponent(simSeleccionado.id ?? index)}&idx=${index}`;
+                }
+              });
+            }
+          });
+        });
+      }
+
+      if (todasUnis.length > 0 || todosSims.length > 0) {
+        pintarListaSimulacros();
+      } else {
+        contenedor.innerHTML = `<p style="color:#94a3b8;font-size:13px;text-align:center;padding:20px;">Cargando simulacros...</p>`;
+      }
+
+      try {
+        const [resUnis, resSims] = await Promise.all([
+          supabase.from('universidades').select('*'),
+          supabase.from('simulacros').select('id, titulo, nombre, descripcion, universidad_siglas, universidad, siglas, alumnos, creado_en').order('id', { ascending: true })
+        ]);
+
+        if (!resUnis.error && Array.isArray(resUnis.data)) {
+          todasUnis = resUnis.data;
+          try { sessionStorage.setItem('tales_unis_cache', JSON.stringify(todasUnis)); } catch (e) {}
+        }
+
+        if (!resSims.error && Array.isArray(resSims.data)) {
+          todosSims = resSims.data;
+          try { sessionStorage.setItem('tales_sims_cache', JSON.stringify(todosSims)); } catch (e) {}
+        }
+
+        pintarListaSimulacros();
+      } catch (e) {
+        console.error("Error cargando simulacros desde Supabase:", e);
+        if (todasUnis.length === 0 && todosSims.length === 0) {
+          pintarListaSimulacros();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

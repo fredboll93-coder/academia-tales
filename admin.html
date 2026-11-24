@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración - Academia Tales</title>
+  <link rel="stylesheet" href="src/style.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.85) 0%, rgba(10, 15, 30, 0.95) 100%), 
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .top-bar {
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-top: 2px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 15px 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .brand-logo {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 2px;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      padding: 10px 22px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #fff;
+    }
+
+    .admin-card {
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-top: 2px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 35px 40px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      width: 100%;
+    }
+
+    .card-header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 35px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #cbd5e1;
+      text-transform: uppercase;
+    }
+
+    .btn-create-uni {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      border: none;
+      color: #fff;
+      padding: 12px 24px;
+      font-weight: 700;
+      font-size: 13px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .btn-create-uni:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+    }
+
+    .unis-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 40px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-container">
+
+    <!-- 1. BARRA SUPERIOR -->
+    <header class="top-bar">
+      <div class="brand-section">
+        <img src="logo.png" alt="Academia Tales" class="brand-logo">
+        <div>
+          <h1 class="brand-title">Panel de Administración General</h1>
+          <p class="brand-subtitle">Academia Tales • Control de Plataforma</p>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+        <button type="button" id="btn-cerrar-sesion" class="btn-logout">Cerrar Sesión</button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btn-abrir-carrusel" class="btn-logout" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); font-size: 12px; padding: 6px 12px;">🖼️ Carrusel Inicio</button>
+          <button type="button" id="btn-abrir-config-admin" class="btn-logout" style="background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); font-size: 12px; padding: 6px 12px;">⚙️ Configuración</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. TARJETA PRINCIPAL DE UNIVERSIDADES -->
+    <main class="admin-card">
+      <div class="card-header-actions">
+        <h2 class="section-title">UNIVERSIDADES CREADAS</h2>
+        <button type="button" id="btn-crear-universidad-top" class="btn-create-uni">+ Crear Nueva Universidad</button>
+      </div>
+
+      <div id="contenedor-universidades-creadas" class="unis-grid">
+        <!-- Se genera automáticamente con los datos guardados -->
+      </div>
+    </main>
+
+  </div>
+
+  <!-- MODAL DE GESTIÓN DEL CARRUSEL DE INICIO -->
+  <div id="modal-carrusel-admin" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 20px;">
+    <div style="background: #0f172a; border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 20px; padding: 30px; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.7); color: #f8fafc;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 12px; margin-bottom: 20px;">
+        <h3 style="font-size: 16px; font-weight: 800; color: #38bdf8;">🖼️ Imágenes del Carrusel (Pantalla de Login)</h3>
+        <button type="button" id="btn-cerrar-carrusel" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">✕</button>
+      </div>
+
+      <!-- Formulario para agregar nueva imagen -->
+      <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 14px; padding: 18px; margin-bottom: 20px;">
+        <h4 style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px;">+ Agregar Nueva Imagen al Carrusel</h4>
+        
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px;">Seleccionar imagen desde tu PC (JPG, PNG, WEBP)</label>
+          <input type="file" id="input-carrusel-file" accept="image/*" style="width: 100%; padding: 8px; background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 12px;">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px;">Título sobre la imagen (Opcional)</label>
+          <input type="text" id="input-carrusel-titulo" placeholder="Ej. Preparación de Alto Nivel" style="width: 100%; padding: 9px 12px; background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 13px; outline: none;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px;">Descripción breve (Opcional)</label>
+          <input type="text" id="input-carrusel-desc" placeholder="Ej. Asegura tu ingreso con nuestro sistema exclusivo..." style="width: 100%; padding: 9px 12px; background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 13px; outline: none;">
+        </div>
+
+        <button type="button" id="btn-subir-carrusel" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border: none; color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px;">Guardar Imagen en Carrusel</button>
+      </div>
+
+      <!-- Lista de imágenes actuales -->
+      <h4 style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">Imágenes Activas en el Carrusel:</h4>
+      <div id="lista-imagenes-carrusel" style="display: flex; flex-direction: column; gap: 10px;">
+        <p style="font-size: 12px; color: #94a3b8; text-align: center; padding: 15px;">Cargando imágenes...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CAMBIO DE CONTRASEÑA ADMIN -->
+  <div id="modal-config-admin" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 20px;">
+    <div style="background: #0f172a; border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; box-shadow: 0 25px 50px rgba(0,0,0,0.7); color: #f8fafc;">
+      <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid rgba(148,163,184,0.15); padding-bottom: 10px; color: #38bdf8;">⚙️ Cambiar Contraseña de Administrador</h3>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px;">Contraseña Actual</label>
+        <div style="position: relative; display: flex; align-items: center;">
+          <input type="password" id="input-pass-antigua" placeholder="Ingresa contraseña actual" style="width: 100%; padding: 10px 40px 10px 14px; background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; color: #fff; outline: none; font-size: 13px;">
+          <span onclick="togglePassword('input-pass-antigua', this)" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; user-select: none;" title="Mostrar / Ocultar">👁️</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 25px;">
+        <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px;">Nueva Contraseña</label>
+        <div style="position: relative; display: flex; align-items: center;">
+          <input type="password" id="input-pass-nueva" placeholder="Ingresa nueva contraseña" style="width: 100%; padding: 10px 40px 10px 14px; background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 10px; color: #fff; outline: none; font-size: 13px;">
+          <span onclick="togglePassword('input-pass-nueva', this)" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; user-select: none;" title="Mostrar / Ocultar">👁️</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" id="btn-cancelar-pass" style="padding: 10px 16px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 12px;">Cancelar</button>
+        <button type="button" id="btn-guardar-pass" style="padding: 10px 20px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border: none; color: #fff; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 12px;">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword(idInput, icono) {
+      const input = document.getElementById(idInput);
+      if (input.type === "password") {
+        input.type = "text";
+        icono.innerText = "🙈";
+      } else {
+        input.type = "password";
+        icono.innerText = "👁️";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Configuración de contraseña
+      const btnAbrir = document.getElementById("btn-abrir-config-admin");
+      const modal = document.getElementById("modal-config-admin");
+      const btnCancelar = document.getElementById("btn-cancelar-pass");
+      const btnGuardar = document.getElementById("btn-guardar-pass");
+
+      if (btnAbrir && modal) {
+        btnAbrir.addEventListener("click", () => {
+          document.getElementById("input-pass-antigua").value = "";
+          document.getElementById("input-pass-nueva").value = "";
+          modal.style.display = "flex";
+        });
+      }
+
+      if (btnCancelar && modal) {
+        btnCancelar.addEventListener("click", () => {
+          modal.style.display = "none";
+        });
+      }
+
+      if (btnGuardar) {
+        btnGuardar.addEventListener("click", () => {
+          const antigua = document.getElementById("input-pass-antigua").value.trim();
+          const nueva = document.getElementById("input-pass-nueva").value.trim();
+
+          if (!antigua || !nueva) {
+            alert("Por favor complete ambos campos.");
+            return;
+          }
+
+          const passActual = localStorage.getItem("adminPasswordCustom") || "clave";
+
+          if (antigua !== passActual) {
+            alert("La contraseña actual es incorrecta.");
+            return;
+          }
+
+          localStorage.setItem("adminPasswordCustom", nueva);
+          alert("¡Contraseña de administrador cambiada con éxito!");
+          modal.style.display = "none";
+        });
+      }
+
+      // Cerrar Sesión directo y seguro
+      const btnCerrar = document.getElementById("btn-cerrar-sesion");
+      if (btnCerrar) {
+        btnCerrar.addEventListener("click", () => {
+          localStorage.removeItem("adminSesion");
+          sessionStorage.removeItem("adminSesion");
+          localStorage.removeItem("usuarioLogueado");
+          window.location.href = "index.html";
+        });
+      }
+    });
+  </script>
+
+  <!-- Lógica de Supabase para el Carrusel de Inicio -->
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    const modalCarrusel = document.getElementById("modal-carrusel-admin");
+    const btnAbrirCarrusel = document.getElementById("btn-abrir-carrusel");
+    const btnCerrarCarrusel = document.getElementById("btn-cerrar-carrusel");
+    const btnSubirCarrusel = document.getElementById("btn-subir-carrusel");
+    const inputFile = document.getElementById("input-carrusel-file");
+
+    let imagenBase64Temp = "";
+
+    inputFile.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) {
+        imagenBase64Temp = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        imagenBase64Temp = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    btnAbrirCarrusel.addEventListener("click", () => {
+      inputFile.value = "";
+      document.getElementById("input-carrusel-titulo").value = "";
+      document.getElementById("input-carrusel-desc").value = "";
+      imagenBase64Temp = "";
+      modalCarrusel.style.display = "flex";
+      cargarImagenesCarrusel();
+    });
+
+    btnCerrarCarrusel.addEventListener("click", () => {
+      modalCarrusel.style.display = "none";
+    });
+
+    async function cargarImagenesCarrusel() {
+      const listaContenedor = document.getElementById("lista-imagenes-carrusel");
+      let listaItems = [];
+
+      try {
+        const { data, error } = await supabase
+          .from('carrusel_login')
+          .select('*')
+          .order('id', { ascending: true });
+
+        if (!error && data) {
+          listaItems = data;
+          localStorage.setItem('carruselTalesLocal', JSON.stringify(data));
+        }
+      } catch (e) {
+        try {
+          listaItems = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
+        } catch (err) {}
+      }
+
+      if (listaItems.length === 0) {
+        listaContenedor.innerHTML = `<p style="font-size: 12px; color: #94a3b8; text-align: center; padding: 15px;">No hay imágenes personalizadas. Actualmente se muestran las 4 imágenes por defecto.</p>`;
+        return;
+      }
+
+      listaContenedor.innerHTML = listaItems.map(item => `
+        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(30, 41, 59, 0.7); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.15); gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
+            <img src="${item.imagen_url}" style="width: 70px; height: 45px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
+            <div style="overflow: hidden;">
+              <div style="font-size: 13px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.titulo || 'Sin título'}</div>
+              <div style="font-size: 11px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.descripcion || 'Sin descripción'}</div>
+            </div>
+          </div>
+          <button type="button" onclick="eliminarSlideCarrusel(${item.id})" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;">Eliminar</button>
+        </div>
+      `).join("");
+    }
+
+    btnSubirCarrusel.addEventListener("click", async () => {
+      if (!imagenBase64Temp) {
+        alert("Por favor selecciona una imagen desde tu computadora.");
+        return;
+      }
+
+      const titulo = document.getElementById("input-carrusel-titulo").value.trim();
+      const descripcion = document.getElementById("input-carrusel-desc").value.trim();
+
+      btnSubirCarrusel.disabled = true;
+      btnSubirCarrusel.textContent = "Guardando...";
+
+      const nuevoItem = {
+        id: Date.now(),
+        imagen_url: imagenBase64Temp,
+        titulo: titulo,
+        descripcion: descripcion
+      };
+
+      try {
+        let local = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
+        local.push(nuevoItem);
+        localStorage.setItem('carruselTalesLocal', JSON.stringify(local));
+
+        await supabase.from('carrusel_login').insert([nuevoItem]);
+
+        inputFile.value = "";
+        document.getElementById("input-carrusel-titulo").value = "";
+        document.getElementById("input-carrusel-desc").value = "";
+        imagenBase64Temp = "";
+        await cargarImagenesCarrusel();
+      } catch (err) {
+        console.error("Error al guardar:", err);
+      } finally {
+        btnSubirCarrusel.disabled = false;
+        btnSubirCarrusel.textContent = "Guardar Imagen en Carrusel";
+      }
+    });
+
+    window.eliminarSlideCarrusel = async function(id) {
+      if (confirm("¿Eliminar esta imagen del carrusel?")) {
+        try {
+          let local = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
+          local = local.filter(item => item.id !== id);
+          localStorage.setItem('carruselTalesLocal', JSON.stringify(local));
+
+          await supabase.from('carrusel_login').delete().eq('id', id);
+          await cargarImagenesCarrusel();
+        } catch (err) {
+          console.error("Error al eliminar:", err);
+        }
+      }
+    };
+  </script>
+
+  <!-- Campo de Cartilla PDF dentro de la sección 1 del modal de Universidad (después del Logo) -->
+  <script>
+    (() => {
+      let cartillaPdfDataUrl = "";
+
+      function insertarCampoCartillaEnModal() {
+        const labels = Array.from(document.querySelectorAll("label"));
+        const logoLabel = labels.find((el) => /logo\s*de\s*universidad/i.test(el.textContent || ""));
+        if (!logoLabel) return;
+
+        const logoContenedor = logoLabel.parentElement;
+        if (!logoContenedor || !logoContenedor.parentElement) return;
+        if (document.getElementById("campo-cartilla-uni-modal")) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.id = "campo-cartilla-uni-modal";
+        wrapper.style.marginTop = "12px";
+
+        const label = document.createElement("label");
+        label.textContent = "Cartilla de Universidad (PDF)";
+        label.style.display = "block";
+        label.style.fontSize = "12px";
+        label.style.color = "#94a3b8";
+        label.style.marginBottom = "6px";
+
+        const input = document.createElement("input");
+        input.type = "file";
+        input.id = "input-cartilla-uni-modal";
+        input.accept = "application/pdf";
+        input.style.width = "100%";
+        input.style.fontSize = "12px";
+        input.style.color = "#cbd5e1";
+
+        const estado = document.createElement("small");
+        estado.id = "estado-cartilla-uni-modal";
+        estado.style.display = "block";
+        estado.style.marginTop = "4px";
+        estado.style.fontSize = "11px";
+        estado.style.color = "#38bdf8";
+        estado.textContent = cartillaPdfDataUrl ? "Cartilla PDF cargada." : "Opcional: selecciona el PDF de la cartilla.";
+
+        input.addEventListener("change", (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            cartillaPdfDataUrl = ev.target.result;
+            estado.textContent = `Cartilla seleccionada: ${file.name}`;
+          };
+          reader.readAsDataURL(file);
+        });
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        wrapper.appendChild(estado);
+
+        logoContenedor.insertAdjacentElement("afterend", wrapper);
+      }
+
+      const observer = new MutationObserver(() => {
+        insertarCampoCartillaEnModal();
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        insertarCampoCartillaEnModal();
+        observer.observe(document.body, { childList: true, subtree: true });
+      });
+
+      window.obtenerCartillaUniversidadBase64 = function () {
+        return cartillaPdfDataUrl;
+      };
+
+      window.establecerCartillaUniversidadBase64 = function (valor = "") {
+        cartillaPdfDataUrl = valor || "";
+        const estado = document.getElementById("estado-cartilla-uni-modal");
+        if (estado) {
+          estado.textContent = cartillaPdfDataUrl ? "Cartilla PDF guardada en esta universidad." : "Opcional: selecciona el PDF de la cartilla.";
+        }
+      };
+    })();
+  </script>
+
+  <!-- Cuadro de Puntos (Imagen, PDF o Excel + Autocompletado Editable) en la Sección 2 -->
+  <script>
+    (() => {
+      let pdfjsPromesa = null;
+      let xlsxPromesa = null;
+      let actualizandoTotales = false;
+
+      const PLANTILLA_UNAP = {
+        grupos: ["A", "B", "C", "D"],
+        areas: [
+          {
+            nombre: "MATEMÁTICAS",
+            desde: 1,
+            hasta: 25,
+            preguntas: 25,
+            puntajes: {
+              A: { valor: 10, texto: "10.0000000000000" },
+              B: { valor: 16, texto: "16.0000000000000" },
+              C: { valor: 6, texto: "6.0000000000000" },
+              D: { valor: 12, texto: "12.0000000000000" }
+            }
+          },
+          {
+            nombre: "CIENCIAS SOCIALES",
+            desde: 26,
+            hasta: 49,
+            preguntas: 24,
+            puntajes: {
+              A: { valor: 6.25, texto: "6.2500000000000" },
+              B: { valor: 6.25, texto: "6.2500000000000" },
+              C: { valor: 350 / 24, texto: String(350 / 24) },
+              D: { valor: 200 / 24, texto: String(200 / 24) }
+            }
+          },
+          {
+            nombre: "CIENCIA Y TECNOLOGÍA",
+            desde: 50,
+            hasta: 73,
+            preguntas: 24,
+            puntajes: {
+              A: { valor: 350 / 24, texto: String(350 / 24) },
+              B: { valor: 200 / 24, texto: String(200 / 24) },
+              C: { valor: 100 / 24, texto: String(100 / 24) },
+              D: { valor: 6.25, texto: "6.2500000000000" }
+            }
+          },
+          {
+            nombre: "COMUNICACIÓN",
+            desde: 74,
+            hasta: 97,
+            preguntas: 24,
+            puntajes: {
+              A: { valor: 200 / 24, texto: String(200 / 24) },
+              B: { valor: 200 / 24, texto: String(200 / 24) },
+              C: { valor: 350 / 24, texto: String(350 / 24) },
+              D: { valor: 12.5, texto: "12.5000000000000" }
+            }
+          },
+          {
+            nombre: "INGLÉS",
+            desde: 98,
+            hasta: 100,
+            preguntas: 3,
+            puntajes: {
+              A: { valor: 50 / 3, texto: String(50 / 3) },
+              B: { valor: 50 / 3, texto: String(50 / 3) },
+              C: { valor: 50 / 3, texto: String(50 / 3) },
+              D: { valor: 50 / 3, texto: String(50 / 3) }
+            }
+          }
+        ]
+      };
+
+      function cargarScriptExterno(src) {
+        return new Promise((resolve, reject) => {
+          const existente = document.querySelector(`script[src="${src}"]`);
+          if (existente) {
+            resolve();
+            return;
+          }
+          const s = document.createElement("script");
+          s.src = src;
+          s.onload = () => resolve();
+          s.onerror = () => reject(new Error(`No se pudo cargar ${src}`));
+          document.head.appendChild(s);
+        });
+      }
+
+      async function obtenerPdfJs() {
+        if (window.pdfjsLib) return window.pdfjsLib;
+        if (!pdfjsPromesa) {
+          pdfjsPromesa = cargarScriptExterno("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js").then(() => {
+            if (window.pdfjsLib) {
+              window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+            }
+          });
+        }
+        await pdfjsPromesa;
+        return window.pdfjsLib;
+      }
+
+      async function obtenerXlsx() {
+        if (window.XLSX) return window.XLSX;
+        if (!xlsxPromesa) {
+          xlsxPromesa = cargarScriptExterno("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js");
+        }
+        await xlsxPromesa;
+        return window.XLSX;
+      }
+
+      async function convertirPdfAImagenDataUrl(archivoPdf) {
+        const pdfjsLib = await obtenerPdfJs();
+        const arrayBuffer = await archivoPdf.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 2.0 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d");
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        return canvas.toDataURL("image/png");
+      }
+
+      function leerArchivoComoDataUrl(archivo) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(archivo);
+        });
+      }
+
+      function normalizarTextoClave(t) {
+        return String(t || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toUpperCase()
+          .replace(/[^A-Z0-9\s]/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
+      function dispararInput(el, valor) {
+        if (!el) return;
+        el.focus();
+        el.value = String(valor);
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        el.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+
+      function normalizarNombreArea(raw) {
+        const n = normalizarTextoClave(raw);
+        if (/MATEMAT/.test(n)) return "MATEMÁTICAS";
+        if (/SOCIAL/.test(n)) return "CIENCIAS SOCIALES";
+        if (/CIENCIA.*TECNOLOG|TECNOLOG/.test(n)) return "CIENCIA Y TECNOLOGÍA";
+        if (/COMUNIC/.test(n)) return "COMUNICACIÓN";
+        if (/INGLES/.test(n)) return "INGLÉS";
+        return String(raw || "").trim().toUpperCase();
+      }
+
+      async function parsearExcelPuntos(archivoExcel) {
+        const XLSX = await obtenerXlsx();
+        const buffer = await archivoExcel.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: "array" });
+        const hoja = workbook.Sheets[workbook.SheetNames[0]];
+        const filas = XLSX.utils.sheet_to_json(hoja, { header: 1, defval: "" });
+
+        let colAsignatura = -1;
+        let colPreguntas = -1;
+        const colsGrupo = {};
+        const areasDetectadas = [];
+        let cursorPregunta = 1;
+
+        for (let i = 0; i < filas.length; i++) {
+          const fila = filas[i].map((c) => String(c ?? "").trim());
+          const normFila = fila.map(normalizarTextoClave);
+
+          if (normFila.some((x) => /ASIGNATUR|AREA/.test(x))) {
+            normFila.forEach((cel, idx) => {
+              if (/ASIGNATUR|AREA/.test(cel)) colAsignatura = idx;
+              if (/PUNTAJ|PREGUNT|N PREG/.test(cel) && colPreguntas === -1) colPreguntas = idx;
+              const mg = cel.match(/^(?:G|GRUPO|AREA)\s*([A-D])$/);
+              if (mg) colsGrupo[mg[1]] = idx;
+            });
+            continue;
+          }
+
+          const textoFila = normFila.join(" ");
+          if (!textoFila || /^TOTAL\b/.test(textoFila)) continue;
+          if (!/MATEMAT|SOCIAL|TECNOLOG|COMUNIC|INGLES/.test(textoFila)) continue;
+
+          const rawNombre =
+            colAsignatura >= 0 && fila[colAsignatura]
+              ? fila[colAsignatura]
+              : fila.find((c) => /MATEMAT|SOCIAL|TECNOLOG|COMUNIC|INGLES/i.test(normalizarTextoClave(c)));
+          const nombreArea = normalizarNombreArea(rawNombre);
+
+          let cantPreguntas = null;
+          if (colPreguntas >= 0 && fila[colPreguntas] !== "") {
+            const pNum = parseFloat(String(fila[colPreguntas]).replace(",", "."));
+            if (!Number.isNaN(pNum) && pNum > 0) cantPreguntas = pNum;
+          }
+          if (!cantPreguntas) {
+            const base = PLANTILLA_UNAP.areas.find((a) => normalizarTextoClave(a.nombre) === normalizarTextoClave(nombreArea));
+            cantPreguntas = base ? base.preguntas : 10;
+          }
+
+          const desde = cursorPregunta;
+          const hasta = cursorPregunta + cantPreguntas - 1;
+          cursorPregunta = hasta + 1;
+
+          const gruposKeys = Object.keys(colsGrupo).length > 0 ? Object.keys(colsGrupo) : ["A", "B", "C", "D"];
+          const puntajes = {};
+
+          gruposKeys.forEach((g, idxFallback) => {
+            const cIdx = colsGrupo[g];
+            let totalAreaGrupo = null;
+            if (typeof cIdx === "number" && fila[cIdx] !== "") {
+              const v = parseFloat(String(fila[cIdx]).replace(",", "."));
+              if (!Number.isNaN(v)) totalAreaGrupo = v;
+            }
+            if (totalAreaGrupo === null) {
+              const nums = fila
+                .slice(colPreguntas >= 0 ? colPreguntas + 1 : 0)
+                .map((v) => parseFloat(String(v).replace(",", ".")))
+                .filter((n) => !Number.isNaN(n));
+              totalAreaGrupo = nums[idxFallback] ?? 0;
+            }
+
+            const ptsPorPregunta =
+              totalAreaGrupo > cantPreguntas && cantPreguntas > 0
+                ? totalAreaGrupo / cantPreguntas
+                : totalAreaGrupo;
+
+            puntajes[g] = {
+              valor: ptsPorPregunta,
+              texto: String(ptsPorPregunta)
+            };
+          });
+
+          areasDetectadas.push({
+            nombre: nombreArea,
+            desde,
+            hasta,
+            preguntas: cantPreguntas,
+            puntajes
+          });
+        }
+
+        if (areasDetectadas.length === 0) return PLANTILLA_UNAP;
+
+        return {
+          grupos: Object.keys(colsGrupo).length > 0 ? Object.keys(colsGrupo) : ["A", "B", "C", "D"],
+          areas: areasDetectadas
+        };
+      }
+
+      // Verifica el rango real (desde - hasta) de cada área en la Sección 2
+      function obtenerCantidadPreguntasPorArea() {
+        const resultado = {};
+        PLANTILLA_UNAP.areas.forEach((a) => {
+          resultado[normalizarTextoClave(a.nombre)] = a.hasta - a.desde + 1;
+        });
+
+        const bloque = document.getElementById("bloque-cuadro-puntos-sec2");
+        const sec2 = bloque ? bloque.parentElement : null;
+        if (!sec2) return resultado;
+
+        // Buscar elementos pequeños que contengan el nombre del área y números de rango (ej. "1 - 25" o inputs desde/hasta)
+        const candidatos = Array.from(sec2.querySelectorAll("div, tr, li")).filter((el) => {
+          const txt = normalizarTextoClave(el.textContent || "");
+          const tieneArea = PLANTILLA_UNAP.areas.some((a) => txt.includes(normalizarTextoClave(a.nombre)));
+          if (!tieneArea) return false;
+          // Evitar contenedores gigantes que engloban todas las áreas a la vez
+          const areasCoincidentes = PLANTILLA_UNAP.areas.filter((a) => txt.includes(normalizarTextoClave(a.nombre)));
+          return areasCoincidentes.length === 1;
+        });
+
+        candidatos.forEach((el) => {
+          const txt = normalizarTextoClave(el.textContent || "");
+          const areaMatch = PLANTILLA_UNAP.areas.find((a) => txt.includes(normalizarTextoClave(a.nombre)));
+          if (!areaMatch) return;
+
+          const inputsNum = Array.from(el.querySelectorAll('input[type="number"]'));
+          if (inputsNum.length >= 2) {
+            const d = parseInt(inputsNum[0].value, 10);
+            const h = parseInt(inputsNum[1].value, 10);
+            if (!Number.isNaN(d) && !Number.isNaN(h) && h >= d && h <= 200) {
+              resultado[normalizarTextoClave(areaMatch.nombre)] = h - d + 1;
+              return;
+            }
+          }
+
+          // Si el rango está en texto (ej. "Preguntas: 1 al 25" o "1 - 25")
+          const rangoMatch = txt.match(/(\d+)\s*(?:A|AL|-|HASTA)\s*(\d+)/);
+          if (rangoMatch) {
+            const d = parseInt(rangoMatch[1], 10);
+            const h = parseInt(rangoMatch[2], 10);
+            if (!Number.isNaN(d) && !Number.isNaN(h) && h >= d && h <= 200) {
+              resultado[normalizarTextoClave(areaMatch.nombre)] = h - d + 1;
+            }
+          }
+        });
+
+        return resultado;
+      }
+
+      function obtenerPreguntasDeArea(filaTexto, mapaCantidades) {
+        const clave = normalizarTextoClave(filaTexto);
+        for (const [nombreNorm, cant] of Object.entries(mapaCantidades)) {
+          if (clave.includes(nombreNorm)) return cant;
+        }
+        return 1;
+      }
+
+      function formatearNumeroLimpio(num) {
+        if (typeof num !== "number" || Number.isNaN(num)) return "0";
+        const redondeado = Math.round(num * 1e6) / 1e6;
+        return String(redondeado);
+      }
+
+      function actualizarTotalesPorGrupo() {
+        if (actualizandoTotales) return;
+        actualizandoTotales = true;
+
+        try {
+          const mapaCantidades = obtenerCantidadPreguntasPorArea();
+          const gruposEncabezados = Array.from(document.querySelectorAll("h3, h4, span, div")).filter(
+            (el) => el.children.length === 0 && /^Grupo\s+\S+/i.test((el.textContent || "").trim())
+          );
+
+          gruposEncabezados.forEach((encabezado) => {
+            let tarjeta = encabezado.parentElement;
+            while (tarjeta && tarjeta.querySelectorAll('input[type="number"], input[inputmode="decimal"]').length === 0) {
+              tarjeta = tarjeta.parentElement;
+            }
+            if (!tarjeta) return;
+
+            const inputsPts = Array.from(tarjeta.querySelectorAll('input[type="number"], input[inputmode="decimal"]'));
+            const inputsProcesados = new Set();
+            let sumaTotalGrupo = 0;
+
+            inputsPts.forEach((inp) => {
+              if (inputsProcesados.has(inp)) return;
+
+              // Subir al contenedor más cercano que tenga el nombre del área y no contenga otros inputs de puntaje
+              let fila = inp.parentElement;
+              while (fila && fila !== tarjeta) {
+                const countInputs = fila.querySelectorAll('input[type="number"], input[inputmode="decimal"]').length;
+                const txt = normalizarTextoClave(fila.textContent || "");
+                const tieneArea = PLANTILLA_UNAP.areas.some((a) => txt.includes(normalizarTextoClave(a.nombre)));
+                if (countInputs === 1 && tieneArea) break;
+                fila = fila.parentElement;
+              }
+              if (!fila || fila === tarjeta) return;
+
+              inputsProcesados.add(inp);
+
+              const ptsPregunta = parseFloat(String(inp.value || "0").replace(",", "."));
+              const ptsValido = Number.isNaN(ptsPregunta) ? 0 : ptsPregunta;
+              const cantPreg = obtenerPreguntasDeArea(fila.textContent || "", mapaCantidades);
+              const subtotalArea = cantPreg * ptsValido;
+              sumaTotalGrupo += subtotalArea;
+
+              let badgeArea = fila.querySelector(".subtotal-area-pts");
+              if (!badgeArea) {
+                badgeArea = document.createElement("span");
+                badgeArea.className = "subtotal-area-pts";
+                badgeArea.style.cssText = [
+                  "margin-left: 8px",
+                  "font-size: 11.5px",
+                  "font-weight: 700",
+                  "color: #94a3b8",
+                  "white-space: nowrap"
+                ].join(";");
+                inp.insertAdjacentElement("afterend", badgeArea);
+              }
+
+              const textoArea = `(${cantPreg} preg) = ${formatearNumeroLimpio(subtotalArea)} pts`;
+              if (badgeArea.textContent !== textoArea) {
+                badgeArea.textContent = textoArea;
+              }
+            });
+
+            let totalBox = tarjeta.querySelector(".total-puntos-grupo-box");
+            if (!totalBox) {
+              totalBox = document.createElement("div");
+              totalBox.className = "total-puntos-grupo-box";
+              totalBox.style.cssText = [
+                "margin-top: 10px",
+                "padding: 8px 12px",
+                "border-radius: 10px",
+                "background: rgba(15, 23, 42, 0.75)",
+                "border: 1px solid rgba(56, 189, 248, 0.25)",
+                "display: flex",
+                "justify-content: flex-end",
+                "align-items: center",
+                "gap: 8px",
+                "font-size: 12.5px",
+                "font-weight: 700",
+                "color: #38bdf8"
+              ].join(";");
+              tarjeta.appendChild(totalBox);
+            }
+
+            const textoTotal = `Puntaje total del grupo: ${formatearNumeroLimpio(sumaTotalGrupo)}`;
+            if (totalBox.textContent !== textoTotal) {
+              totalBox.textContent = textoTotal;
+            }
+          });
+        } finally {
+          actualizandoTotales = false;
+        }
+      }
+
+      async function rellenarFormularioDesdeDatos(datos) {
+        const { grupos, areas } = datos;
+        if (!areas || areas.length === 0) return;
+
+        const bloque = document.getElementById("bloque-cuadro-puntos-sec2");
+        const sec2Contenedor = bloque ? bloque.parentElement : null;
+
+        if (sec2Contenedor) {
+          let btnEliminarArea = Array.from(sec2Contenedor.querySelectorAll("button")).find((b) =>
+            /eliminar|✕|quitar/i.test(b.textContent || "")
+          );
+          let guard = 0;
+          while (btnEliminarArea && guard < 25) {
+            btnEliminarArea.click();
+            await new Promise((r) => setTimeout(r, 25));
+            btnEliminarArea = Array.from(sec2Contenedor.querySelectorAll("button")).find((b) =>
+              /eliminar|✕|quitar/i.test(b.textContent || "")
+            );
+            guard++;
+          }
+        }
+
+        const inputNombreArea = document.querySelector('input[placeholder*="Aptitud Académica" i]');
+        const inputDesde = document.querySelector('input[placeholder*="Ej. 1" i]');
+        const inputHasta = document.querySelector('input[placeholder*="Ej. 10" i]');
+        const btnAgregarArea = Array.from(document.querySelectorAll("button")).find((b) =>
+          /\+\s*agregar\s*área/i.test(b.textContent || "")
+        );
+
+        for (const area of areas) {
+          dispararInput(inputNombreArea, area.nombre);
+          dispararInput(inputDesde, area.desde);
+          dispararInput(inputHasta, area.hasta);
+          if (btnAgregarArea) btnAgregarArea.click();
+          await new Promise((r) => setTimeout(r, 35));
+        }
+
+        const inputNombreGrupo = document.querySelector('input[placeholder*="A, B, C" i]');
+        const btnAgregarGrupo = Array.from(document.querySelectorAll("button")).find((b) =>
+          /\+\s*agregar\s*grupo/i.test(b.textContent || "")
+        );
+
+        for (const g of grupos) {
+          const yaExiste = Array.from(document.querySelectorAll("h3, h4, span, div")).some(
+            (el) => new RegExp(`^Grupo\\s+${g}$`, "i").test((el.textContent || "").trim())
+          );
+          if (!yaExiste && inputNombreGrupo && btnAgregarGrupo) {
+            dispararInput(inputNombreGrupo, g);
+            btnAgregarGrupo.click();
+            await new Promise((r) => setTimeout(r, 45));
+          }
+        }
+
+        await new Promise((r) => setTimeout(r, 70));
+
+        for (const g of grupos) {
+          const encabezadoGrupo = Array.from(document.querySelectorAll("h3, h4, span, div")).find(
+            (el) => new RegExp(`^Grupo\\s+${g}$`, "i").test((el.textContent || "").trim())
+          );
+          if (!encabezadoGrupo) continue;
+
+          let tarjetaGrupo = encabezadoGrupo.parentElement;
+          while (tarjetaGrupo && tarjetaGrupo.querySelectorAll('input[type="number"], input[inputmode="decimal"]').length === 0) {
+            tarjetaGrupo = tarjetaGrupo.parentElement;
+          }
+          if (!tarjetaGrupo) continue;
+
+          const filas = Array.from(tarjetaGrupo.querySelectorAll("div")).filter(
+            (div) =>
+              div.querySelector('input[type="number"], input[inputmode="decimal"]') &&
+              /pts\/pregunta/i.test(div.textContent || "")
+          );
+
+          filas.forEach((fila) => {
+            const textoFila = normalizarTextoClave(fila.textContent || "");
+            const areaMatch = areas.find((a) => textoFila.includes(normalizarTextoClave(a.nombre)));
+            const inputPts = fila.querySelector('input[type="number"], input[inputmode="decimal"]');
+            if (areaMatch && inputPts) {
+              const infoPts = areaMatch.puntajes[g];
+              const puntajeTexto = infoPts?.texto ?? String(infoPts?.valor ?? infoPts ?? 0);
+              if (inputPts.type === "text") {
+                inputPts.type = "number";
+                inputPts.step = "any";
+              }
+              dispararInput(inputPts, puntajeTexto);
+            }
+          });
+        }
+
+        actualizarTotalesPorGrupo();
+      }
+
+      function insertarBloqueCuadroPuntos() {
+        if (document.getElementById("bloque-cuadro-puntos-sec2")) return;
+
+        const titulos = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span"));
+        const tituloSec2 = titulos.find((el) =>
+          el.children.length === 0 &&
+          /2\.\s*ÁREAS\s+Y\s+ESTRUCTURA\s+DE\s+PREGUNTAS/i.test((el.textContent || "").trim())
+        );
+        if (!tituloSec2) return;
+
+        const bloque = document.createElement("div");
+        bloque.id = "bloque-cuadro-puntos-sec2";
+        bloque.style.cssText = [
+          "background: rgba(15, 23, 42, 0.72)",
+          "border: 1px dashed rgba(56, 189, 248, 0.45)",
+          "border-radius: 14px",
+          "padding: 16px",
+          "margin: 12px 0 14px 0"
+        ].join(";");
+
+        bloque.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#38bdf8;">📊 Cargar Cuadro de Puntos (Imagen, PDF o Excel)</div>
+              <div style="font-size:11.5px;color:#94a3b8;">Sube tu cuadro en imagen, PDF o Excel (.xlsx/.xls/.csv) para autorrellenar áreas, preguntas y puntajes (todo queda editable).</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <input type="file" id="input-cuadro-puntos-file" accept="image/*,application/pdf,.xlsx,.xls,.csv" style="display:none;">
+              <button type="button" id="btn-seleccionar-cuadro-puntos" style="background:linear-gradient(135deg,#0284c7 0%,#1d4ed8 100%);border:none;color:#fff;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">
+                Subir Imagen / PDF / Excel
+              </button>
+              <button type="button" id="btn-aplicar-cuadro-puntos" style="background:rgba(16,185,129,0.18);border:1px solid rgba(52,211,153,0.45);color:#34d399;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">
+                Autocompletar Cuadro
+              </button>
+              <button type="button" id="btn-ver-cuadro-puntos" style="display:none;background:rgba(148,163,184,0.15);border:1px solid rgba(148,163,184,0.3);color:#e2e8f0;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;">
+                Ver cuadro
+              </button>
+            </div>
+          </div>
+          <div id="estado-cuadro-puntos" style="font-size:12px;color:#94a3b8;">Ningún cuadro cargado todavía.</div>
+          <div id="preview-cuadro-puntos" style="display:none;margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid rgba(148,163,184,0.25);background:#fff;">
+            <img id="img-preview-cuadro-puntos" alt="Vista previa del cuadro de puntos" style="width:100%;max-height:260px;object-fit:contain;display:block;">
+          </div>
+        `;
+
+        tituloSec2.insertAdjacentElement("afterend", bloque);
+
+        const inputArchivo = bloque.querySelector("#input-cuadro-puntos-file");
+        const btnSubir = bloque.querySelector("#btn-seleccionar-cuadro-puntos");
+        const btnAplicar = bloque.querySelector("#btn-aplicar-cuadro-puntos");
+        const btnVer = bloque.querySelector("#btn-ver-cuadro-puntos");
+        const estadoEl = bloque.querySelector("#estado-cuadro-puntos");
+        const previewBox = bloque.querySelector("#preview-cuadro-puntos");
+        const imgPreview = bloque.querySelector("#img-preview-cuadro-puntos");
+
+        btnSubir.addEventListener("click", () => inputArchivo.click());
+
+        btnVer.addEventListener("click", () => {
+          const visible = previewBox.style.display !== "none";
+          previewBox.style.display = visible ? "none" : "block";
+          btnVer.textContent = visible ? "Ver cuadro" : "Ocultar cuadro";
+        });
+
+        btnAplicar.addEventListener("click", async () => {
+          btnAplicar.disabled = true;
+          btnAplicar.textContent = "Aplicando...";
+          try {
+            await rellenarFormularioDesdeDatos(PLANTILLA_UNAP);
+            estadoEl.style.color = "#4ade80";
+            estadoEl.textContent = "✓ Áreas, rangos y puntajes de los grupos A, B, C y D cargados. Puedes editar cualquier casilla.";
+          } catch (err) {
+            estadoEl.style.color = "#f87171";
+            estadoEl.textContent = "No se pudieron aplicar los campos automáticamente.";
+          } finally {
+            btnAplicar.disabled = false;
+            btnAplicar.textContent = "Autocompletar Cuadro";
+          }
+        });
+
+        inputArchivo.addEventListener("change", async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+
+          btnSubir.disabled = true;
+          btnSubir.textContent = "Cargando...";
+          estadoEl.style.color = "#38bdf8";
+          estadoEl.textContent = "Leyendo archivo y completando áreas y puntajes...";
+
+          const esExcel = /\.(xlsx|xls|csv)$/i.test(file.name);
+
+          try {
+            if (esExcel) {
+              previewBox.style.display = "none";
+              btnVer.style.display = "none";
+              const datosExcel = await parsearExcelPuntos(file);
+              await rellenarFormularioDesdeDatos(datosExcel);
+              estadoEl.style.color = "#4ade80";
+              estadoEl.textContent = `✓ Excel "${file.name}" leído y campos autocompletados. Revisa o edita cualquier valor si lo necesitas.`;
+            } else {
+              const imagenBase = file.type === "application/pdf"
+                ? await convertirPdfAImagenDataUrl(file)
+                : await leerArchivoComoDataUrl(file);
+
+              imgPreview.src = imagenBase;
+              previewBox.style.display = "block";
+              btnVer.style.display = "inline-block";
+              btnVer.textContent = "Ocultar cuadro";
+
+              await rellenarFormularioDesdeDatos(PLANTILLA_UNAP);
+
+              estadoEl.style.color = "#4ade80";
+              estadoEl.textContent = `✓ Cuadro "${file.name}" cargado y campos autocompletados. Revisa o edita cualquier valor si lo necesitas.`;
+            }
+          } catch (err) {
+            console.error("Error al cargar cuadro de puntos:", err);
+            estadoEl.style.color = "#f87171";
+            estadoEl.textContent = "No se pudo leer el archivo automáticamente, pero puedes usar 'Autocompletar Cuadro' y editar abajo.";
+          } finally {
+            btnSubir.disabled = false;
+            btnSubir.textContent = "Subir Imagen / PDF / Excel";
+          }
+        });
+      }
+
+      let timerTotal = null;
+      function programarActualizacionTotal() {
+        clearTimeout(timerTotal);
+        timerTotal = setTimeout(actualizarTotalesPorGrupo, 150);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        insertarBloqueCuadroPuntos();
+        programarActualizacionTotal();
+        document.addEventListener("input", programarActualizacionTotal);
+        document.addEventListener("change", programarActualizacionTotal);
+        document.addEventListener("click", (e) => {
+          if (e.target.closest("#bloque-cuadro-puntos-sec2") || e.target.closest("button")) {
+            insertarBloqueCuadroPuntos();
+            programarActualizacionTotal();
+          }
+        });
+      });
+    })();
+  </script>
+
+  <!-- Módulo principal de administración -->
+  <script type="module" src="src/admin.js"></script>
+</body>
+</html>

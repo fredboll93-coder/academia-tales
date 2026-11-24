@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Academia Tales - Plataforma Educativa</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      height: 100vh;
+      background: #020617;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* BARRA SUPERIOR (HEADER) */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 40px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 100px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-logo img {
+      height: 120px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .login-top-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(30, 41, 59, 0.6);
+      padding: 8px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .input-compact {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 12px;
+      width: 130px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-compact:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    #pass-container {
+      display: none;
+      position: relative;
+      align-items: center;
+    }
+
+    #pass-container input {
+      padding-right: 32px;
+      width: 155px;
+    }
+
+    .btn-eye {
+      position: absolute;
+      right: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #94a3b8;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .btn-eye:hover { color: #38bdf8; }
+
+    .btn-compact {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-compact:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transform: translateY(-1px);
+    }
+
+    .btn-compact:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    main {
+      margin-top: 100px;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      height: calc(100vh - 100px);
+    }
+
+    .carousel-container {
+      width: 100%;
+      max-width: 1050px;
+      height: 480px;
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      background: #0f172a;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      display: flex;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .slide-img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 0;
+    }
+
+    .slide-overlay {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 30px 40px;
+      background: linear-gradient(to top, rgba(2, 6, 23, 0.95) 0%, rgba(2, 6, 23, 0.4) 60%, transparent 100%);
+    }
+
+    .slide-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+
+    .slide-desc {
+      font-size: 13px;
+      color: #cbd5e1;
+      max-width: 600px;
+      line-height: 1.4;
+    }
+
+    .dots-container {
+      position: absolute;
+      bottom: 20px;
+      right: 30px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .dot.active {
+      background: #38bdf8;
+      width: 28px;
+      border-radius: 10px;
+    }
+
+    #alerta-top {
+      position: fixed;
+      top: 115px;
+      right: 40px;
+      background: rgba(239, 68, 68, 0.95);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      display: none;
+      z-index: 200;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-logo">
+      <img src="./logo.png" alt="Logo Academia Tales" fetchpriority="high" />
+    </div>
+
+    <div class="login-top-right">
+      <input type="text" id="input-codigo" class="input-compact" placeholder="Código / DNI" autocomplete="off" />
+      
+      <div id="pass-container">
+        <input type="password" id="input-pass" class="input-compact" placeholder="Ingrese su contraseña" />
+        <button type="button" class="btn-eye" id="btn-toggle-pass" onclick="togglePassword()">👁️</button>
+      </div>
+
+      <button type="button" class="btn-compact" id="btn-accion" onclick="procesarIngreso()">Ingresar</button>
+    </div>
+  </header>
+
+  <div id="alerta-top"></div>
+
+  <main>
+    <div class="carousel-container" id="carousel-wrapper">
+      <!-- Carga dinámica -->
+    </div>
+  </main>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    const slidesPorDefecto = [
+      {
+        imagen_url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop',
+        titulo: 'Preparación de Alto Nivel',
+        descripcion: 'Asegura tu ingreso a la universidad con nuestro sistema de preparación exclusiva y simulacros tipo examen de admisión.'
+      },
+      {
+        imagen_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop',
+        titulo: 'Plataforma Digital e Interactiva',
+        descripcion: 'Accede a tus carpetas organizadas por ciclos, grabaciones y recursos educativos en cualquier momento.'
+      },
+      {
+        imagen_url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1600&auto=format&fit=crop',
+        titulo: 'Simulacros y Evaluación Continua',
+        descripcion: 'Mide tu rendimiento en tiempo real con nuestras evaluaciones periódicas diseñadas por especialistas.'
+      },
+      {
+        imagen_url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1600&auto=format&fit=crop',
+        titulo: 'Comunidad Académica Tales',
+        descripcion: 'Aprende junto a los mejores docentes e intégrate a una comunidad enfocada en el éxito profesional.'
+      }
+    ];
+
+    let currentSlide = 0;
+    let totalSlides = 0;
+    let intervaloCarrusel = null;
+
+    async function inicializarCarrusel() {
+      let slidesIniciales = [];
+
+      try {
+        const localSlides = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
+        if (localSlides.length > 0) {
+          slidesIniciales = localSlides;
+        }
+      } catch (e) {}
+
+      if (slidesIniciales.length === 0) {
+        slidesIniciales = slidesPorDefecto;
+      }
+
+      renderizarCarruselUI(slidesIniciales);
+
+      try {
+        const { data, error } = await supabase
+          .from('carrusel_login')
+          .select('*')
+          .order('id', { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          const nuevoJson = JSON.stringify(data);
+          const actualJson = localStorage.getItem('carruselTalesLocal');
+          if (nuevoJson !== actualJson) {
+            localStorage.setItem('carruselTalesLocal', nuevoJson);
+            currentSlide = 0;
+            renderizarCarruselUI(data);
+          }
+        }
+      } catch (e) {}
+    }
+
+    function renderizarCarruselUI(slidesAUsar) {
+      const wrapper = document.getElementById('carousel-wrapper');
+      totalSlides = slidesAUsar.length;
+
+      let htmlSlides = slidesAUsar.map((s, idx) => {
+        const tieneTexto = (s.titulo && s.titulo.trim() !== '') || (s.descripcion && s.descripcion.trim() !== '');
+        const prioridad = idx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="eager"';
+        return `
+          <div class="slide ${idx === 0 ? 'active' : ''}">
+            <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} />
+            ${tieneTexto ? `
+              <div class="slide-overlay">
+                ${s.titulo ? `<div class="slide-title">${s.titulo}</div>` : ''}
+                ${s.descripcion ? `<div class="slide-desc">${s.descripcion}</div>` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      let htmlDots = '';
+      if (totalSlides > 1) {
+        htmlDots = `<div class="dots-container">` + 
+          slidesAUsar.map((_, idx) => `<div class="dot ${idx === 0 ? 'active' : ''}" onclick="irASlide(${idx})"></div>`).join('') +
+        `</div>`;
+      }
+
+      wrapper.innerHTML = htmlSlides + htmlDots;
+
+      if (intervaloCarrusel) clearInterval(intervaloCarrusel);
+      if (totalSlides > 1) {
+        intervaloCarrusel = setInterval(() => {
+          let next = (currentSlide + 1) % totalSlides;
+          window.irASlide(next);
+        }, 4000);
+      }
+    }
+
+    window.irASlide = function(index) {
+      const slides = document.querySelectorAll('.slide');
+      const dots = document.querySelectorAll('.dot');
+      if (!slides.length) return;
+
+      slides[currentSlide].classList.remove('active');
+      if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+      
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+    };
+
+    inicializarCarrusel();
+
+    // --- LOGIN CONECTADO A SUPABASE ---
+    const inputCodigo = document.getElementById('input-codigo');
+    const passContainer = document.getElementById('pass-container');
+    const inputPass = document.getElementById('input-pass');
+    const btnAccion = document.getElementById('btn-accion');
+
+    let universidadesCache = [];
+    let simulacrosCache = [];
+    let debounceTimer = null;
+
+    function mostrarAlerta(msj) {
+      const box = document.getElementById('alerta-top');
+      box.textContent = msj;
+      box.style.display = 'block';
+      setTimeout(() => { box.style.display = 'none'; }, 4500);
+    }
+
+    window.togglePassword = function() {
+      const btnEye = document.getElementById('btn-toggle-pass');
+      if (inputPass.type === 'password') {
+        inputPass.type = 'text';
+        btnEye.textContent = '🙈';
+      } else {
+        inputPass.type = 'password';
+        btnEye.textContent = '👁️';
+      }
+    };
+
+    async function cargarDatosSupabase(forzar = false) {
+      if (!forzar && (universidadesCache.length > 0 || simulacrosCache.length > 0)) {
+        return { universidades: universidadesCache, simulacros: simulacrosCache };
+      }
+
+      try {
+        const [resUnis, resSims] = await Promise.all([
+          supabase.from('universidades').select('*'),
+          supabase.from('simulacros').select('id, titulo, universidad_siglas, alumnos')
+        ]);
+
+        if (!resUnis.error && Array.isArray(resUnis.data) && resUnis.data.length > 0) {
+          universidadesCache = resUnis.data;
+        }
+        if (!resSims.error && Array.isArray(resSims.data) && resSims.data.length > 0) {
+          simulacrosCache = resSims.data;
+        }
+      } catch (e) {
+        console.error('Error consultando Supabase en login:', e);
+      }
+
+      return { universidades: universidadesCache, simulacros: simulacrosCache };
+    }
+
+    cargarDatosSupabase();
+
+    function extraerCodigoAlumno(alu) {
+      if (!alu) return '';
+      if (typeof alu === 'string' || typeof alu === 'number') {
+        return String(alu).trim().toLowerCase();
+      }
+      return String(alu.codigo || alu.dni || alu.id || '').trim().toLowerCase();
+    }
+
+    function buscarAlumnoEnUniversidades(codigoBuscado, listaUniversidades) {
+      const codLim = String(codigoBuscado).trim().toLowerCase();
+      if (!codLim) return null;
+
+      const universidadesEncontradas = [];
+      let alumnoEncontrado = null;
+      let alumnoIndex = -1;
+
+      for (const uni of listaUniversidades) {
+        if (!uni || !Array.isArray(uni.alumnos)) continue;
+        const idx = uni.alumnos.findIndex(a => extraerCodigoAlumno(a) === codLim);
+        if (idx !== -1) {
+          const aluObj = uni.alumnos[idx];
+          if (!alumnoEncontrado) {
+            alumnoEncontrado = typeof aluObj === 'object' ? { ...aluObj } : { codigo: codigoBuscado };
+            alumnoIndex = idx;
+          }
+          universidadesEncontradas.push({
+            uniId: uni.id,
+            siglas: uni.siglas || uni.nombre || '',
+            nombre: uni.nombre || uni.siglas || '',
+            alumno: aluObj
+          });
+        }
+      }
+
+      if (!alumnoEncontrado) return null;
+
+      const passLocal = localStorage.getItem(`passAlumno_${codLim}`) || '';
+      const passwordActual = alumnoEncontrado.password || alumnoEncontrado.contrasena || passLocal || '';
+
+      return {
+        alumno: alumnoEncontrado,
+        alumnoIndex,
+        universidades: universidadesEncontradas,
+        tienePassword: Boolean(String(passwordActual).trim()),
+        passwordActual: String(passwordActual).trim()
+      };
+    }
+
+    function buscarAlumnoEnSimulacros(codigoBuscado, listaSimulacros) {
+      const codLim = String(codigoBuscado).trim().toLowerCase();
+      if (!codLim) return null;
+
+      const simulacrosHabilitados = [];
+
+      for (const sim of listaSimulacros) {
+        if (!sim) continue;
+        let lista = sim.alumnos || sim.alumnosHabilitados || sim.habilitados || sim.codigos || [];
+
+        if (typeof lista === 'string') {
+          lista = lista.split(/[\n,;]+/).map(c => c.trim().toLowerCase());
+        }
+
+        if (Array.isArray(lista)) {
+          const match = lista.find(item => {
+            if (!item) return false;
+            if (typeof item === 'object') {
+              if (item.activo === false || item.habilitado === false) return false;
+              return extraerCodigoAlumno(item) === codLim;
+            }
+            return String(item).trim().toLowerCase() === codLim;
+          });
+
+          if (match) {
+            simulacrosHabilitados.push({
+              id: sim.id,
+              titulo: sim.titulo || 'Simulacro',
+              universidad_siglas: sim.universidad_siglas || ''
+            });
+          }
+        }
+      }
+
+      if (simulacrosHabilitados.length === 0) return null;
+
+      return {
+        codigo: codigoBuscado,
+        simulacros: simulacrosHabilitados,
+        universidadPermitida: simulacrosHabilitados[0].universidad_siglas || ''
+      };
+    }
+
+    async function evaluarEstadoCampoPassword(codigoVal) {
+      const val = String(codigoVal || '').trim();
+
+      if (!val) {
+        passContainer.style.display = 'none';
+        inputPass.value = '';
+        inputPass.placeholder = 'Ingrese su contraseña';
+        btnAccion.textContent = 'Ingresar';
+        return;
+      }
+
+      if (val === '48177869') {
+        passContainer.style.display = 'flex';
+        inputPass.placeholder = 'Ingrese su contraseña';
+        btnAccion.textContent = 'Ingresar';
+        return;
+      }
+
+      const { universidades, simulacros } = await cargarDatosSupabase();
+
+      if (inputCodigo.value.trim() !== val) return;
+
+      const casoUni = buscarAlumnoEnUniversidades(val, universidades);
+      if (casoUni) {
+        passContainer.style.display = 'flex';
+        if (!casoUni.tienePassword) {
+          inputPass.placeholder = 'Crear contraseña';
+          btnAccion.textContent = 'Crear y Entrar';
+        } else {
+          inputPass.placeholder = 'Ingrese su contraseña';
+          btnAccion.textContent = 'Ingresar';
+        }
+        return;
+      }
+
+      const casoSim = buscarAlumnoEnSimulacros(val, simulacros);
+      if (casoSim) {
+        passContainer.style.display = 'none';
+        inputPass.value = '';
+        btnAccion.textContent = 'Ingresar';
+        return;
+      }
+
+      passContainer.style.display = 'none';
+      inputPass.value = '';
+      inputPass.placeholder = 'Ingrese su contraseña';
+      btnAccion.textContent = 'Ingresar';
+    }
+
+    inputCodigo.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (val === '48177869') {
+        passContainer.style.display = 'flex';
+        inputPass.placeholder = 'Ingrese su contraseña';
+        btnAccion.textContent = 'Ingresar';
+        return;
+      }
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        evaluarEstadoCampoPassword(val);
+      }, 100);
+    });
+
+    function manejarEnterIngreso(e) {
+      if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        if (!btnAccion.disabled) {
+          window.procesarIngreso();
+        }
+      }
+    }
+
+    inputPass.addEventListener('keydown', manejarEnterIngreso);
+    inputCodigo.addEventListener('keydown', manejarEnterIngreso);
+
+    window.procesarIngreso = async function() {
+      const codigo = inputCodigo.value.trim();
+      const pass = inputPass.value.trim();
+
+      if (!codigo) {
+        return mostrarAlerta('Ingrese su código o DNI.');
+      }
+
+      if (codigo === '48177869') {
+        const adminPassActual = localStorage.getItem('adminPasswordCustom') || 'clave';
+        if (pass !== adminPassActual) {
+          return mostrarAlerta('Contraseña de administrador incorrecta.');
+        }
+        sessionStorage.setItem('adminSesion', 'true');
+        localStorage.setItem('adminSesion', 'true');
+        window.location.href = 'admin.html';
+        return;
+      }
+
+      btnAccion.disabled = true;
+      const textoOriginalBtn = btnAccion.textContent;
+      btnAccion.textContent = 'Verificando...';
+
+      try {
+        const { universidades, simulacros } = await cargarDatosSupabase(true);
+
+        const casoUni = buscarAlumnoEnUniversidades(codigo, universidades);
+        if (casoUni) {
+          if (casoUni.alumno.habilitado === false || casoUni.alumno.activo === false) {
+            return mostrarAlerta('Su cuenta se encuentra deshabilitada.');
+          }
+
+          if (!casoUni.tienePassword) {
+            if (!pass) {
+              passContainer.style.display = 'flex';
+              inputPass.placeholder = 'Crear contraseña';
+              btnAccion.textContent = 'Crear y Entrar';
+              inputPass.focus();
+              return mostrarAlerta('Es su primera vez ingresando. Cree su contraseña para continuar.');
+            }
+
+            const codKey = codigo.toLowerCase();
+            localStorage.setItem(`passAlumno_${codKey}`, pass);
+            casoUni.alumno.password = pass;
+
+            for (const itemUni of casoUni.universidades) {
+              const uniObj = universidades.find(u => u.id === itemUni.uniId);
+              if (uniObj && Array.isArray(uniObj.alumnos)) {
+                const alumnosActualizados = uniObj.alumnos.map(a => {
+                  if (extraerCodigoAlumno(a) === codKey && typeof a === 'object') {
+                    return { ...a, password: pass };
+                  }
+                  return a;
+                });
+                await supabase
+                  .from('universidades')
+                  .update({ alumnos: alumnosActualizados })
+                  .eq('id', uniObj.id);
+              }
+            }
+          } else {
+            if (!pass) {
+              passContainer.style.display = 'flex';
+              inputPass.placeholder = 'Ingrese su contraseña';
+              inputPass.focus();
+              return mostrarAlerta('Ingrese su contraseña.');
+            }
+            if (pass !== casoUni.passwordActual) {
+              return mostrarAlerta('Contraseña incorrecta.');
+            }
+          }
+
+          const siglasUnis = casoUni.universidades.map(u => u.siglas).filter(Boolean);
+          sessionStorage.setItem('alumnoSesion', JSON.stringify({
+            ...casoUni.alumno,
+            codigo: codigo,
+            universidades: siglasUnis
+          }));
+          sessionStorage.setItem('uniActual', siglasUnis[0] || '');
+          sessionStorage.setItem('alumnoCodigo', codigo);
+          window.location.href = 'estudiante.html';
+          return;
+        }
+
+        const casoSim = buscarAlumnoEnSimulacros(codigo, simulacros);
+        if (casoSim) {
+          sessionStorage.setItem('alumnoSesion', JSON.stringify({
+            codigo: codigo,
+            soloSimulacros: true,
+            universidadPermitida: casoSim.universidadPermitida,
+            simulacrosHabilitados: casoSim.simulacros
+          }));
+          sessionStorage.setItem('alumnoCodigo', codigo);
+          window.location.href = 'estudiante.html';
+          return;
+        }
+
+        return mostrarAlerta('No estás habilitado para ingresar. Comunícate con la Academia TALES al 990 259 827 para tu matrícula o habilitación de simulacro.');
+      } catch (err) {
+        console.error('Error al procesar ingreso:', err);
+        mostrarAlerta('Ocurrió un error al verificar sus datos en la base de datos.');
+      } finally {
+        btnAccion.disabled = false;
+        btnAccion.textContent = textoOriginalBtn === 'Verificando...' ? 'Ingresar' : textoOriginalBtn;
+      }
+    };
+  </script>
+</body>
+</html>

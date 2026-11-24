@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Simulacros - Academia Tales</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.7) 0%, rgba(10, 15, 30, 0.9) 100%), 
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .top-bar {
+      background: rgba(11, 18, 32, 0.85);
+      border: 3px solid rgba(148, 163, 184, 0.15);
+      border-top: 3px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 12px 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .main-card {
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-top: 2px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(148, 163, 184, 0.2);
+    }
+
+    .simulacro-item {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      transition: border-color 0.2s;
+    }
+
+    .simulacro-item:hover {
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Barra Superior -->
+    <div class="top-bar">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="logo.png" alt="Logo" style="width: 70px; height: 70px; object-fit: contain;">
+        <div>
+          <h2 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: #f8fafc;">Panel de Universidad</h2>
+          <p style="margin: 0; font-size: 13px; color: #94a3b8;">Academia Tales • Simulacros (<span id="uni-siglas-title"></span>)</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <button type="button" id="btn-clases" class="btn-secondary">🎥 Clases Grabadas</button>
+        <button type="button" id="btn-materiales" class="btn-secondary">📁 Materiales</button>
+        <button type="button" id="btn-volver" class="btn-secondary">← Volver</button>
+        <button type="button" id="btn-cerrar-sesion" class="btn-secondary" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="main-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <div>
+          <h1 style="font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 5px;">Lista de Simulacros</h1>
+          <p style="font-size: 13px; color: #94a3b8;">Administra los exámenes de admisión creados para esta institución.</p>
+        </div>
+        <button type="button" id="btn-crear" class="btn-primary">+ Crear Nuevo Simulacro</button>
+      </div>
+
+      <div id="lista-simulacros-container">
+        <!-- Se cargan dinámicamente -->
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const siglas = urlParams.get('siglas') || 'UNAP';
+    const cacheKey = `tales_admin_sims_${String(siglas).trim().toLowerCase()}`;
+    let simulacrosCargados = [];
+
+    document.getElementById('uni-siglas-title').textContent = siglas;
+    
+    // Botón Crear simulacro corregido a crear-simulacro.html
+    document.getElementById('btn-crear').onclick = (e) => {
+      e.preventDefault();
+      window.location.href = `crear-simulacro.html?siglas=${siglas}`;
+    };
+
+    // Botones de atajos superiores
+    document.getElementById('btn-clases').onclick = () => {
+      window.location.href = `clases-grabadas.html?siglas=${siglas}`;
+    };
+
+    document.getElementById('btn-materiales').onclick = () => {
+      window.location.href = `materiales.html?siglas=${siglas}`;
+    };
+
+    // Botón Volver -> Redirige a universidad.html con las siglas correspondientes
+    document.getElementById('btn-volver').onclick = () => {
+      window.location.href = `universidad.html?siglas=${siglas}`;
+    };
+
+    // Botón Cerrar Sesión -> Limpia credenciales y sale al index.html
+    document.getElementById('btn-cerrar-sesion').onclick = () => {
+      localStorage.removeItem("adminSesion");
+      sessionStorage.removeItem("adminSesion");
+      localStorage.removeItem("usuarioLogueado");
+      sessionStorage.removeItem("usuarioLogueado");
+      window.location.href = "index.html";
+    };
+
+    function escapeHtml(texto) {
+      return String(texto ?? '').replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    function obtenerListaAreas(sim, alumnos) {
+      const areasSet = [];
+      const vistos = new Set();
+
+      const agregarArea = (nombre) => {
+        const limp = String(nombre || '').trim();
+        if (!limp) return;
+        const clave = limp.toLowerCase();
+        if (!vistos.has(clave)) {
+          vistos.add(clave);
+          areasSet.push(limp);
+        }
+      };
+
+      if (Array.isArray(sim?.areas)) {
+        sim.areas.forEach((a, idx) => agregarArea(a?.nombre || `ÁREA ${idx + 1}`));
+      }
+
+      (Array.isArray(alumnos) ? alumnos : []).forEach((alu) => {
+        const mapa = alu?.correctasPorArea || alu?.areasCorrectas;
+        if (mapa && typeof mapa === 'object') {
+          Object.keys(mapa).forEach(agregarArea);
+        }
+      });
+
+      if (areasSet.length === 0) {
+        return ['MATEMÁTICAS', 'C. SOCIALES', 'C. Y TECNOLOGÍA', 'COMUNICACIÓN', 'INGLÉS'];
+      }
+      return areasSet;
+    }
+
+    function obtenerCorrectaEnArea(alumno, sim, nombreArea, listaResp, claves) {
+      const buscarEnMapa = (mapa) => {
+        if (!mapa || typeof mapa !== 'object') return undefined;
+        if (mapa[nombreArea] !== undefined) return mapa[nombreArea];
+        const target = String(nombreArea).trim().toLowerCase();
+        for (const [k, v] of Object.entries(mapa)) {
+          if (String(k).trim().toLowerCase() === target) return v;
+        }
+        return undefined;
+      };
+
+      const desdeMapa = buscarEnMapa(alumno?.correctasPorArea) ?? buscarEnMapa(alumno?.areasCorrectas);
+      if (desdeMapa !== undefined && desdeMapa !== null && desdeMapa !== '') {
+        return desdeMapa;
+      }
+
+      const areasArr = Array.isArray(sim?.areas) ? sim.areas : [];
+      const areaObj = areasArr.find(a => String(a?.nombre || '').trim().toLowerCase() === String(nombreArea).trim().toLowerCase());
+      if (areaObj && claves && listaResp) {
+        const desde = Math.max(1, parseInt(areaObj.desde ?? areaObj.inicio ?? 1, 10) || 1);
+        const hasta = Math.max(desde, parseInt(areaObj.hasta ?? areaObj.fin ?? desde, 10) || desde);
+        let correctas = 0;
+        for (let p = desde; p <= hasta; p++) {
+          const marca = listaResp[p - 1] || '';
+          const clave = claves[p - 1] || '';
+          if (marca && clave && marca === clave) {
+            correctas++;
+          }
+        }
+        return correctas;
+      }
+
+      return 0;
+    }
+
+    function obtenerTotalResueltas(alumno, sim) {
+      if (typeof alumno?.preguntasResueltas === 'number') return alumno.preguntasResueltas;
+      if (typeof alumno?.totalResueltas === 'number') return alumno.totalResueltas;
+      if (typeof alumno?.resueltas === 'number') return alumno.resueltas;
+
+      const resp = alumno?.respuestas;
+      if (Array.isArray(resp)) {
+        return resp.filter(r => r !== null && r !== undefined && String(r).trim() !== '').length;
+      }
+      if (typeof resp === 'string' && resp.trim() !== '') {
+        return resp.trim().split('').filter(r => r.trim() !== '' && r.trim() !== '-').length;
+      }
+
+      const correctas = Number(alumno?.correctas ?? alumno?.aciertos ?? 0) || 0;
+      const incorrectas = Number(alumno?.incorrectas ?? alumno?.errores ?? 0) || 0;
+      if (correctas > 0 || incorrectas > 0) return correctas + incorrectas;
+
+      return sim?.preguntas ? '—' : 0;
+    }
+
+    function obtenerPuntajeFinal(alumno) {
+      const val = alumno?.puntaje ?? alumno?.puntajeFinal ?? alumno?.puntaje_final ?? alumno?.nota;
+      if (typeof val === 'number' && !Number.isNaN(val)) return val.toFixed(7);
+      if (val !== undefined && val !== null && String(val).trim() !== '') {
+        const num = Number(val);
+        return !Number.isNaN(num) ? num.toFixed(7) : String(val);
+      }
+      return (0).toFixed(7);
+    }
+
+    window.verListaSimulacro = function(id) {
+      const sim = simulacrosCargados.find(s => String(s.id) === String(id));
+      if (!sim) {
+        alert('No se encontró la información del simulacro.');
+        return;
+      }
+
+      const alumnosRaw = Array.isArray(sim.alumnos) ? sim.alumnos : [];
+      const alumnosQueDieron = alumnosRaw.filter(a => {
+        if (!a || typeof a !== 'object') return false;
+        const tienePuntaje = a.puntaje !== undefined && a.puntaje !== null && a.puntaje !== '';
+        const tieneRespuestas = Array.isArray(a.respuestas)
+          ? a.respuestas.some(r => r !== null && r !== undefined && String(r).trim() !== '')
+          : (typeof a.respuestas === 'string' && a.respuestas.trim() !== '');
+        return Boolean(a.rindio === true || a.finalizado === true || a.fecha_envio || tienePuntaje || tieneRespuestas);
+      });
+
+      const areasColumnas = obtenerListaAreas(sim, alumnosQueDieron);
+      const claves = String(sim?.claves || '').trim().toUpperCase();
+
+      const gruposKeys = sim?.grupos && typeof sim.grupos === 'object' ? Object.keys(sim.grupos) : [];
+      const etiquetaGrupos = gruposKeys.length > 0
+        ? `GRUPOS ${gruposKeys.map(g => String(g).toUpperCase()).join(' - ')}`
+        : 'GRUPOS A - B - C - D';
+
+      const thAreasHtml = areasColumnas
+        .map(area => `<th class="col-area">${escapeHtml(String(area).toUpperCase())}</th>`)
+        .join('');
+
+      const filasHtml = alumnosQueDieron.length > 0
+        ? alumnosQueDieron.map((alu) => {
+            const dni = escapeHtml(alu.codigo || alu.dni || alu.id || '—');
+            const nombres = escapeHtml(alu.nombres || alu.nombre || alu.apellidosYnombres || alu.nombreAlumno || '—');
+            const facultad = escapeHtml(alu.carrera || alu.especialidad || '—');
+            const listaResp = Array.isArray(alu?.respuestas)
+              ? alu.respuestas.map(r => String(r ?? '').trim().toUpperCase())
+              : (typeof alu?.respuestas === 'string' ? alu.respuestas.trim().toUpperCase().split('') : null);
+
+            const celdasAreas = areasColumnas.map((area) => {
+              const cant = obtenerCorrectaEnArea(alu, sim, area, listaResp, claves);
+              return `<td class="num-cell">${escapeHtml(cant)}</td>`;
+            }).join('');
+
+            const resueltas = escapeHtml(obtenerTotalResueltas(alu, sim));
+            const puntajeFinal = escapeHtml(obtenerPuntajeFinal(alu));
+
+            return `
+              <tr>
+                <td class="dni-cell">${dni}</td>
+                <td class="nom-cell">${nombres}</td>
+                <td class="fac-cell">${facultad}</td>
+                ${celdasAreas}
+                <td class="num-cell">${resueltas}</td>
+                <td class="pts-cell">${puntajeFinal}</td>
+              </tr>
+            `;
+          }).join('')
+        : `<tr><td colspan="${5 + areasColumnas.length}" style="text-align:center;padding:18px;color:#475569;">Ningún alumno ha rendido este simulacro aún.</td></tr>`;
+
+      const ventana = window.open('', '_blank', 'width=1200,height=760');
+      if (!ventana) {
+        alert('Permite las ventanas emergentes en tu navegador para ver y descargar la lista en PDF.');
+        return;
+      }
+
+      const tituloSim = escapeHtml((sim.titulo || 'SIMULACRO').toUpperCase());
+      const siglasSim = escapeHtml(String(siglas).toUpperCase());
+      const fechaHoy = new Date().toLocaleDateString('es-PE', {
+        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+      }).toUpperCase();
+
+      ventana.document.write(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Resultados - ${tituloSim} (${siglasSim})</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+              font-family: Calibri, Arial, Helvetica, sans-serif;
+              color: #000000;
+              background: #ffffff;
+              padding: 24px 28px;
+            }
+            .top-actions {
+              display: flex;
+              justify-content: flex-end;
+              margin-bottom: 10px;
+            }
+            .btn-pdf {
+              background: #1d4ed8;
+              color: #ffffff;
+              border: none;
+              padding: 8px 16px;
+              border-radius: 6px;
+              font-size: 13px;
+              font-weight: 700;
+              cursor: pointer;
+            }
+            .btn-pdf:hover { background: #1e40af; }
+            .doc-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+              gap: 16px;
+              margin-bottom: 12px;
+            }
+            .doc-title-main {
+              font-size: 13.5px;
+              font-weight: 700;
+              line-height: 1.35;
+              letter-spacing: 0.2px;
+            }
+            .doc-date {
+              font-size: 11.5px;
+              font-weight: 700;
+              white-space: nowrap;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 11px;
+            }
+            th, td {
+              border: 1px solid #000000;
+              padding: 4px 6px;
+              line-height: 1.25;
+            }
+            .grp-header {
+              font-weight: 700;
+              text-align: left;
+              background: #ffffff;
+            }
+            .area-group-header {
+              font-weight: 700;
+              text-align: center;
+              background: #ffffff;
+            }
+            .sub-header th {
+              font-weight: 700;
+              text-align: center;
+              background: #ffffff;
+            }
+            .sub-header th.left-head {
+              text-align: left;
+            }
+            .dni-cell {
+              text-align: left;
+              white-space: nowrap;
+            }
+            .nom-cell {
+              text-align: left;
+              white-space: nowrap;
+            }
+            .fac-cell {
+              text-align: center;
+            }
+            .num-cell {
+              text-align: center;
+              white-space: nowrap;
+            }
+            .pts-cell {
+              text-align: right;
+              font-variant-numeric: tabular-nums;
+              white-space: nowrap;
+            }
+            @media print {
+              .no-print { display: none !important; }
+              body { padding: 10px 14px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="top-actions no-print">
+            <button type="button" class="btn-pdf" onclick="window.print()">Descargar PDF</button>
+          </div>
+          <div class="doc-header">
+            <div class="doc-title-main">
+              <div>ACADEMIA PRE UNIVERSITARIA TALES</div>
+              <div>RESULTADOS DE ${tituloSim} — ${siglasSim}</div>
+            </div>
+            <div class="doc-date">${escapeHtml(fechaHoy)}</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th colspan="3" class="grp-header">${escapeHtml(etiquetaGrupos)}</th>
+                <th colspan="${areasColumnas.length}" class="area-group-header">N° DE PREGUNTAS CORRECTAS POR ÁREA</th>
+                <th class="area-group-header">N° PREGUNTAS RESUELTAS</th>
+                <th class="area-group-header">PUNTAJE</th>
+              </tr>
+              <tr class="sub-header">
+                <th class="left-head">D.N.I</th>
+                <th class="left-head">APELLIDOS Y NOMBRES</th>
+                <th>FACULTAD</th>
+                ${thAreasHtml}
+                <th>TOTAL</th>
+                <th>FINAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filasHtml}
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `);
+      ventana.document.close();
+    };
+
+    function pintarSimulacros(simulacros) {
+      simulacrosCargados = Array.isArray(simulacros) ? simulacros : [];
+      const container = document.getElementById('lista-simulacros-container');
+      container.innerHTML = '';
+
+      if (!simulacros || simulacros.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+            <p style="font-size: 15px; margin-bottom: 10px;">Aún no hay ningún simulacro creado.</p>
+            <button type="button" onclick="window.location.href='crear-simulacro.html?siglas=${siglas}'" style="background: none; border: none; color: #60a5fa; font-size: 14px; text-decoration: underline; cursor: pointer;">Crea tu primer simulacro aquí</button>
+          </div>
+        `;
+        return;
+      }
+
+      const ordenados = [...simulacros].sort((a, b) => {
+        const idA = Number(a.id);
+        const idB = Number(b.id);
+        if (!Number.isNaN(idA) && !Number.isNaN(idB) && idA !== idB) {
+          return idA - idB;
+        }
+        const timeA = a.creado_en ? new Date(a.creado_en).getTime() : 0;
+        const timeB = b.creado_en ? new Date(b.creado_en).getTime() : 0;
+        return timeA - timeB;
+      });
+
+      ordenados.forEach((sim) => {
+        container.innerHTML += `
+          <div class="simulacro-item">
+            <div>
+              <h3 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px;">${sim.titulo || 'Simulacro sin nombre'}</h3>
+              <p style="font-size: 13px; color: #94a3b8;">Preguntas: ${sim.preguntas || 0} • Duración: ${sim.duracion || 0} min • Alternativas: ${sim.alternativas || 'ABCDE'}</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button type="button" class="btn-secondary" onclick="verListaSimulacro(${sim.id})">Ver lista</button>
+              <button type="button" class="btn-secondary" onclick="window.location.href='crear-simulacro.html?siglas=${siglas}&edit=${sim.id}'">Editar</button>
+              <button type="button" class="btn-secondary" style="color: #f87171; border-color: rgba(239,68,68,0.3);" onclick="eliminarSimulacro(${sim.id})">Eliminar</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    async function cargarSimulacros() {
+      const container = document.getElementById('lista-simulacros-container');
+      let cachedSims = null;
+      try {
+        cachedSims = JSON.parse(sessionStorage.getItem(cacheKey) || 'null');
+      } catch (e) {}
+
+      if (Array.isArray(cachedSims)) {
+        pintarSimulacros(cachedSims);
+      } else {
+        container.innerHTML = '';
+      }
+
+      try {
+        const { data: simulacros, error } = await supabase
+          .from('simulacros')
+          .select('id, titulo, preguntas, duracion, alternativas, creado_en, alumnos, areas, grupos, claves, punto_en_contra')
+          .ilike('universidad_siglas', siglas)
+          .order('id', { ascending: true });
+
+        if (error) throw error;
+
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify(simulacros || []));
+        } catch (e) {}
+
+        pintarSimulacros(simulacros || []);
+
+      } catch (e) {
+        console.error("Error al cargar simulacros:", e);
+        if (!Array.isArray(cachedSims)) {
+          container.innerHTML = `<p style="text-align: center; color: #f87171; padding: 20px;">Error al conectar con la base de datos.</p>`;
+        }
+      }
+    }
+
+    window.eliminarSimulacro = async function(id) {
+      if (!confirm('¿Estás seguro de eliminar este simulacro de la base de datos?')) return;
+      
+      try {
+        const { error } = await supabase
+          .from('simulacros')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+
+        sessionStorage.removeItem(cacheKey);
+        cargarSimulacros();
+        alert('Simulacro eliminado correctamente.');
+      } catch (e) {
+        console.error("Error al eliminar:", e);
+        alert('Hubo un error al intentar eliminar el simulacro.');
+      }
+    }
+
+    cargarSimulacros();
+  </script>
+</body>
+</html>

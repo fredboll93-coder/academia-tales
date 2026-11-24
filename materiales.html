@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materiales de Estudio - Academia Tales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background: #020617;
+      color: #f8fafc;
+      min-height: 100vh;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    /* HEADER SUPERIOR */
+    .header-panel {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .brand-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .brand-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+    }
+
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-action-nav {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-volver {
+      background: rgba(148, 163, 184, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .btn-volver:hover {
+      background: rgba(148, 163, 184, 0.2);
+      color: #fff;
+    }
+
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    /* CARD CONTENEDOR PRINCIPAL */
+    .main-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .left-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .crumb-link {
+      cursor: pointer;
+      color: #94a3b8;
+      transition: color 0.2s;
+    }
+
+    .crumb-link:hover {
+      color: #38bdf8;
+    }
+
+    /* SELECTOR DE VISTA (CUADRÍCULA / LISTA) */
+    .view-toggle-box {
+      display: flex;
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .btn-view-toggle {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-view-toggle.active {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .btn-primary-add {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+    }
+
+    /* VISTA DE CUADRÍCULA (GRID) */
+    .grid-items.view-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .view-grid .item-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .view-grid .item-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      transform: translateY(-3px);
+    }
+
+    .view-grid .item-card.oculto {
+      opacity: 0.45;
+      border-style: dashed;
+    }
+
+    .view-grid .item-icon {
+      font-size: 44px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .view-grid .item-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 15px;
+      word-break: break-word;
+      cursor: pointer;
+    }
+
+    .view-grid .item-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: auto;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    /* VISTA DE LISTA (LIST) */
+    .grid-items.view-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .view-list .item-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 12px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+
+    .view-list .item-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(30, 41, 59, 0.95);
+    }
+
+    .view-list .item-card.oculto {
+      opacity: 0.45;
+      border-style: dashed;
+    }
+
+    .view-list .item-main-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .view-list .item-icon {
+      font-size: 26px;
+    }
+
+    .view-list .item-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .view-list .item-actions {
+      display: flex;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .badge-oculto {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .view-list .badge-oculto {
+      margin-bottom: 0;
+      margin-left: 10px;
+    }
+
+    .btn-item-action {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-item-action:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* MODALES */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #f8fafc;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      color: #fff;
+      outline: none;
+      font-size: 13px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .btn-cancel {
+      padding: 10px 18px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-save {
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      border: none;
+      color: #fff;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #64748b;
+      grid-column: 1 / -1;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- PANEL SUPERIOR FLOTANTE CON LOGO Y ATAJOS -->
+    <header class="header-panel">
+      <div class="brand-info">
+        <img src="logo.png" alt="Academia Tales" class="brand-logo" id="header-logo" onerror="this.src='https://via.placeholder.com/120x45/0f172a/f8fafc?text=TALES'">
+        <div class="brand-text">
+          <h1 id="header-titulo">Materiales de Estudio</h1>
+          <p id="header-subtitulo">Gestión de carpetas y separatas PDF</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-action-nav btn-volver" id="btn-simulacros">📝 Simulacros</button>
+        <button class="btn-action-nav btn-volver" id="btn-clases">🎥 Clases Grabadas</button>
+        <button class="btn-action-nav btn-volver" id="btn-volver-panel">← Volver</button>
+        <button class="btn-action-nav btn-logout" id="btn-cerrar-sesion">Cerrar Sesión</button>
+      </div>
+    </header>
+
+    <!-- TARJETA CONTENEDORA PRINCIPAL -->
+    <main class="main-card">
+      <div class="section-header">
+        <div class="left-controls">
+          <div class="breadcrumbs" id="breadcrumbs-container">
+            <!-- Dinámico -->
+          </div>
+          <!-- SELECTOR DE VISTA -->
+          <div class="view-toggle-box">
+            <button class="btn-view-toggle active" id="btn-mode-grid" onclick="cambiarModoVista('grid')">⣿ Cuadrícula</button>
+            <button class="btn-view-toggle" id="btn-mode-list" onclick="cambiarModoVista('list')">☰ Lista</button>
+          </div>
+        </div>
+        <button class="btn-primary-add" id="btn-crear-accion">+ Crear Carpeta</button>
+      </div>
+
+      <!-- GRID / LISTA DE CARPETAS Y ARCHIVOS -->
+      <div class="grid-items view-grid" id="items-container">
+        <!-- Renderizado dinámico -->
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL CREAR / EDITAR CARPETA -->
+  <div class="modal-overlay" id="modal-carpeta">
+    <div class="modal-box">
+      <h3 class="modal-title" id="modal-carpeta-titulo">Crear Nueva Carpeta</h3>
+      <div class="form-group">
+        <label>Nombre de la carpeta</label>
+        <input type="text" id="input-nombre-carpeta" class="form-control" placeholder="Ej: Álgebra, Biología - Semana 1">
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="cerrarModal('modal-carpeta')">Cancelar</button>
+        <button class="btn-save" id="btn-guardar-carpeta" onclick="guardarCarpeta()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CREAR / EDITAR ARCHIVO PDF -->
+  <div class="modal-overlay" id="modal-archivo">
+    <div class="modal-box">
+      <h3 class="modal-title" id="modal-archivo-titulo">Agregar Archivo PDF</h3>
+      <div class="form-group">
+        <label>Nombre o descripción del documento</label>
+        <input type="text" id="input-nombre-archivo" class="form-control" placeholder="Ej: Practica Dirigida - Vectores.pdf">
+      </div>
+      <div class="form-group" id="group-file-input">
+        <label>Seleccionar archivo PDF desde la PC</label>
+        <input type="file" id="input-file-pdf" accept="application/pdf" class="form-control" style="font-size: 11px;">
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="cerrarModal('modal-archivo')">Cancelar</button>
+        <button class="btn-save" id="btn-guardar-archivo" onclick="guardarArchivo()">Guardar Archivo</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const siglasUni = urlParams.get('siglas') || 'UNAP';
+
+    let modoVista = localStorage.getItem("materialesModoVista") || "grid";
+    let carpetaActualId = null; // null = Raíz (carpetas), número = ID de la carpeta actual (archivos)
+    let editandoCarpetaId = null;
+    let editandoArchivoId = null;
+    let tempPdfBase64 = "";
+
+    let listaCarpetasMateriales = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("btn-simulacros").onclick = () => {
+        window.location.href = `simulacros.html?siglas=${siglasUni}`;
+      };
+
+      document.getElementById("btn-clases").onclick = () => {
+        window.location.href = `clases-grabadas.html?siglas=${siglasUni}`;
+      };
+
+      document.getElementById("btn-volver-panel").onclick = () => {
+        window.location.href = `universidad.html?siglas=${siglasUni}`;
+      };
+
+      document.getElementById("btn-cerrar-sesion").onclick = () => {
+        localStorage.removeItem("adminSesion");
+        sessionStorage.removeItem("adminSesion");
+        localStorage.removeItem("usuarioLogueado");
+        sessionStorage.removeItem("usuarioLogueado");
+        window.location.href = "index.html";
+      };
+
+      document.getElementById("input-file-pdf").addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          if (file.type !== "application/pdf") {
+            alert("Por favor selecciona un archivo en formato PDF.");
+            e.target.value = "";
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            tempPdfBase64 = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      document.getElementById("btn-crear-accion").onclick = abrirModalCrear;
+
+      actualizarBotonesModoVista();
+      cargarCarpetasSupabase();
+    });
+
+    window.cambiarModoVista = function(modo) {
+      modoVista = modo;
+      localStorage.setItem("materialesModoVista", modo);
+      actualizarBotonesModoVista();
+      renderizarNavegacionYContenido();
+    }
+
+    function actualizarBotonesModoVista() {
+      const btnGrid = document.getElementById("btn-mode-grid");
+      const btnList = document.getElementById("btn-mode-list");
+      const container = document.getElementById("items-container");
+
+      if (modoVista === "grid") {
+        btnGrid.classList.add("active");
+        btnList.classList.remove("active");
+        container.className = "grid-items view-grid";
+      } else {
+        btnList.classList.add("active");
+        btnGrid.classList.remove("active");
+        container.className = "grid-items view-list";
+      }
+    }
+
+    window.cerrarModal = function(id) {
+      document.getElementById(id).style.display = "none";
+      editandoCarpetaId = null;
+      editandoArchivoId = null;
+      tempPdfBase64 = "";
+    }
+
+    function abrirModalCrear() {
+      if (carpetaActualId === null) {
+        editandoCarpetaId = null;
+        document.getElementById("modal-carpeta-titulo").innerText = "Crear Nueva Carpeta";
+        document.getElementById("input-nombre-carpeta").value = "";
+        document.getElementById("modal-carpeta").style.display = "flex";
+      } else {
+        editandoArchivoId = null;
+        document.getElementById("modal-archivo-titulo").innerText = "Agregar Archivo PDF";
+        document.getElementById("input-nombre-archivo").value = "";
+        document.getElementById("input-file-pdf").value = "";
+        document.getElementById("group-file-input").style.display = "block";
+        document.getElementById("modal-archivo").style.display = "flex";
+      }
+    }
+
+    async function cargarCarpetasSupabase() {
+      try {
+        const { data, error } = await supabase
+          .from('materiales')
+          .select('*')
+          .ilike('universidad_siglas', siglasUni)
+          .order('id', { ascending: true });
+
+        if (error) throw error;
+        listaCarpetasMateriales = data || [];
+      } catch (e) {
+        console.error("Error al cargar materiales:", e);
+        listaCarpetasMateriales = [];
+      }
+      renderizarNavegacionYContenido();
+    }
+
+    window.guardarCarpeta = async function() {
+      const nombre = document.getElementById("input-nombre-carpeta").value.trim();
+      if (!nombre) {
+        alert("Por favor ingresa un nombre para la carpeta.");
+        return;
+      }
+
+      try {
+        if (editandoCarpetaId !== null) {
+          const { error } = await supabase
+            .from('materiales')
+            .update({ nombre: nombre })
+            .eq('id', editandoCarpetaId);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from('materiales')
+            .insert([{
+              id: Date.now(),
+              universidad_siglas: siglasUni,
+              nombre: nombre,
+              oculto: false,
+              archivos: []
+            }]);
+          if (error) throw error;
+        }
+
+        window.cerrarModal("modal-carpeta");
+        await cargarCarpetasSupabase();
+      } catch (e) {
+        console.error("Error al guardar carpeta:", e);
+        alert("Hubo un error al guardar la carpeta en Supabase.");
+      }
+    }
+
+    window.guardarArchivo = async function() {
+      const nombre = document.getElementById("input-nombre-archivo").value.trim();
+      if (!nombre) {
+        alert("Por favor ingresa un nombre para el archivo.");
+        return;
+      }
+
+      const folder = listaCarpetasMateriales.find(c => c.id === carpetaActualId);
+      if (!folder) return;
+
+      let archivosActuales = Array.isArray(folder.archivos) ? [...folder.archivos] : [];
+
+      try {
+        if (editandoArchivoId !== null) {
+          archivosActuales = archivosActuales.map(a => {
+            if (a.id === editandoArchivoId) {
+              return { ...a, nombre: nombre };
+            }
+            return a;
+          });
+        } else {
+          if (!tempPdfBase64) {
+            alert("Debes seleccionar un archivo PDF desde tu equipo.");
+            return;
+          }
+          archivosActuales.push({
+            id: Date.now(),
+            nombre: nombre,
+            pdfBase64: tempPdfBase64,
+            oculto: false
+          });
+        }
+
+        const { error } = await supabase
+          .from('materiales')
+          .update({ archivos: archivosActuales })
+          .eq('id', folder.id);
+
+        if (error) throw error;
+
+        window.cerrarModal("modal-archivo");
+        await cargarCarpetasSupabase();
+      } catch (e) {
+        console.error("Error al guardar archivo:", e);
+        alert("Hubo un error al guardar el archivo en Supabase.");
+      }
+    }
+
+    function renderizarNavegacionYContenido() {
+      const breadcrumbs = document.getElementById("breadcrumbs-container");
+      const btnAccion = document.getElementById("btn-crear-accion");
+      const container = document.getElementById("items-container");
+
+      if (carpetaActualId === null) {
+        breadcrumbs.innerHTML = `<span style="color:#f8fafc;">📁 Materiales (${siglasUni})</span>`;
+        btnAccion.innerText = "+ Crear Carpeta";
+
+        if (listaCarpetasMateriales.length === 0) {
+          container.innerHTML = `<div class="empty-state">No hay carpetas creadas aún. Haz clic en <strong>+ Crear Carpeta</strong> para comenzar.</div>`;
+          return;
+        }
+
+        if (modoVista === "grid") {
+          container.innerHTML = listaCarpetasMateriales.map(c => `
+            <div class="item-card ${c.oculto ? 'oculto' : ''}">
+              ${c.oculto ? '<span class="badge-oculto">Oculto</span>' : ''}
+              <div class="item-icon" onclick="entrarCarpeta(${c.id})">📁</div>
+              <div class="item-title" onclick="entrarCarpeta(${c.id})">${c.nombre}</div>
+              <div class="item-actions">
+                <button class="btn-item-action" onclick="editarCarpeta(${c.id})" title="Editar Nombre">✏️</button>
+                <button class="btn-item-action" onclick="toggleOcultarCarpeta(${c.id})" title="${c.oculto ? 'Mostrar' : 'Ocultar'}">${c.oculto ? '👁️' : '🙈'}</button>
+                <button class="btn-item-action" onclick="eliminarCarpeta(${c.id})" title="Eliminar">🗑️</button>
+              </div>
+            </div>
+          `).join("");
+        } else {
+          container.innerHTML = listaCarpetasMateriales.map(c => `
+            <div class="item-card ${c.oculto ? 'oculto' : ''}">
+              <div class="item-main-info" onclick="entrarCarpeta(${c.id})">
+                <span class="item-icon">📁</span>
+                <span class="item-title">${c.nombre}</span>
+                ${c.oculto ? '<span class="badge-oculto">Oculto</span>' : ''}
+              </div>
+              <div class="item-actions">
+                <button class="btn-item-action" onclick="editarCarpeta(${c.id})" title="Editar Nombre">✏️</button>
+                <button class="btn-item-action" onclick="toggleOcultarCarpeta(${c.id})" title="${c.oculto ? 'Mostrar' : 'Ocultar'}">${c.oculto ? '👁️' : '🙈'}</button>
+                <button class="btn-item-action" onclick="eliminarCarpeta(${c.id})" title="Eliminar">🗑️</button>
+              </div>
+            </div>
+          `).join("");
+        }
+
+      } else {
+        const folder = listaCarpetasMateriales.find(c => c.id === carpetaActualId);
+        if (!folder) {
+          carpetaActualId = null;
+          renderizarNavegacionYContenido();
+          return;
+        }
+
+        breadcrumbs.innerHTML = `
+          <span class="crumb-link" onclick="irARaiz()">📁 Materiales</span>
+          <span>/</span>
+          <span style="color:#f8fafc;">${folder.nombre}</span>
+        `;
+        btnAccion.innerText = "+ Agregar Archivo PDF";
+
+        const archivos = Array.isArray(folder.archivos) ? folder.archivos : [];
+
+        if (archivos.length === 0) {
+          container.innerHTML = `<div class="empty-state">Esta carpeta está vacía. Haz clic en <strong>+ Agregar Archivo PDF</strong> para subir separatas.</div>`;
+          return;
+        }
+
+        if (modoVista === "grid") {
+          container.innerHTML = archivos.map(a => `
+            <div class="item-card ${a.oculto ? 'oculto' : ''}">
+              ${a.oculto ? '<span class="badge-oculto">Oculto</span>' : ''}
+              <div class="item-icon" onclick="verPdf(${a.id})">📄</div>
+              <div class="item-title" onclick="verPdf(${a.id})">${a.nombre}</div>
+              <div class="item-actions">
+                <button class="btn-item-action" onclick="verPdf(${a.id})" title="Ver PDF">👁️ Ver</button>
+                <button class="btn-item-action" onclick="editarArchivo(${a.id})" title="Editar Nombre">✏️</button>
+                <button class="btn-item-action" onclick="toggleOcultarArchivo(${a.id})" title="${a.oculto ? 'Mostrar' : 'Ocultar'}">${a.oculto ? '👁️' : '🙈'}</button>
+                <button class="btn-item-action" onclick="eliminarArchivo(${a.id})" title="Eliminar">🗑️</button>
+              </div>
+            </div>
+          `).join("");
+        } else {
+          container.innerHTML = archivos.map(a => `
+            <div class="item-card ${a.oculto ? 'oculto' : ''}">
+              <div class="item-main-info" onclick="verPdf(${a.id})">
+                <span class="item-icon">📄</span>
+                <span class="item-title">${a.nombre}</span>
+                ${a.oculto ? '<span class="badge-oculto">Oculto</span>' : ''}
+              </div>
+              <div class="item-actions">
+                <button class="btn-item-action" onclick="verPdf(${a.id})" title="Ver PDF">👁️ Ver</button>
+                <button class="btn-item-action" onclick="editarArchivo(${a.id})" title="Editar Nombre">✏️</button>
+                <button class="btn-item-action" onclick="toggleOcultarArchivo(${a.id})" title="${a.oculto ? 'Mostrar' : 'Ocultar'}">${a.oculto ? '👁️' : '🙈'}</button>
+                <button class="btn-item-action" onclick="eliminarArchivo(${a.id})" title="Eliminar">🗑️</button>
+              </div>
+            </div>
+          `).join("");
+        }
+      }
+    }
+
+    window.entrarCarpeta = function(id) {
+      carpetaActualId = id;
+      renderizarNavegacionYContenido();
+    }
+
+    window.irARaiz = function() {
+      carpetaActualId = null;
+      renderizarNavegacionYContenido();
+    }
+
+    window.editarCarpeta = function(id) {
+      const c = listaCarpetasMateriales.find(item => item.id === id);
+      if (c) {
+        editandoCarpetaId = id;
+        document.getElementById("modal-carpeta-titulo").innerText = "Editar Nombre de Carpeta";
+        document.getElementById("input-nombre-carpeta").value = c.nombre;
+        document.getElementById("modal-carpeta").style.display = "flex";
+      }
+    }
+
+    window.toggleOcultarCarpeta = async function(id) {
+      const c = listaCarpetasMateriales.find(item => item.id === id);
+      if (c) {
+        try {
+          const nuevoEstado = !c.oculto;
+          const { error } = await supabase
+            .from('materiales')
+            .update({ oculto: nuevoEstado })
+            .eq('id', id);
+          if (error) throw error;
+          await cargarCarpetasSupabase();
+        } catch (e) {
+          console.error("Error al ocultar carpeta:", e);
+        }
+      }
+    }
+
+    window.eliminarCarpeta = async function(id) {
+      if (confirm("¿Estás seguro de eliminar esta carpeta y todos los archivos dentro de ella?")) {
+        try {
+          const { error } = await supabase
+            .from('materiales')
+            .delete()
+            .eq('id', id);
+          if (error) throw error;
+          await cargarCarpetasSupabase();
+        } catch (e) {
+          console.error("Error al eliminar carpeta:", e);
+        }
+      }
+    }
+
+    window.verPdf = function(archivoId) {
+      const folder = listaCarpetasMateriales.find(c => c.id === carpetaActualId);
+      if (folder && Array.isArray(folder.archivos)) {
+        const fileObj = folder.archivos.find(a => a.id === archivoId);
+        if (fileObj && fileObj.pdfBase64) {
+          const win = window.open();
+          win.document.write(`<iframe src="${fileObj.pdfBase64}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+        }
+      }
+    }
+
+    window.editarArchivo = function(archivoId) {
+      const folder = listaCarpetasMateriales.find(c => c.id === carpetaActualId);
+      if (folder && Array.isArray(folder.archivos)) {
+        const fileObj = folder.archivos.find(a => a.id === archivoId);
+        if (fileObj) {
+          editandoArchivoId = archivoId;
+          document.getElementById("modal-archivo-titulo").innerText = "Editar Nombre del Archivo";
+          document.getElementById("input-nombre-archivo").value = fileObj.nombre;
+          document.getElementById("group-file-input").style.display = "none";
+          document.getElementById("modal-archivo").style.display = "flex";
+        }
+      }
+    }
+
+    window.toggleOcultarArchivo = async function(archivoId) {
+      const folder = listaCarpetasMateriales.find(c => c.id === carpetaActualId);
+      if (folder && Array.isArray(folder.archivos)) {
+        try {
+          const archivosNuevos = folder.archivos.map(a => {
+            if (a.id === archivoId) {
+              return { ...a, oculto: !a.oculto };
+            }
+            return a;
+          });
+
+          const { error } = await supabase
+            .from('materiales')
+            .update({ archivos: archivosNuevos })
+            .eq('id', folder.id);
+
+          if (error) throw error;
+          await cargarCarpetasSupabase();
+        } catch (e) {
+          console.error("Error al ocultar archivo:", e);
+        }
+      }
+    }
+
+    window.eliminarArchivo = async function(archivoId) {
+      if (confirm("¿Estás seguro de eliminar este archivo PDF?")) {
+        try {
+          const folder = listaCarpetasMateriales.find(c => c.id === carpetaActualId);
+          if (!folder) return;
+
+          const archivosNuevos = folder.archivos.filter(a => a.id !== archivoId);
+
+          const { error } = await supabase
+            .from('materiales')
+            .update({ archivos: archivosNuevos })
+            .eq('id', folder.id);
+
+          if (error) throw error;
+          await cargarCarpetasSupabase();
+        } catch (e) {
+          console.error("Error al eliminar archivo:", e);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

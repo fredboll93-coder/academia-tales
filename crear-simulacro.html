@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear Nuevo Simulacro - Academia Tales</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.7) 0%, rgba(10, 15, 30, 0.9) 100%), 
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+
+    .main-card {
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-top: 2px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    input[type="text"], input[type="number"], select, textarea {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #3b82f6;
+    }
+
+    .row-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #60a5fa;
+      margin: 25px 0 12px 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .btn-danger-sm {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-danger-sm:hover {
+      background: rgba(239, 68, 68, 0.3);
+    }
+
+    .table-container {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    th {
+      background: rgba(30, 41, 59, 0.8);
+      color: #94a3b8;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 20px;">
+
+    <!-- Barra Superior -->
+    <div style="background: rgba(11, 18, 32, 0.85); border: 3px solid rgba(148, 163, 184, 0.15); border-top: 3px solid rgba(148, 163, 184, 0.4); border-radius: 24px; padding: 12px 35px; backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="logo.png" alt="Logo" style="width: 90px; height: 90px; object-fit: contain; margin-top: -6px;">
+        <div style="margin-top: 5px;">
+          <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #f8fafc;">Panel de Universidad</h2>
+          <p style="margin: 0; font-size: 13px; color: #94a3b8;">Academia Tales • Crear Simulacro (<span id="uni-siglas-title"></span>)</p>
+        </div>
+      </div>
+      <button id="btn-volver" class="btn-secondary">← Volver a Simulacros</button>
+    </div>
+
+    <!-- Formulario Principal -->
+    <div class="main-card">
+      <h1 id="form-titulo-header" style="font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 25px;">Configuración del Nuevo Simulacro</h1>
+
+      <div class="form-group">
+        <label>Nombre del Simulacro</label>
+        <input type="text" id="sim-nombre" placeholder="Ej. Simulacro Ordinario 2026-I">
+      </div>
+
+      <div class="row-grid">
+        <div class="form-group">
+          <label>Número de Preguntas</label>
+          <input type="number" id="sim-preguntas" placeholder="Ej. 100" min="1">
+        </div>
+        <div class="form-group">
+          <label>Duración (en minutos)</label>
+          <input type="number" id="sim-duracion" placeholder="Ej. 180" min="1">
+        </div>
+      </div>
+
+      <div class="row-grid">
+        <div class="form-group">
+          <label>Número de Alternativas</label>
+          <input type="text" id="sim-alternativas" value="ABCDE" placeholder="Ej. ABCDE">
+        </div>
+        <div class="form-group">
+          <label>Punto en Contra (Puntaje Negativo)</label>
+          <input type="text" id="sim-puntaje-contra" placeholder="Ej. 0.25">
+        </div>
+      </div>
+
+      <div class="row-grid">
+        <div class="form-group">
+          <label>Subir Archivo de Simulacro (PDF)</label>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="file" id="file-simulacro" accept="application/pdf" style="color: #94a3b8; font-size: 13px; display: none;" onchange="document.getElementById('nombre-archivo-sim').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('file-simulacro').click()">Seleccionar archivo</button>
+            <span id="nombre-archivo-sim" style="font-size: 13px; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Ningún archivo seleccionado</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Subir Solucionario (PDF)</label>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="file" id="file-solucionario" accept="application/pdf" style="color: #94a3b8; font-size: 13px; display: none;" onchange="document.getElementById('nombre-archivo-sol').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('file-solucionario').click()">Seleccionar archivo</button>
+            <span id="nombre-archivo-sol" style="font-size: 13px; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Ningún archivo seleccionado</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Cartilla del Simulacro (PDF)</label>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="file" id="file-cartilla" accept="application/pdf" style="color: #94a3b8; font-size: 13px; display: none;" onchange="document.getElementById('nombre-archivo-cartilla').textContent = this.files[0] ? this.files[0].name : (cartillaUrlAnterior ? 'Cartilla cargada' : 'Ningún archivo seleccionado')">
+          <button type="button" class="btn-secondary" onclick="document.getElementById('file-cartilla').click()">Cambiar cartilla</button>
+          <span id="nombre-archivo-cartilla" style="font-size: 13px; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Ningún archivo seleccionado</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Claves de Respuestas (Ej. ABDBAC...)</label>
+        <input type="text" id="sim-claves" placeholder="Ingrese las claves continuas según el número de preguntas">
+        <span style="font-size: 11px; color: #94a3b8;">La cantidad de letras debe coincidir exactamente con el número de preguntas configurado.</span>
+      </div>
+
+      <div class="section-title">
+        <span>Áreas, Grupos y Puntajes (Editables)</span>
+        <button type="button" class="btn-secondary" style="padding: 6px 12px; font-size: 12px; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);" onclick="agregarGrupoManual()">+ Agregar Grupo</button>
+      </div>
+      <div id="areas-grupos-container" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+        <!-- Se llena dinámicamente -->
+      </div>
+
+      <div class="section-title">Gestión de Alumnos Habilitados</div>
+      
+      <!-- Bloque de Registro Estilo Configuración de Universidades -->
+      <div style="background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 14px; padding: 15px; margin-bottom: 15px;">
+        <div style="display: grid; grid-template-columns: 1fr 2fr 1.2fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Código</label>
+            <input type="text" id="input-alumno-codigo" placeholder="Ej. 202601" style="width: 100%; padding: 8px 12px; background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 13px; outline: none;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Apellidos y Nombres</label>
+            <input type="text" id="input-alumno-nombre" placeholder="Ej. Pérez Gómez, Juan Carlos" style="width: 100%; padding: 8px 12px; background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 13px; outline: none;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Carrera</label>
+            <select id="input-alumno-carrera" style="width: 100%; padding: 8px 12px; background: #09101f; border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 13px; outline: none; cursor: pointer;">
+              <option value="">-- Seleccionar Carrera --</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">O pegar lista masiva desde Excel (Código \t Apellidos y Nombres \t Carrera por línea):</label>
+          <textarea id="input-alumno-excel" rows="2" placeholder="Pega aquí los datos copiados de tu Excel..." style="width: 100%; padding: 8px 12px; background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 13px; outline: none; resize: vertical; font-family: inherit;"></textarea>
+        </div>
+
+        <button type="button" class="btn-primary" onclick="agregarAlumnoManual()" style="padding: 8px 20px; font-size: 12px; font-weight: 700;">+ Agregar Alumno(s)</button>
+      </div>
+
+      <!-- Buscador de Alumnos -->
+      <div style="margin-bottom: 12px;">
+        <input type="text" id="buscar-alumno" placeholder="🔍 Buscar alumno por código, nombre o carrera..." oninput="renderizarAlumnos()" style="width: 100%; padding: 8px 12px; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 13px; outline: none;">
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Apellidos y Nombres</th>
+              <th>Carrera</th>
+              <th style="text-align: center;">Estado</th>
+              <th style="text-align: center;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-alumnos-body">
+            <!-- Se llena dinámicamente con los alumnos -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+        <button type="button" id="btn-cancelar-simulacro" class="btn-secondary" style="padding: 12px 24px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 12px; font-weight: 700; cursor: pointer;">Cancelar</button>
+        <button type="button" id="btn-guardar-simulacro" class="btn-primary" onclick="guardarSimulacroCompleto()" style="padding: 12px 28px; border-radius: 12px; font-weight: 700; cursor: pointer;">Guardar Simulacro</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    localStorage.setItem('adminSesion', 'true');
+    sessionStorage.setItem('adminSesion', 'true');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const siglas = urlParams.get('siglas') || 'UNAP';
+    const editIndex = urlParams.get('edit');
+    const adminSimsCacheKey = `tales_admin_sims_${String(siglas).trim().toLowerCase()}`;
+
+    document.getElementById('uni-siglas-title').textContent = siglas;
+    
+    const volverUrl = `simulacros.html?siglas=${encodeURIComponent(siglas)}`;
+    document.getElementById('btn-volver').onclick = () => {
+      window.location.href = volverUrl;
+    };
+    document.getElementById('btn-cancelar-simulacro').onclick = () => {
+      window.location.href = volverUrl;
+    };
+
+    let alumnosSimulacro = [];
+    let carrerasUniversidad = [];
+    let uniDataGlobal = null;
+    let gruposNormalizados = [];
+    let pdfUrlAnterior = '';
+    let solucionarioUrlAnterior = '';
+    let cartillaUrlAnterior = '';
+
+    function obtenerCartillaDeObjeto(obj) {
+      if (!obj || typeof obj !== 'object') return '';
+      return (
+        obj.cartilla_url ||
+        obj.cartilla_pdf ||
+        obj.cartillaPdf ||
+        obj.cartilla ||
+        obj.cartillaUrl ||
+        ''
+      );
+    }
+
+    function mostrarNombreCartilla(fuente) {
+      const span = document.getElementById('nombre-archivo-cartilla');
+      if (!span) return;
+      if (!fuente) {
+        span.textContent = 'Ningún archivo seleccionado';
+        return;
+      }
+      if (!String(fuente).startsWith('data:')) {
+        span.textContent = decodeURIComponent(String(fuente).split('/').pop());
+      } else {
+        span.textContent = 'Cartilla.pdf (guardada)';
+      }
+    }
+
+    function formatearCarrera(texto) {
+      if (!texto) return "";
+      return texto.toLowerCase().replace(/(?:^|\s)\S/g, (a) => a.toUpperCase());
+    }
+
+    function aplicarDatosUniversidad(uniData) {
+      if (!uniData) return;
+      uniDataGlobal = uniData;
+      const cartillaUni = obtenerCartillaDeObjeto(uniData);
+      if (cartillaUni && !cartillaUrlAnterior) {
+        cartillaUrlAnterior = cartillaUni;
+        mostrarNombreCartilla(cartillaUrlAnterior);
+      }
+      if (uniData.alumnos && Array.isArray(uniData.alumnos)) {
+        alumnosSimulacro = uniData.alumnos;
+      }
+      if (uniData.carreras && Array.isArray(uniData.carreras)) {
+        carrerasUniversidad = uniData.carreras;
+      }
+      extraerGruposYCursos(uniData);
+    }
+
+    function aplicarDatosSimulacro(simData) {
+      if (!simData) return;
+      document.getElementById('form-titulo-header').textContent = "Editar Simulacro";
+      document.getElementById('sim-nombre').value = simData.titulo || '';
+      document.getElementById('sim-preguntas').value = simData.preguntas || '';
+      document.getElementById('sim-duracion').value = simData.duracion || '';
+      document.getElementById('sim-alternativas').value = simData.alternativas || 'ABCDE';
+      document.getElementById('sim-puntaje-contra').value = simData.punto_en_contra ?? '';
+      document.getElementById('sim-claves').value = simData.claves || '';
+
+      if (simData.pdf_url) {
+        pdfUrlAnterior = simData.pdf_url;
+        if (!simData.pdf_url.startsWith('data:')) {
+          const nombreSim = simData.pdf_url.split('/').pop();
+          document.getElementById('nombre-archivo-sim').textContent = decodeURIComponent(nombreSim);
+        } else {
+          document.getElementById('nombre-archivo-sim').textContent = 'Simulacro.pdf (guardado)';
+        }
+      }
+      if (simData.solucionario_url) {
+        solucionarioUrlAnterior = simData.solucionario_url;
+        if (!simData.solucionario_url.startsWith('data:')) {
+          const nombreSol = simData.solucionario_url.split('/').pop();
+          document.getElementById('nombre-archivo-sol').textContent = decodeURIComponent(nombreSol);
+        } else {
+          document.getElementById('nombre-archivo-sol').textContent = 'Solucionario.pdf (guardado)';
+        }
+      }
+      const cartillaSim = obtenerCartillaDeObjeto(simData);
+      if (cartillaSim) {
+        cartillaUrlAnterior = cartillaSim;
+        mostrarNombreCartilla(cartillaUrlAnterior);
+      }
+
+      if (simData.alumnos && Array.isArray(simData.alumnos) && simData.alumnos.length > 0) {
+        alumnosSimulacro = simData.alumnos;
+      }
+      extraerGruposYCursos(simData);
+    }
+
+    function refrescarInterfaz() {
+      actualizarSelectorCarrerasAlumnos();
+      renderizarEstructuraAdmin();
+      renderizarAlumnos();
+    }
+
+    async function cargarDatosBase() {
+      const siglaLim = String(siglas).trim().toLowerCase();
+      let pintoCache = false;
+
+      try {
+        const cachedUnis = JSON.parse(sessionStorage.getItem('tales_unis_cache') || 'null');
+        if (Array.isArray(cachedUnis)) {
+          const matchUni = cachedUnis.find(u => String(u.siglas || u.nombre || "").trim().toLowerCase() === siglaLim);
+          if (matchUni) {
+            aplicarDatosUniversidad(matchUni);
+            pintoCache = true;
+          }
+        }
+
+        if (editIndex !== null && editIndex !== '') {
+          const cachedSims = JSON.parse(sessionStorage.getItem(adminSimsCacheKey) || 'null');
+          if (Array.isArray(cachedSims)) {
+            const matchSim = cachedSims.find(s => String(s.id) === String(editIndex));
+            if (matchSim && (matchSim.pdf_url !== undefined || matchSim.claves !== undefined)) {
+              aplicarDatosSimulacro(matchSim);
+              pintoCache = true;
+            }
+          }
+        }
+      } catch (e) {}
+
+      if (pintoCache) {
+        refrescarInterfaz();
+      }
+
+      try {
+        const promesaUni = supabase
+          .from('universidades')
+          .select('*')
+          .ilike('siglas', siglas)
+          .single();
+
+        const promesaSim = (editIndex !== null && editIndex !== '')
+          ? supabase.from('simulacros').select('*').eq('id', editIndex).single()
+          : Promise.resolve({ data: null, error: null });
+
+        const [resUni, resSim] = await Promise.all([promesaUni, promesaSim]);
+
+        if (!resUni.error && resUni.data) {
+          aplicarDatosUniversidad(resUni.data);
+        }
+
+        if (resSim && !resSim.error && resSim.data) {
+          aplicarDatosSimulacro(resSim.data);
+        }
+      } catch (e) {
+        console.error("Error al cargar datos desde Supabase:", e);
+      }
+
+      refrescarInterfaz();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      cargarDatosBase();
+    });
+
+    function actualizarSelectorCarrerasAlumnos() {
+      const selectCarrera = document.getElementById("input-alumno-carrera");
+      if (!selectCarrera) return;
+
+      const valorPrevio = selectCarrera.value;
+      
+      if (carrerasUniversidad.length === 0) {
+        selectCarrera.innerHTML = `<option value="">-- Primero agregue carreras en Configuración --</option>`;
+        return;
+      }
+
+      selectCarrera.innerHTML = `<option value="">-- Seleccionar Carrera --</option>` + 
+        carrerasUniversidad.map(car => {
+          const nombreCar = typeof car === 'object' ? car.nombre : car;
+          return `<option value="${nombreCar}">${nombreCar}</option>`;
+        }).join("");
+
+      if (carrerasUniversidad.some(c => (typeof c === 'object' ? c.nombre : c) === valorPrevio)) {
+        selectCarrera.value = valorPrevio;
+      }
+    }
+
+    function extraerGruposYCursos(fuente) {
+      gruposNormalizados = [];
+      if (!fuente) return;
+
+      const rawAreas = fuente.areas || [];
+      const listaAreasBase = Array.isArray(rawAreas)
+        ? rawAreas.map((a, idx) => ({
+            nombre: a.nombre || `Área ${idx + 1}`,
+            desde: a.inicio ?? a.desde ?? 1,
+            hasta: a.fin ?? a.hasta ?? 10
+          }))
+        : [];
+
+      const rawGrupos = fuente.grupos || {};
+
+      if (rawGrupos && typeof rawGrupos === 'object' && Object.keys(rawGrupos).length > 0) {
+        Object.keys(rawGrupos).forEach(nomGrupoKey => {
+          let mapaPuntajes = rawGrupos[nomGrupoKey];
+          if (mapaPuntajes && mapaPuntajes.ponderaciones) {
+            mapaPuntajes = mapaPuntajes.ponderaciones;
+          }
+
+          const cursosDelGrupo = listaAreasBase.map(area => {
+            let pts = 10;
+            if (mapaPuntajes && typeof mapaPuntajes === 'object') {
+              if (mapaPuntajes[area.nombre] !== undefined) {
+                pts = mapaPuntajes[area.nombre];
+              }
+            }
+            return { nombre: area.nombre, desde: area.desde, hasta: area.hasta, puntaje: pts };
+          });
+
+          gruposNormalizados.push({ nombreGrupo: nomGrupoKey, cursos: cursosDelGrupo });
+        });
+      } else if (listaAreasBase.length > 0) {
+        gruposNormalizados.push({
+          nombreGrupo: 'A',
+          cursos: listaAreasBase.map(a => ({ ...a, puntaje: 10 }))
+        });
+      }
+    }
+
+    window.renderizarEstructuraAdmin = function() {
+      const container = document.getElementById('areas-grupos-container');
+      container.innerHTML = '';
+
+      if (gruposNormalizados.length === 0) {
+        container.innerHTML = `<p style="font-size: 13px; color: #94a3b8; font-style: italic;">No hay grupos ni áreas configurados. Haz clic en "+ Agregar Grupo" para crear uno.</p>`;
+        return;
+      }
+
+      let htmlContenido = '';
+
+      gruposNormalizados.forEach((grupo, gIndex) => {
+        let cursosHtml = '';
+        grupo.cursos.forEach((curso, cIndex) => {
+          cursosHtml += `
+            <div style="display: grid; grid-template-columns: 2fr 1.8fr 1.1fr auto; gap: 10px; align-items: center; background: rgba(15, 23, 42, 0.45); padding: 8px 12px; border-radius: 10px; margin-top: 6px; border: 1px solid rgba(148, 163, 184, 0.1);">
+              <input type="text" value="${curso.nombre}" placeholder="Nombre del área" style="padding: 6px 10px; font-size: 13px; border-radius: 8px; width: 100%;" onchange="actualizarNombreArea(${gIndex}, ${cIndex}, this.value)">
+              
+              <div style="display: flex; align-items: center; gap: 6px; justify-content: center; background: rgba(30, 41, 59, 0.6); padding: 4px 8px; border-radius: 8px;">
+                <span style="font-size: 11px; color: #94a3b8;">Preg.</span>
+                <input type="number" min="1" value="${curso.desde}" style="width: 56px; padding: 4px 6px; font-size: 12px; text-align: center; border-radius: 6px;" onchange="actualizarRangoArea(${gIndex}, ${cIndex}, 'desde', this.value)">
+                <span style="font-size: 11px; color: #94a3b8;">al</span>
+                <input type="number" min="1" value="${curso.hasta}" style="width: 56px; padding: 4px 6px; font-size: 12px; text-align: center; border-radius: 6px;" onchange="actualizarRangoArea(${gIndex}, ${cIndex}, 'hasta', this.value)">
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 6px; justify-content: flex-end;">
+                <span style="font-size: 11px; color: #94a3b8;">Pts:</span>
+                <input type="number" step="any" value="${curso.puntaje}" style="width: 75px; padding: 6px 8px; font-size: 13px; text-align: center; border-radius: 8px;" onchange="actualizarPuntajeNormalizado(${gIndex}, ${cIndex}, this.value)">
+              </div>
+
+              <button type="button" class="btn-danger-sm" title="Eliminar área" onclick="eliminarAreaDeGrupo(${gIndex}, ${cIndex})">✕</button>
+            </div>
+          `;
+        });
+
+        htmlContenido += `
+          <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 14px; padding: 15px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(148, 163, 184, 0.15); padding-bottom: 8px; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                <span style="font-size: 14px; font-weight: 800; color: #38bdf8;">🏷️ Grupo:</span>
+                <input type="text" value="${grupo.nombreGrupo}" placeholder="Ej. A" style="padding: 5px 10px; font-size: 14px; font-weight: 700; color: #38bdf8; border-radius: 8px; width: 150px;" onchange="actualizarNombreGrupo(${gIndex}, this.value)">
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn-secondary" style="padding: 4px 10px; font-size: 11px; color: #38bdf8;" onclick="agregarAreaAGrupo(${gIndex})">+ Agregar Área</button>
+                <button type="button" class="btn-danger-sm" onclick="eliminarGrupo(${gIndex})">Eliminar Grupo</button>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              ${cursosHtml || '<p style="font-size: 12px; color: #94a3b8; font-style: italic;">Sin áreas en este grupo. Haz clic en "+ Agregar Área".</p>'}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = htmlContenido;
+    }
+
+    window.actualizarNombreGrupo = function(gIndex, nuevoNombre) {
+      if (gruposNormalizados[gIndex] && nuevoNombre.trim() !== '') {
+        gruposNormalizados[gIndex].nombreGrupo = nuevoNombre.trim();
+      }
+    }
+
+    window.actualizarNombreArea = function(gIndex, cIndex, nuevoNombre) {
+      if (gruposNormalizados[gIndex]?.cursos[cIndex] && nuevoNombre.trim() !== '') {
+        gruposNormalizados[gIndex].cursos[cIndex].nombre = nuevoNombre.trim();
+      }
+    }
+
+    window.actualizarRangoArea = function(gIndex, cIndex, campo, valor) {
+      const num = parseInt(valor);
+      if (!isNaN(num) && num >= 1 && gruposNormalizados[gIndex]?.cursos[cIndex]) {
+        gruposNormalizados[gIndex].cursos[cIndex][campo] = num;
+      }
+    }
+
+    window.actualizarPuntajeNormalizado = function(gIndex, cIndex, valor) {
+      const num = parseFloat(valor);
+      if (!isNaN(num) && gruposNormalizados[gIndex] && gruposNormalizados[gIndex].cursos[cIndex]) {
+        gruposNormalizados[gIndex].cursos[cIndex].puntaje = num;
+      }
+    }
+
+    window.agregarGrupoManual = function() {
+      const letras = ['A', 'B', 'C', 'D', 'E', 'F'];
+      const siguienteLetra = letras[gruposNormalizados.length] || `G${gruposNormalizados.length + 1}`;
+      const numPreg = parseInt(document.getElementById('sim-preguntas').value) || 10;
+
+      gruposNormalizados.push({
+        nombreGrupo: siguienteLetra,
+        cursos: [
+          { nombre: 'Área Única', desde: 1, hasta: numPreg, puntaje: 10 }
+        ]
+      });
+      renderizarEstructuraAdmin();
+    }
+
+    window.eliminarGrupo = function(gIndex) {
+      if (confirm(`¿Seguro que deseas eliminar el grupo "${gruposNormalizados[gIndex].nombreGrupo}"?`)) {
+        gruposNormalizados.splice(gIndex, 1);
+        renderizarEstructuraAdmin();
+      }
+    }
+
+    window.agregarAreaAGrupo = function(gIndex) {
+      const cursos = gruposNormalizados[gIndex].cursos;
+      const ultimaPregunta = cursos.length > 0 ? parseInt(cursos[cursos.length - 1].hasta) : 0;
+      const totalPreg = parseInt(document.getElementById('sim-preguntas').value) || (ultimaPregunta + 10);
+
+      cursos.push({
+        nombre: `Área ${cursos.length + 1}`,
+        desde: ultimaPregunta + 1,
+        hasta: Math.max(ultimaPregunta + 1, totalPreg),
+        puntaje: 10
+      });
+      renderizarEstructuraAdmin();
+    }
+
+    window.eliminarAreaDeGrupo = function(gIndex, cIndex) {
+      gruposNormalizados[gIndex].cursos.splice(cIndex, 1);
+      renderizarEstructuraAdmin();
+    }
+
+    window.renderizarAlumnos = function() {
+      const tbody = document.getElementById('tabla-alumnos-body');
+      tbody.innerHTML = '';
+
+      if (alumnosSimulacro.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">No hay alumnos registrados. Agregue uno arriba.</td></tr>`;
+        return;
+      }
+
+      const filtro = (document.getElementById('buscar-alumno')?.value || '').toLowerCase().trim();
+      let mostrados = 0;
+
+      alumnosSimulacro.forEach((alu, index) => {
+        const cod = String(alu.codigo || alu.dni || alu.id || '');
+        const nom = String(alu.nombres || alu.nombre || alu.apellidosYnombres || alu.nombreAlumno || '');
+        const car = String(alu.carrera || alu.especialidad || '');
+
+        if (filtro && !cod.toLowerCase().includes(filtro) && !nom.toLowerCase().includes(filtro) && !car.toLowerCase().includes(filtro)) {
+          return;
+        }
+
+        mostrados++;
+        const estaHabilitado = alu.activo !== false && alu.habilitado !== false && String(alu.estado || '').toLowerCase() !== 'deshabilitado';
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${cod}</td>
+            <td>${nom}</td>
+            <td>${car}</td>
+            <td style="text-align: center;"><span style="color: ${estaHabilitado ? '#4ade80' : '#f87171'}; font-weight: 600;">${estaHabilitado ? 'Habilitado' : 'Deshabilitado'}</span></td>
+            <td style="text-align: center; display: flex; gap: 6px; justify-content: center;">
+              <button type="button" class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="toggleAlumno(${index})">${estaHabilitado ? 'Deshabilitar' : 'Habilitar'}</button>
+              <button type="button" class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="reiniciarAlumno(${index})">Reiniciar</button>
+              <button type="button" class="btn-secondary" style="padding: 4px 8px; font-size: 11px; color: #f87171;" onclick="eliminarAlumno(${index})">Eliminar</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      if (mostrados === 0 && filtro) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">No se encontraron alumnos con "${filtro}".</td></tr>`;
+      }
+    }
+
+    window.agregarAlumnoManual = function() {
+      const codInput = document.getElementById("input-alumno-codigo");
+      const nomInput = document.getElementById("input-alumno-nombre");
+      const carSelect = document.getElementById("input-alumno-carrera");
+      const excelInput = document.getElementById("input-alumno-excel");
+
+      const codigoManual = codInput.value.trim();
+      const nombreManual = nomInput.value.trim().toUpperCase();
+      const carreraManual = carSelect.value;
+      const textoExcel = excelInput.value.trim();
+
+      let nuevosAlumnos = [];
+
+      if (codigoManual || nombreManual || carreraManual) {
+        if (!codigoManual || !nombreManual || !carreraManual) {
+          alert("Para agregar un alumno manualmente, completa Código, Apellidos y Nombres, y selecciona una Carrera.");
+          return;
+        }
+        nuevosAlumnos.push({
+          codigo: codigoManual,
+          nombres: nombreManual,
+          carrera: formatearCarrera(carreraManual),
+          activo: true
+        });
+      }
+
+      if (textoExcel) {
+        const lineas = textoExcel.split(/\r?\n/);
+        lineas.forEach(linea => {
+          linea = linea.trim();
+          if (!linea) return;
+
+          let partes = linea.split(/\t|;|\|/).map(p => p.trim());
+          if (partes.length < 3) {
+            partes = linea.split('-').map(p => p.trim());
+          }
+
+          if (partes.length >= 3) {
+            nuevosAlumnos.push({
+              codigo: partes[0],
+              nombres: partes[1].toUpperCase(),
+              carrera: formatearCarrera(partes[2]),
+              activo: true
+            });
+          }
+        });
+      }
+
+      if (nuevosAlumnos.length === 0) {
+        alert("Por favor ingresa los datos de un alumno o pega una lista desde Excel.");
+        return;
+      }
+
+      nuevosAlumnos.forEach(nuevo => {
+        const existe = alumnosSimulacro.some(a => (a.codigo || a.dni) === nuevo.codigo);
+        if (!existe) {
+          alumnosSimulacro.push(nuevo);
+        }
+      });
+
+      codInput.value = "";
+      nomInput.value = "";
+      carSelect.value = "";
+      excelInput.value = "";
+
+      renderizarAlumnos();
+    }
+
+    window.toggleAlumno = function(index) {
+      const alu = alumnosSimulacro[index];
+      if (!alu) return;
+      const estaHabilitado = alu.activo !== false && alu.habilitado !== false && String(alu.estado || '').toLowerCase() !== 'deshabilitado';
+      const nuevoEstado = !estaHabilitado;
+
+      alu.activo = nuevoEstado;
+      alu.habilitado = nuevoEstado;
+      alu.estado = nuevoEstado ? 'Habilitado' : 'Deshabilitado';
+
+      if (nuevoEstado) {
+        alu.rindio = false;
+        alu.finalizado = false;
+      }
+
+      renderizarAlumnos();
+    }
+
+    window.reiniciarAlumno = function(index) {
+      const alu = alumnosSimulacro[index];
+      if (alu) {
+        alu.activo = true;
+        alu.habilitado = true;
+        alu.estado = 'Habilitado';
+        alu.rindio = false;
+        alu.finalizado = false;
+        delete alu.puntaje;
+        delete alu.respuestas;
+        delete alu.fecha_envio;
+      }
+      renderizarAlumnos();
+      alert(`Progreso del alumno reiniciado.`);
+    }
+
+    window.eliminarAlumno = function(index) {
+      alumnosSimulacro.splice(index, 1);
+      renderizarAlumnos();
+    }
+
+    function construirAreasYGruposDesdeEstado() {
+      const areasMap = new Map();
+      const gruposObj = {};
+
+      gruposNormalizados.forEach(grupo => {
+        const nombreGrupo = grupo.nombreGrupo || 'A';
+        const ponderaciones = {};
+
+        (grupo.cursos || []).forEach(curso => {
+          const nombreArea = curso.nombre || 'Área';
+          const inicio = parseInt(curso.desde) || 1;
+          const fin = parseInt(curso.hasta) || 10;
+          const puntaje = parseFloat(curso.puntaje);
+
+          if (!areasMap.has(nombreArea)) {
+            areasMap.set(nombreArea, { nombre: nombreArea, inicio, fin });
+          }
+          ponderaciones[nombreArea] = isNaN(puntaje) ? 10 : puntaje;
+        });
+
+        gruposObj[nombreGrupo] = { ponderaciones };
+      });
+
+      return {
+        areas: Array.from(areasMap.values()),
+        grupos: gruposObj
+      };
+    }
+
+    function leerArchivoComoBase64(archivo) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(archivo);
+      });
+    }
+
+    async function subirPdfConFallback(archivo, carpeta, urlAnterior) {
+      if (!archivo) return urlAnterior;
+      const ruta = `${carpeta}/${Date.now()}_${archivo.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      try {
+        const { error } = await supabase.storage
+          .from('simulacros')
+          .upload(ruta, archivo, {
+            upsert: true,
+            contentType: archivo.type || 'application/pdf',
+            cacheControl: '3600'
+          });
+
+        if (!error) {
+          const { data } = supabase.storage.from('simulacros').getPublicUrl(ruta);
+          if (data?.publicUrl) return data.publicUrl;
+        }
+      } catch (e) {}
+
+      try {
+        return await leerArchivoComoBase64(archivo);
+      } catch (e) {
+        return urlAnterior;
+      }
+    }
+
+    window.guardarSimulacroCompleto = async function() {
+      const btnGuardar = document.getElementById('btn-guardar-simulacro');
+      const nombre = document.getElementById('sim-nombre').value.trim();
+      const numPreguntas = parseInt(document.getElementById('sim-preguntas').value);
+      const duracion = parseInt(document.getElementById('sim-duracion').value);
+      const alternativas = document.getElementById('sim-alternativas').value.trim();
+      const puntajeContra = parseFloat(document.getElementById('sim-puntaje-contra').value) || 0;
+      const claves = document.getElementById('sim-claves').value.trim();
+
+      const inputSim = document.getElementById('file-simulacro');
+      const inputSol = document.getElementById('file-solucionario');
+      const inputCartilla = document.getElementById('file-cartilla');
+
+      if (!nombre) {
+        alert("Por favor ingrese el nombre del simulacro.");
+        return;
+      }
+
+      btnGuardar.disabled = true;
+      btnGuardar.textContent = "Guardando...";
+
+      try {
+        const archivoSim = inputSim?.files?.[0] || null;
+        const archivoSol = inputSol?.files?.[0] || null;
+        const archivoCartilla = inputCartilla?.files?.[0] || null;
+
+        const [pdfUrl, solucionarioUrl, cartillaUrl] = await Promise.all([
+          subirPdfConFallback(archivoSim, 'examenes', pdfUrlAnterior),
+          subirPdfConFallback(archivoSol, 'solucionarios', solucionarioUrlAnterior),
+          subirPdfConFallback(archivoCartilla, 'cartillas', cartillaUrlAnterior)
+        ]);
+
+        const { areas, grupos } = construirAreasYGruposDesdeEstado();
+
+        const datosGuardar = {
+          titulo: nombre,
+          preguntas: isNaN(numPreguntas) ? 100 : numPreguntas,
+          duracion: isNaN(duracion) ? 180 : duracion,
+          alternativas: alternativas || 'ABCDE',
+          punto_en_contra: puntajeContra,
+          claves,
+          pdf_url: pdfUrl,
+          solucionario_url: solucionarioUrl,
+          cartilla_url: cartillaUrl,
+          areas,
+          grupos,
+          alumnos: alumnosSimulacro,
+          universidad_siglas: siglas
+        };
+
+        let errorGuardado = null;
+        if (editIndex !== null && editIndex !== '') {
+          const { error } = await supabase
+            .from('simulacros')
+            .update(datosGuardar)
+            .eq('id', editIndex);
+          errorGuardado = error;
+        } else {
+          datosGuardar.id = Date.now();
+          const { error } = await supabase
+            .from('simulacros')
+            .insert([datosGuardar]);
+          errorGuardado = error;
+        }
+
+        if (errorGuardado) {
+          throw errorGuardado;
+        }
+
+        try {
+          sessionStorage.removeItem(adminSimsCacheKey);
+          sessionStorage.removeItem('tales_sims_cache');
+        } catch (e) {}
+
+        window.location.href = volverUrl;
+      } catch (err) {
+        console.error("Error al guardar simulacro:", err);
+        alert("Error al guardar el simulacro: " + (err?.message || err));
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = "Guardar Simulacro";
+      }
+    };
+  </script>
+</body>
+</html>

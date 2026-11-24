@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cartilla del Postulante - Academia TALES</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.88) 0%, rgba(10, 15, 30, 0.96) 100%);
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 14px;
+    }
+    .header-bar {
+      background: rgba(11, 18, 32, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 14px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: #f8fafc;
+    }
+    .btn-volver {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-imprimir {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hoja-contenedor {
+      display: flex;
+      justify-content: center;
+      padding-bottom: 24px;
+      overflow-x: auto;
+    }
+    .cartilla-hoja {
+      width: 980px;
+      min-width: 980px;
+      background: #ffffff;
+      color: #0f172a;
+      border: 2px solid #0f172a;
+      padding: 16px 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .top-grid {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .left-panel {
+      border: 1.5px solid #1e293b;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1.5px solid #1e293b;
+      padding-bottom: 6px;
+    }
+    .brand-header .logo-box-cartilla {
+      width: 60px;
+      height: 60px;
+      min-width: 60px;
+      min-height: 60px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .brand-header .logo-box-cartilla img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    .brand-header .academia {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #1e293b;
+    }
+    .brand-header .nombre-academia {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1;
+      color: #0f172a;
+    }
+    .box-title {
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+      padding: 4px 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .campo-ident {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .campo-ident label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #334155;
+    }
+    .campo-ident .valor-campo {
+      border: 1px solid #475569;
+      min-height: 24px;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #0f172a;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      text-transform: uppercase;
+    }
+    .ejemplos-box {
+      border: 1px solid #475569;
+      padding: 6px;
+      font-size: 9px;
+    }
+    .ejemplos-title {
+      text-align: center;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .ejemplos-cols {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 6px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .burbujas-ejemplo {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 4px;
+      align-items: center;
+    }
+    .mini-circ {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid #0f172a;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 700;
+    }
+    .mini-circ.filled {
+      background: #0f172a;
+      color: #fff;
+    }
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .firma-sede-huella {
+      display: grid;
+      grid-template-columns: 1.35fr 0.85fr 1fr;
+      gap: 8px;
+    }
+    .recuadro-box {
+      border: 1.5px solid #1e293b;
+      padding: 6px 8px;
+      min-height: 122px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .recuadro-titulo {
+      font-size: 10px;
+      font-weight: 800;
+      text-align: center;
+      color: #0f172a;
+    }
+    .recuadro-sub {
+      font-size: 8px;
+      text-align: center;
+      color: #475569;
+    }
+    .sede-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+    .sede-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sede-circ {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid #0f172a;
+      display: inline-block;
+    }
+    .sede-circ.filled {
+      background: #0f172a;
+    }
+    .grids-numericos {
+      display: grid;
+      grid-template-columns: 1.55fr 0.7fr 0.7fr 0.85fr;
+      gap: 8px;
+      flex: 1;
+    }
+    .grid-col-box {
+      border: 1.5px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+    }
+    .grid-header {
+      background: #0f172a;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      text-align: center;
+      padding: 4px 2px;
+    }
+    .grid-valor-top {
+      border-bottom: 1.5px solid #1e293b;
+      min-height: 22px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 0 4px;
+      background: #f8fafc;
+    }
+    .grid-matriz {
+      padding: 5px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+      justify-content: space-between;
+    }
+    .fila-digitos {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .dig-circ {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1px solid #334155;
+      font-size: 8.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+    }
+    .dig-circ.marked {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+    .facultad-bar {
+      border: 1.5px solid #1e293b;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      background: #f8fafc;
+    }
+    .facultad-bar strong {
+      white-space: nowrap;
+    }
+    .facultad-bar span {
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .grupo-strip {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 2px 4px;
+    }
+    .grupo-label {
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .grupo-opciones {
+      display: flex;
+      gap: 8px;
+    }
+    .grupo-circ {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid #0f172a;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .grupo-circ.selected {
+      background: #0f172a;
+      color: #ffffff;
+    }
+    .timing-bar {
+      display: grid;
+      grid-template-columns: repeat(42, 1fr);
+      gap: 3px;
+      height: 10px;
+      padding: 0 2px;
+    }
+    .timing-bar span {
+      background: #0f172a;
+      display: block;
+      height: 100%;
+    }
+    .preguntas-5cols {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      border: 1.5px solid #1e293b;
+      padding: 8px;
+      background: #ffffff;
+    }
+    .col-preguntas {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-right: 1px dashed #cbd5e1;
+      padding-right: 6px;
+    }
+    .col-preguntas:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+    .fila-pregunta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      font-size: 11px;
+      padding: 1px 2px;
+    }
+    .num-preg {
+      font-weight: 800;
+      min-width: 24px;
+      color: #0f172a;
+    }
+    .burbujas-preg {
+      display: flex;
+      gap: 5px;
+    }
+    .op-circ {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.2px solid #1e293b;
+      font-size: 9.5px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: #ffffff;
+    }
+    .op-circ.marked {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .header-bar { display: none !important; }
+      .hoja-contenedor { padding: 0; overflow: visible; }
+      .cartilla-hoja { box-shadow: none; width: 100%; min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <img id="logoBarraSuperior" src="/logo.png" alt="Logo" style="width: 40px; height: 40px; object-fit: contain;">
+      <div>
+        <h2 style="font-size: 16px; font-weight: 800;">Cartilla de Respuestas</h2>
+        <p id="subtituloCartilla" style="font-size: 12px; color: #94a3b8;">Cargando datos del postulante...</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <button type="button" class="btn-imprimir" onclick="window.print()">
+        <i class="fa-solid fa-print"></i> Imprimir
+      </button>
+      <button type="button" class="btn-volver" id="btnVolverExamen">
+        <i class="fa-solid fa-arrow-left"></i> Volver al Examen
+      </button>
+    </div>
+  </div>
+
+  <div class="hoja-contenedor">
+    <div class="cartilla-hoja" id="cartillaHoja">
+      <div class="top-grid">
+        <div class="left-panel">
+          <div class="brand-header">
+            <div class="logo-box-cartilla" id="contenedorLogoCartilla">
+              <img id="logoCartillaOficial" src="/logo.png" alt="Logo Academia Tales">
+            </div>
+            <div>
+              <div class="academia">ACADEMIA</div>
+              <div class="nombre-academia">TALES</div>
+            </div>
+          </div>
+
+          <div class="box-title">HOJA DE IDENTIFICACIÓN</div>
+
+          <div class="campo-ident">
+            <label>Apellido Paterno</label>
+            <div class="valor-campo" id="campoApPaterno"></div>
+          </div>
+
+          <div class="campo-ident">
+            <label>Apellido Materno</label>
+            <div class="valor-campo" id="campoApMaterno"></div>
+          </div>
+
+          <div class="campo-ident">
+            <label>Nombres</label>
+            <div class="valor-campo" id="campoNombres"></div>
+          </div>
+
+          <div class="ejemplos-box">
+            <div class="ejemplos-title">EJEMPLOS DE MARCA</div>
+            <div class="ejemplos-cols">
+              <div>
+                <div>CORRECTA</div>
+                <div class="burbujas-ejemplo">
+                  <span class="mini-circ filled"></span>
+                </div>
+              </div>
+              <div>
+                <div>INCORRECTAS</div>
+                <div class="burbujas-ejemplo">
+                  <span class="mini-circ">✕</span>
+                  <span class="mini-circ">✓</span>
+                  <span class="mini-circ">◐</span>
+                  <span class="mini-circ">◑</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-panel">
+          <div class="firma-sede-huella">
+            <div class="recuadro-box">
+              <div class="recuadro-titulo">FIRMA DEL POSTULANTE <span style="font-weight:500;">(dentro del recuadro)</span></div>
+              <div id="firmaPostulante" style="text-align:center; font-style:italic; font-weight:700; color:#334155; font-size:13px;"></div>
+              <div style="height:12px;"></div>
+            </div>
+
+            <div class="recuadro-box">
+              <div class="recuadro-titulo">SEDE DONDE POSTULA</div>
+              <div class="sede-lista" id="listaSedes">
+                <div class="sede-item"><span>Iquitos</span><span class="sede-circ filled"></span></div>
+                <div class="sede-item"><span>Nauta</span><span class="sede-circ"></span></div>
+                <div class="sede-item"><span>Yurimaguas</span><span class="sede-circ"></span></div>
+                <div class="sede-item"><span>Requena</span><span class="sede-circ"></span></div>
+                <div class="sede-item"><span>Contamana</span><span class="sede-circ"></span></div>
+                <div class="sede-item"><span>Datem</span><span class="sede-circ"></span></div>
+              </div>
+            </div>
+
+            <div class="recuadro-box">
+              <div class="recuadro-titulo">HUELLA DIGITAL</div>
+              <div class="recuadro-sub">Índice Derecho</div>
+              <div style="height:56px;"></div>
+            </div>
+          </div>
+
+          <div class="grids-numericos">
+            <div class="grid-col-box">
+              <div class="grid-header">CÓDIGO DEL ALUMNO</div>
+              <div class="grid-valor-top" id="topCodigo"></div>
+              <div class="grid-matriz" id="matrizCodigo"></div>
+            </div>
+
+            <div class="grid-col-box">
+              <div class="grid-header">LOCAL</div>
+              <div class="grid-valor-top" id="topLocal"></div>
+              <div class="grid-matriz" id="matrizLocal"></div>
+            </div>
+
+            <div class="grid-col-box">
+              <div class="grid-header">AULA</div>
+              <div class="grid-valor-top" id="topAula"></div>
+              <div class="grid-matriz" id="matrizAula"></div>
+            </div>
+
+            <div class="grid-col-box">
+              <div class="grid-header">N° ASIENTO</div>
+              <div class="grid-valor-top" id="topAsiento"></div>
+              <div class="grid-matriz" id="matrizAsiento"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="facultad-bar">
+        <strong>Facultad que postula:</strong>
+        <span id="campoFacultad"></span>
+      </div>
+
+      <div class="grupo-strip">
+        <span class="grupo-label">GRUPO</span>
+        <div class="grupo-opciones" id="contenedorGrupos">
+          <span class="grupo-circ" data-grupo="A">A</span>
+          <span class="grupo-circ" data-grupo="B">B</span>
+          <span class="grupo-circ" data-grupo="C">C</span>
+          <span class="grupo-circ" data-grupo="D">D</span>
+        </div>
+      </div>
+
+      <div class="timing-bar" id="barraTiempo"></div>
+
+      <div class="preguntas-5cols" id="contenedor5Columnas"></div>
+    </div>
+  </div>
+
+  <script>
+    function asegurarLogoEnCartilla() {
+      const imgTop = document.getElementById("logoBarraSuperior");
+      const imgCartilla = document.getElementById("logoCartillaOficial");
+      if (!imgCartilla) return;
+
+      if (imgTop && imgTop.src) {
+        imgCartilla.src = imgTop.src;
+      } else if (!imgCartilla.getAttribute("src")) {
+        imgCartilla.src = "/logo.png";
+      }
+    }
+    window.addEventListener("DOMContentLoaded", asegurarLogoEnCartilla);
+    window.addEventListener("load", asegurarLogoEnCartilla);
+  </script>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    function separarApellidosYNombre(nombreCompleto) {
+      const partes = String(nombreCompleto || "").trim().split(/\s+/).filter(Boolean);
+      if (partes.length >= 3) {
+        return { paterno: partes[0], materno: partes[1], nombres: partes.slice(2).join(" ") };
+      }
+      if (partes.length === 2) {
+        return { paterno: partes[0], materno: "", nombres: partes[1] };
+      }
+      return { paterno: "", materno: "", nombres: partes[0] || "POSTULANTE" };
+    }
+
+    function construirMatrizDigitos(contenedorId, topId, valorStr, columnas) {
+      const cont = document.getElementById(contenedorId);
+      const top = document.getElementById(topId);
+      if (!cont || !top) return;
+
+      const limpio = String(valorStr || "").replace(/\D/g, "").slice(0, columnas);
+      top.innerHTML = "";
+      for (let c = 0; c < columnas; c++) {
+        const spanTop = document.createElement("span");
+        spanTop.textContent = limpio[c] || "";
+        top.appendChild(spanTop);
+      }
+
+      const digitos = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+      cont.innerHTML = "";
+
+      digitos.forEach((d) => {
+        const fila = document.createElement("div");
+        fila.className = "fila-digitos";
+        for (let c = 0; c < columnas; c++) {
+          const circ = document.createElement("span");
+          circ.className = "dig-circ" + (limpio[c] === d ? " marked" : "");
+          circ.textContent = d;
+          fila.appendChild(circ);
+        }
+        cont.appendChild(fila);
+      });
+    }
+
+    function construirBarraTiempo() {
+      const barra = document.getElementById("barraTiempo");
+      if (!barra) return;
+      barra.innerHTML = "";
+      for (let i = 0; i < 42; i++) {
+        barra.appendChild(document.createElement("span"));
+      }
+    }
+
+    function construirPreguntas5Columnas(totalPreguntas, respuestas, alternativasStr) {
+      const cont = document.getElementById("contenedor5Columnas");
+      if (!cont) return;
+      cont.innerHTML = "";
+
+      const opciones = String(alternativasStr || "ABCD")
+        .split("")
+        .map((x) => x.trim().toUpperCase())
+        .filter(Boolean);
+      const listaOps = opciones.length > 0 ? opciones : ["A", "B", "C", "D"];
+
+      const total = Math.max(20, parseInt(totalPreguntas, 10) || 100);
+      const numCols = 5;
+      const porCol = Math.ceil(total / numCols);
+
+      for (let col = 0; col < numCols; col++) {
+        const colDiv = document.createElement("div");
+        colDiv.className = "col-preguntas";
+
+        const inicio = col * porCol + 1;
+        const fin = Math.min(total, (col + 1) * porCol);
+
+        for (let p = inicio; p <= fin; p++) {
+          const fila = document.createElement("div");
+          fila.className = "fila-pregunta";
+
+          const numSpan = document.createElement("span");
+          numSpan.className = "num-preg";
+          numSpan.textContent = `${String(p).padStart(2, "0")}.`;
+
+          const burbujas = document.createElement("div");
+          burbujas.className = "burbujas-preg";
+
+          const marcada = String(respuestas?.[p] ?? respuestas?.[String(p)] ?? "").trim().toUpperCase();
+
+          listaOps.forEach((op) => {
+            const btn = document.createElement("span");
+            btn.className = "op-circ" + (marcada === op ? " marked" : "");
+            btn.textContent = op;
+            burbujas.appendChild(btn);
+          });
+
+          fila.appendChild(numSpan);
+          fila.appendChild(burbujas);
+          colDiv.appendChild(fila);
+        }
+
+        cont.appendChild(colDiv);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      asegurarLogoEnCartilla();
+
+      const params = new URLSearchParams(window.location.search);
+      const siglaUni = params.get("uni") || localStorage.getItem("universidadSeleccionada") || "UNAP";
+      const simId = params.get("id") || sessionStorage.getItem("simulacroActivoId") || "";
+
+      document.getElementById("btnVolverExamen").onclick = () => {
+        const idx = params.get("idx") || "";
+        window.location.href = `examen.html?uni=${encodeURIComponent(siglaUni)}&id=${encodeURIComponent(simId)}${idx ? `&idx=${encodeURIComponent(idx)}` : ""}`;
+      };
+
+      construirBarraTiempo();
+
+      let simData = {};
+      try {
+        if (simId) {
+          const { data } = await supabase.from("simulacros").select("*").eq("id", simId).single();
+          if (data) simData = data;
+        }
+      } catch (e) {
+        console.error("Error obteniendo simulacro:", e);
+      }
+
+      let datosGuardados = {};
+      try {
+        const rawTemp = sessionStorage.getItem("cartilla_datos_actuales");
+        if (rawTemp) datosGuardados = JSON.parse(rawTemp);
+      } catch (e) {}
+
+      if (!datosGuardados.respuestas && simId) {
+        const cod = String(sessionStorage.getItem("alumnoCodigo") || localStorage.getItem("alumnoCodigo") || "").trim().toLowerCase();
+        const keysLocal = Object.keys(localStorage).filter((k) => k.startsWith(`resultado_${simId}_`));
+        for (const k of keysLocal) {
+          if (!cod || k.endsWith(`_${cod}`)) {
+            try {
+              const parsed = JSON.parse(localStorage.getItem(k));
+              if (parsed?.respuestas) {
+                datosGuardados = { ...datosGuardados, ...parsed };
+                break;
+              }
+            } catch (e) {}
+          }
+        }
+      }
+
+      const alumno = datosGuardados.alumno || {};
+      const respuestas = datosGuardados.respuestas || {};
+      const carrera = datosGuardados.carrera || alumno.carrera || "";
+      const grupo = String(datosGuardados.grupo || alumno.grupo || "A").trim().toUpperCase();
+      const nombreAlumno = alumno.nombres || alumno.nombre || "Postulante";
+
+      document.getElementById("subtituloCartilla").textContent = `${nombreAlumno} • ${siglaUni.toUpperCase()} • Grupo ${grupo}`;
+
+      const { paterno, materno, nombres } = separarApellidosYNombre(nombreAlumno);
+      document.getElementById("campoApPaterno").textContent = paterno;
+      document.getElementById("campoApMaterno").textContent = materno;
+      document.getElementById("campoNombres").textContent = nombres;
+      document.getElementById("campoFacultad").textContent = carrera;
+      document.getElementById("firmaPostulante").textContent = nombreAlumno;
+
+      const codigoStr = String(alumno.codigo || alumno.dni || alumno.id || "");
+      construirMatrizDigitos("matrizCodigo", "topCodigo", codigoStr, 8);
+      construirMatrizDigitos("matrizLocal", "topLocal", alumno.local || "", 3);
+      construirMatrizDigitos("matrizAula", "topAula", alumno.aula || "", 3);
+      construirMatrizDigitos("matrizAsiento", "topAsiento", alumno.asiento || "", 4);
+
+      document.querySelectorAll("#contenedorGrupos .grupo-circ").forEach((el) => {
+        if (el.getAttribute("data-grupo") === grupo) {
+          el.classList.add("selected");
+        } else {
+          el.classList.remove("selected");
+        }
+      });
+
+      const totalPreg = parseInt(simData?.preguntas, 10) || 100;
+      const alternativasSim = simData?.alternativas || "ABCD";
+      construirPreguntas5Columnas(totalPreg, respuestas, alternativasSim);
+    });
+  </script>
+</body>
+</html>

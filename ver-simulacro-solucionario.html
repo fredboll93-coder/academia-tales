@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulacro y Solucionario - Academia TALES</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.75) 0%, rgba(10, 15, 30, 0.92) 100%),
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      gap: 14px;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      background: rgba(11, 18, 32, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      padding: 12px 24px;
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .btn-volver {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s;
+    }
+
+    .btn-volver:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-cerrar {
+      background: rgba(148, 163, 184, 0.14);
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .btn-cerrar:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #fff;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      flex: 1;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .panel-half {
+      background: rgba(11, 18, 32, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      backdrop-filter: blur(20px);
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: #38bdf8;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .lupa-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 8px;
+      padding: 3px 8px;
+    }
+
+    .lupa-btn {
+      background: rgba(59, 130, 246, 0.18);
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 6px;
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .lupa-btn:hover {
+      background: rgba(59, 130, 246, 0.35);
+      color: #fff;
+    }
+
+    .lupa-porcentaje {
+      font-size: 11px;
+      font-weight: 700;
+      color: #cbd5e1;
+      min-width: 42px;
+      text-align: center;
+    }
+
+    .pdf-box {
+      flex: 1;
+      min-height: 0;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      overflow-y: auto;
+      overflow-x: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .pdf-box canvas {
+      height: auto !important;
+      border-radius: 6px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+      pointer-events: none;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        overflow: auto;
+      }
+      .split-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+      }
+      .panel-half {
+        height: 75vh;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <img src="logo.png" alt="Logo" style="width: 44px; height: 44px; object-fit: contain;">
+      <div>
+        <h1 id="tituloSimulacroSplit" style="font-size: 16px; font-weight: 700; color: #fff;">Simulacro y Solucionario</h1>
+        <p id="subtituloSimulacroSplit" style="font-size: 12px; color: #94a3b8;">Academia Tales • Revisión del Examen</p>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button type="button" id="btnCerrarVentana" class="btn-cerrar">
+        <i class="fa-solid fa-xmark"></i> Cerrar
+      </button>
+      <button type="button" id="btnVolverSimulacros" class="btn-volver">
+        <i class="fa-solid fa-arrow-left"></i> Volver a Simulacros
+      </button>
+    </div>
+  </div>
+
+  <div class="split-grid">
+    <div class="panel-half">
+      <div class="panel-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-file-pdf" style="color: #60a5fa;"></i>
+          <span>Examen / Simulacro</span>
+        </div>
+        <div class="lupa-controls" title="Lupa del simulacro">
+          <i class="fa-solid fa-magnifying-glass" style="color: #60a5fa; font-size: 12px;"></i>
+          <button type="button" class="lupa-btn" id="lupaMenosSim" title="Alejar">-</button>
+          <span class="lupa-porcentaje" id="lupaPctSim">100%</span>
+          <button type="button" class="lupa-btn" id="lupaMasSim" title="Acercar">+</button>
+        </div>
+      </div>
+      <div class="pdf-box" id="visorSimulacro" oncontextmenu="return false;">
+        <div style="color: #94a3b8; font-size: 13px; margin: auto;">Cargando simulacro...</div>
+      </div>
+    </div>
+
+    <div class="panel-half">
+      <div class="panel-header" style="color: #c084fc;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-book-open" style="color: #c084fc;"></i>
+          <span>Solucionario</span>
+        </div>
+        <div class="lupa-controls" title="Lupa del solucionario">
+          <i class="fa-solid fa-magnifying-glass" style="color: #c084fc; font-size: 12px;"></i>
+          <button type="button" class="lupa-btn" id="lupaMenosSol" title="Alejar">-</button>
+          <span class="lupa-porcentaje" id="lupaPctSol">100%</span>
+          <button type="button" class="lupa-btn" id="lupaMasSol" title="Acercar">+</button>
+        </div>
+      </div>
+      <div class="pdf-box" id="visorSolucionario" oncontextmenu="return false;">
+        <div style="color: #94a3b8; font-size: 13px; margin: auto;">Cargando solucionario...</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    const estadoVisores = {
+      sim: { fuente: "", mensajeVacio: "No se encontró el PDF del simulacro.", zoom: 1.0, renderToken: 0 },
+      sol: { fuente: "", mensajeVacio: "No se encontró el PDF del solucionario para este simulacro.", zoom: 1.0, renderToken: 0 }
+    };
+
+    function cederFrame() {
+      return new Promise(resolve => requestAnimationFrame(() => resolve()));
+    }
+
+    async function renderizarPdfEnContenedor(fuentePdf, contenedor, mensajeVacio, zoom = 1.0, visorKey = null) {
+      const tokenActual = visorKey ? ++estadoVisores[visorKey].renderToken : 0;
+
+      if (!fuentePdf) {
+        contenedor.innerHTML = `<div style="color: #94a3b8; font-size: 13px; font-style: italic; margin: auto; text-align: center; padding: 20px;">${mensajeVacio}</div>`;
+        return;
+      }
+
+      try {
+        let loadingTask;
+        if (fuentePdf.startsWith('data:')) {
+          const base64 = fuentePdf.split(';base64,')[1];
+          const raw = window.atob(base64);
+          const uint8Array = new Uint8Array(raw.length);
+          for (let i = 0; i < raw.length; i++) {
+            uint8Array[i] = raw.charCodeAt(i);
+          }
+          loadingTask = pdfjsLib.getDocument({ data: uint8Array });
+        } else {
+          try {
+            const resp = await fetch(fuentePdf);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const buffer = await resp.arrayBuffer();
+            loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
+          } catch (e) {
+            loadingTask = pdfjsLib.getDocument(fuentePdf);
+          }
+        }
+
+        const pdf = await loadingTask.promise;
+        if (visorKey && tokenActual !== estadoVisores[visorKey].renderToken) return;
+        contenedor.innerHTML = '';
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          if (visorKey && tokenActual !== estadoVisores[visorKey].renderToken) return;
+          const page = await pdf.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1.25 * zoom });
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          contenedor.appendChild(canvas);
+
+          await page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise;
+
+          if (pageNum < pdf.numPages) {
+            await cederFrame();
+          }
+        }
+      } catch (err) {
+        if (visorKey && tokenActual !== estadoVisores[visorKey].renderToken) return;
+        console.error("Error al renderizar PDF:", err);
+        contenedor.innerHTML = `<div style="color: #f87171; font-size: 13px; margin: auto; text-align: center; padding: 20px;">No se pudo cargar el documento PDF.</div>`;
+      }
+    }
+
+    function configurarLupa(clave, idMenos, idMas, idPct, idVisor) {
+      const btnMenos = document.getElementById(idMenos);
+      const btnMas = document.getElementById(idMas);
+      const pctEl = document.getElementById(idPct);
+      const visorEl = document.getElementById(idVisor);
+
+      const actualizarZoom = async (delta) => {
+        const nuevoZoom = Math.min(2.2, Math.max(0.7, Number((estadoVisores[clave].zoom + delta).toFixed(2))));
+        estadoVisores[clave].zoom = nuevoZoom;
+        pctEl.textContent = `${Math.round(nuevoZoom * 100)}%`;
+        await renderizarPdfEnContenedor(
+          estadoVisores[clave].fuente,
+          visorEl,
+          estadoVisores[clave].mensajeVacio,
+          nuevoZoom,
+          clave
+        );
+      };
+
+      btnMenos.addEventListener("click", () => actualizarZoom(-0.15));
+      btnMas.addEventListener("click", () => actualizarZoom(0.15));
+    }
+
+    function aplicarSimulacroAInterfaz(sim, siglaUni) {
+      if (!sim) return;
+      document.getElementById("tituloSimulacroSplit").textContent = `${sim.titulo || 'Simulacro'} • Simulacro y Solucionario`;
+      document.getElementById("subtituloSimulacroSplit").textContent = `Academia Tales • ${sim.universidad_siglas || siglaUni}`;
+      estadoVisores.sim.fuente = sim.pdf_url || sim.pdfBase64 || sim.archivoSimulacroBase64 || sim.archivoSimulacro || "";
+      estadoVisores.sol.fuente = sim.solucionario_url || sim.solucionarioPdf || sim.solucionarioBase64 || sim.solucionario || "";
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      configurarLupa("sim", "lupaMenosSim", "lupaMasSim", "lupaPctSim", "visorSimulacro");
+      configurarLupa("sol", "lupaMenosSol", "lupaMasSol", "lupaPctSol", "visorSolucionario");
+
+      const params = new URLSearchParams(window.location.search);
+      const siglaUni = params.get('uni') || params.get('siglas') || localStorage.getItem('universidadSeleccionada') || sessionStorage.getItem('uniActual') || 'UNAP';
+      const simId = params.get('id') || sessionStorage.getItem('simulacroActivoId');
+
+      const urlVolverSimulacros = `simulacrosAlumno.html?siglas=${encodeURIComponent(siglaUni)}`;
+
+      document.getElementById("btnVolverSimulacros").addEventListener("click", () => {
+        window.location.href = urlVolverSimulacros;
+      });
+
+      document.getElementById("btnCerrarVentana").addEventListener("click", () => {
+        window.location.href = urlVolverSimulacros;
+      });
+
+      const visorSim = document.getElementById("visorSimulacro");
+      const visorSol = document.getElementById("visorSolucionario");
+
+      try {
+        if (simId) {
+          const caches = [
+            sessionStorage.getItem(`tales_admin_sims_${String(siglaUni).trim().toLowerCase()}`),
+            sessionStorage.getItem('tales_sims_cache')
+          ];
+          for (const rawCache of caches) {
+            if (!rawCache) continue;
+            const parsed = JSON.parse(rawCache);
+            if (Array.isArray(parsed)) {
+              const found = parsed.find(s => String(s.id) === String(simId));
+              if (found && (found.pdf_url || found.solucionario_url)) {
+                aplicarSimulacroAInterfaz(found, siglaUni);
+                renderizarPdfEnContenedor(estadoVisores.sim.fuente, visorSim, estadoVisores.sim.mensajeVacio, estadoVisores.sim.zoom, "sim");
+                renderizarPdfEnContenedor(estadoVisores.sol.fuente, visorSol, estadoVisores.sol.mensajeVacio, estadoVisores.sol.zoom, "sol");
+                break;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+
+      let simulacro = null;
+      try {
+        if (simId) {
+          const { data, error } = await supabase
+            .from('simulacros')
+            .select('*')
+            .eq('id', simId)
+            .single();
+
+          if (!error && data) {
+            simulacro = data;
+          }
+        }
+      } catch (e) {
+        console.error("Error obteniendo simulacro:", e);
+      }
+
+      if (simulacro) {
+        const simFuenteNueva = simulacro.pdf_url || simulacro.pdfBase64 || simulacro.archivoSimulacroBase64 || simulacro.archivoSimulacro || "";
+        const solFuenteNueva = simulacro.solucionario_url || simulacro.solucionarioPdf || simulacro.solucionarioBase64 || simulacro.solucionario || "";
+        const cambioSim = simFuenteNueva !== estadoVisores.sim.fuente;
+        const cambioSol = solFuenteNueva !== estadoVisores.sol.fuente;
+
+        aplicarSimulacroAInterfaz(simulacro, siglaUni);
+
+        const tareas = [];
+        if (cambioSim || visorSim.querySelector('canvas') === null) {
+          tareas.push(renderizarPdfEnContenedor(estadoVisores.sim.fuente, visorSim, estadoVisores.sim.mensajeVacio, estadoVisores.sim.zoom, "sim"));
+        }
+        if (cambioSol || visorSol.querySelector('canvas') === null) {
+          tareas.push(renderizarPdfEnContenedor(estadoVisores.sol.fuente, visorSol, estadoVisores.sol.mensajeVacio, estadoVisores.sol.zoom, "sol"));
+        }
+        await Promise.all(tareas);
+      } else if (!estadoVisores.sim.fuente && !estadoVisores.sol.fuente) {
+        await Promise.all([
+          renderizarPdfEnContenedor("", visorSim, estadoVisores.sim.mensajeVacio, estadoVisores.sim.zoom, "sim"),
+          renderizarPdfEnContenedor("", visorSol, estadoVisores.sol.mensajeVacio, estadoVisores.sol.zoom, "sol")
+        ]);
+      }
+    });
+  </script>
+</body>
+</html>

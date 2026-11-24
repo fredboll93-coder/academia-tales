@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Clases Grabadas - Academia Tales</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.7) 0%, rgba(10, 15, 30, 0.9) 100%), 
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .top-bar {
+      background: rgba(11, 18, 32, 0.85);
+      border: 3px solid rgba(148, 163, 184, 0.15);
+      border-top: 3px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 12px 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .main-card {
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-top: 2px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(148, 163, 184, 0.2);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(2, 6, 23, 0.7);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-card {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 20px;
+      padding: 25px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .modal-card h3 {
+      font-size: 18px;
+      color: #fff;
+    }
+
+    .modal-card input {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .modal-card input:focus {
+      border-color: #3b82f6;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .folder-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .folder-item {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: opacity 0.3s ease;
+    }
+
+    .folder-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .folder-icon {
+      font-size: 22px;
+    }
+
+    .folder-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+
+    .folder-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .disabled-folder {
+      opacity: 0.35;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-container">
+    <div class="top-bar">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="logo.png" alt="Logo" style="width: 90px; height: 90px; object-fit: contain; margin-top: -6px;">
+        <div style="margin-top: 5px;">
+          <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #f8fafc;">Panel de Universidad</h2>
+          <p style="margin: 0; font-size: 13px; color: #94a3b8;">Academia Tales • Clases Grabadas (<span id="uni-siglas-title"></span>)</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <button type="button" id="btn-simulacros" class="btn-secondary">📝 Simulacros</button>
+        <button type="button" id="btn-materiales" class="btn-secondary">📁 Materiales</button>
+        <button type="button" id="btn-volver" class="btn-secondary">← Volver</button>
+        <button type="button" id="btn-cerrar-sesion" class="btn-secondary" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <div class="main-card">
+      <div class="header-section">
+        <div>
+          <h1 style="font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px;">Clases Grabadas</h1>
+          <p style="font-size: 13px; color: #94a3b8;">Organiza las sesiones en video del ciclo por carpetas.</p>
+        </div>
+        <button class="btn-primary" onclick="abrirModalCarpeta()">+ Crear Carpeta</button>
+      </div>
+
+      <div id="folder-container" class="folder-list">
+        <p style="font-size: 13px; color: #94a3b8; text-align: center; padding: 20px;">Cargando carpetas...</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-carpeta" class="modal-overlay">
+    <div class="modal-card">
+      <h3 id="modal-titulo">Crear Nueva Carpeta</h3>
+      <input type="text" id="input-nombre-carpeta" placeholder="Nombre de la carpeta (Ej. Semana 1 - Álgebra)">
+      <div class="modal-buttons">
+        <button class="btn-secondary" onclick="cerrarModalCarpeta()">Cancelar</button>
+        <button class="btn-primary" onclick="guardarCarpeta()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const siglas = urlParams.get('siglas') || 'UNAP';
+
+    document.getElementById('uni-siglas-title').textContent = siglas;
+
+    // Botones de atajos superiores
+    document.getElementById('btn-simulacros').onclick = () => {
+      window.location.href = `simulacros.html?siglas=${siglas}`;
+    };
+
+    document.getElementById('btn-materiales').onclick = () => {
+      window.location.href = `materiales.html?siglas=${siglas}`;
+    };
+
+    document.getElementById('btn-volver').onclick = () => {
+      window.location.href = `universidad.html?siglas=${siglas}`;
+    };
+
+    document.getElementById('btn-cerrar-sesion').onclick = () => {
+      localStorage.removeItem("adminSesion");
+      sessionStorage.removeItem("adminSesion");
+      localStorage.removeItem("usuarioLogueado");
+      sessionStorage.removeItem("usuarioLogueado");
+      window.location.href = "index.html";
+    };
+
+    let carpetasClases = [];
+    let editandoIndex = null;
+
+    async function cargarCarpetas() {
+      try {
+        const { data, error } = await supabase
+          .from('clases_grabadas')
+          .select('*')
+          .ilike('universidad_siglas', siglas)
+          .order('id', { ascending: true });
+
+        if (error) throw error;
+        carpetasClases = data || [];
+      } catch (e) {
+        console.error("Error al leer carpetas:", e);
+        carpetasClases = [];
+      }
+      renderizarCarpetas();
+    }
+
+    function renderizarCarpetas() {
+      const container = document.getElementById('folder-container');
+      container.innerHTML = '';
+
+      if (carpetasClases.length === 0) {
+        container.innerHTML = `<p style="font-size: 13px; color: #94a3b8; font-style: italic; text-align: center; padding: 20px;">No hay carpetas creadas. Haga clic en "+ Crear Carpeta".</p>`;
+        return;
+      }
+
+      carpetasClases.forEach((carpeta, index) => {
+        const estadoClase = carpeta.habilitado !== false ? '' : 'disabled-folder';
+        const textoHabilitar = carpeta.habilitado !== false ? 'Deshabilitar' : 'Habilitar';
+        const cantVideos = Array.isArray(carpeta.videos) ? carpeta.videos.length : 0;
+
+        container.innerHTML += `
+          <div class="folder-item ${estadoClase}">
+            <div class="folder-info" style="cursor: pointer;" onclick="abrirContenidoCarpeta(${index})">
+              <span class="folder-icon">📁</span>
+              <div>
+                <div class="folder-name">${carpeta.nombre}</div>
+                <div style="font-size: 12px; color: #94a3b8;">${cantVideos} video(s) guardado(s) • Clic para abrir</div>
+              </div>
+            </div>
+            <div class="folder-actions">
+              <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleHabilitar(${index})">${textoHabilitar}</button>
+              <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editarCarpeta(${index})">Editar</button>
+              <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; color: #f87171; border-color: rgba(239,68,68,0.3);" onclick="eliminarCarpeta(${index})">Eliminar</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    window.abrirContenidoCarpeta = function(index) {
+      const folder = carpetasClases[index];
+      if (folder) {
+        window.location.href = `contenido-carpeta.html?siglas=${siglas}&folderId=${folder.id}`;
+      }
+    };
+
+    window.abrirModalCarpeta = function(index = null) {
+      editandoIndex = index;
+      const modal = document.getElementById('modal-carpeta');
+      const input = document.getElementById('input-nombre-carpeta');
+      const titulo = document.getElementById('modal-titulo');
+
+      if (index !== null) {
+        titulo.textContent = "Editar Carpeta";
+        input.value = carpetasClases[index].nombre || '';
+      } else {
+        titulo.textContent = "Crear Nueva Carpeta";
+        input.value = '';
+      }
+
+      modal.style.display = 'flex';
+      input.focus();
+    };
+
+    window.cerrarModalCarpeta = function() {
+      document.getElementById('modal-carpeta').style.display = 'none';
+      editandoIndex = null;
+    };
+
+    window.guardarCarpeta = async function() {
+      const nombreVal = document.getElementById('input-nombre-carpeta').value.trim();
+      if (!nombreVal) {
+        alert('Por favor ingrese un nombre para la carpeta.');
+        return;
+      }
+
+      try {
+        if (editandoIndex !== null) {
+          const carpetaActual = carpetasClases[editandoIndex];
+          const { error } = await supabase
+            .from('clases_grabadas')
+            .update({ nombre: nombreVal })
+            .eq('id', carpetaActual.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from('clases_grabadas')
+            .insert([{
+              id: Date.now(),
+              universidad_siglas: siglas,
+              nombre: nombreVal,
+              habilitado: true,
+              videos: []
+            }]);
+          if (error) throw error;
+        }
+
+        cerrarModalCarpeta();
+        await cargarCarpetas();
+      } catch (e) {
+        console.error("Error al guardar:", e);
+        alert("Hubo un error al guardar la carpeta.");
+      }
+    };
+
+    window.editarCarpeta = function(index) {
+      abrirModalCarpeta(index);
+    };
+
+    window.toggleHabilitar = async function(index) {
+      const carpeta = carpetasClases[index];
+      const nuevoEstado = !(carpeta.habilitado !== false);
+
+      try {
+        const { error } = await supabase
+          .from('clases_grabadas')
+          .update({ habilitado: nuevoEstado })
+          .eq('id', carpeta.id);
+        if (error) throw error;
+        await cargarCarpetas();
+      } catch (e) {
+        console.error("Error al actualizar estado:", e);
+      }
+    };
+
+    window.eliminarCarpeta = async function(index) {
+      const carpeta = carpetasClases[index];
+      if (confirm(`¿Está seguro de eliminar la carpeta "${carpeta.nombre}"?`)) {
+        try {
+          const { error } = await supabase
+            .from('clases_grabadas')
+            .delete()
+            .eq('id', carpeta.id);
+          if (error) throw error;
+          await cargarCarpetas();
+        } catch (e) {
+          console.error("Error al eliminar:", e);
+        }
+      }
+    };
+
+    cargarCarpetas();
+  </script>
+</body>
+</html>

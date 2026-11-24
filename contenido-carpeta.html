@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contenido de Carpeta - Academia Tales</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.7) 0%, rgba(10, 15, 30, 0.9) 100%), 
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .top-bar {
+      background: rgba(11, 18, 32, 0.85);
+      border: 3px solid rgba(148, 163, 184, 0.15);
+      border-top: 3px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 12px 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .main-card {
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-top: 2px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(148, 163, 184, 0.2);
+    }
+
+    /* Reproductor de Video */
+    .player-wrapper {
+      display: none;
+      margin-bottom: 25px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .video-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      border: none;
+      background: #000;
+      margin-top: 12px;
+    }
+
+    /* Lista de Videos / Materiales */
+    .video-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .video-item {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .video-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .video-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+
+    .video-desc {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 3px;
+    }
+
+    .video-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(2, 6, 23, 0.75);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-card {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 20px;
+      padding: 25px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-card label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: -8px;
+    }
+
+    .modal-card input, .modal-card textarea {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .modal-card input:focus, .modal-card textarea:focus {
+      border-color: #3b82f6;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-container">
+    <div class="top-bar">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="logo.png" alt="Logo" style="width: 90px; height: 90px; object-fit: contain; margin-top: -6px;">
+        <div style="margin-top: 5px;">
+          <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #f8fafc;">Contenido de Carpeta</h2>
+          <p style="margin: 0; font-size: 13px; color: #94a3b8;">Academia Tales • <span id="uni-siglas-title"></span></p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <button type="button" id="btn-simulacros" class="btn-secondary">📝 Simulacros</button>
+        <button type="button" id="btn-clases" class="btn-secondary">🎥 Clases Grabadas</button>
+        <button type="button" id="btn-materiales" class="btn-secondary">📁 Materiales</button>
+        <button type="button" id="btn-volver" class="btn-secondary">← Volver a Carpetas</button>
+        <button type="button" id="btn-cerrar-sesion" class="btn-secondary" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <div class="main-card">
+      <div class="header-section">
+        <div>
+          <h1 id="nombre-carpeta-titulo" style="font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px;">Cargando carpeta...</h1>
+          <p id="subtitulo-carpeta" style="font-size: 13px; color: #94a3b8;">Agrega los enlaces de tus clases grabadas (YouTube Oculto o Bunny.net).</p>
+        </div>
+        <button type="button" id="btn-agregar-video" class="btn-primary" onclick="abrirModalVideo()">+ Agregar Video</button>
+      </div>
+
+      <!-- Reproductor Integrado -->
+      <div id="player-wrapper" class="player-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 id="player-titulo" style="font-size: 16px; color: #fff;">Reproduciendo clase</h3>
+          <button type="button" class="btn-secondary" style="padding: 5px 12px; font-size: 12px;" onclick="cerrarReproductor()">Cerrar Video ✕</button>
+        </div>
+        <iframe id="video-iframe" class="video-frame" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+      </div>
+
+      <!-- Lista de Videos / Materiales -->
+      <div id="video-container" class="video-list">
+        <p style="font-size: 13px; color: #94a3b8; text-align: center; padding: 20px;">Cargando contenido...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Agregar / Editar Video -->
+  <div id="modal-video" class="modal-overlay">
+    <div class="modal-card">
+      <h3 id="modal-video-titulo" style="font-size: 18px; color: #fff;">Agregar Nuevo Video</h3>
+      
+      <label>Título de la clase</label>
+      <input type="text" id="input-video-titulo" placeholder="Ej. Clase 01 - Teoría de Exponentes">
+      
+      <label>Enlace del video (YouTube o Bunny.net)</label>
+      <input type="text" id="input-video-url" placeholder="Ej. https://youtu.be/xxxxxxx">
+      
+      <label>Descripción o tema (Opcional)</label>
+      <textarea id="input-video-desc" rows="2" placeholder="Breve resumen de los temas tratados..."></textarea>
+
+      <div class="modal-buttons">
+        <button type="button" class="btn-secondary" onclick="cerrarModalVideo()">Cancelar</button>
+        <button type="button" class="btn-primary" onclick="guardarVideo()">Guardar Video</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const siglas = urlParams.get('siglas') || urlParams.get('uni') || 'UNAP';
+    const rawFolderId = urlParams.get('folderId');
+    const modoParam = (urlParams.get('modo') || '').toLowerCase();
+    const siglaLim = String(siglas).trim().toLowerCase();
+    const cacheKey = `tales_carpeta_detalle_${siglaLim}_${rawFolderId ?? ''}`;
+
+    const esAdminSesion = localStorage.getItem("adminSesion") === "true" || sessionStorage.getItem("adminSesion") === "true";
+    const usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado") || "null");
+    const esAdminUsuario = usuarioLogueado && usuarioLogueado.tipo === "admin";
+    const esModoAlumno = modoParam === 'alumno' || (!esAdminSesion && !esAdminUsuario);
+
+    document.getElementById('uni-siglas-title').textContent = siglas;
+
+    const btnAgregarVideo = document.getElementById('btn-agregar-video');
+    const subtituloCarpeta = document.getElementById('subtitulo-carpeta');
+
+    if (esModoAlumno) {
+      if (btnAgregarVideo) btnAgregarVideo.style.display = 'none';
+      if (subtituloCarpeta) subtituloCarpeta.textContent = 'Visualiza el contenido disponible en esta carpeta.';
+    }
+
+    let tipoCarpeta = 'clases'; // 'clases' | 'materiales'
+    let carpetaActual = null;
+    let listaVideos = [];
+    let listaMateriales = [];
+    let editandoVideoIndex = null;
+    let origenDatos = 'clases_grabadas';
+    let uniRowId = null;
+    let uniCarpetasArray = null;
+    let uniCarpetaIndex = -1;
+
+    document.getElementById('btn-simulacros').onclick = () => {
+      window.location.href = esModoAlumno
+        ? `simulacrosAlumno.html?siglas=${encodeURIComponent(siglas)}`
+        : `simulacros.html?siglas=${encodeURIComponent(siglas)}`;
+    };
+
+    document.getElementById('btn-clases').onclick = () => {
+      window.location.href = esModoAlumno
+        ? `clasesGrabadasAlumno.html?siglas=${encodeURIComponent(siglas)}`
+        : `clases-grabadas.html?siglas=${encodeURIComponent(siglas)}`;
+    };
+
+    document.getElementById('btn-materiales').onclick = () => {
+      window.location.href = esModoAlumno
+        ? `materialesAlumno.html?siglas=${encodeURIComponent(siglas)}`
+        : `materiales.html?siglas=${encodeURIComponent(siglas)}`;
+    };
+
+    document.getElementById('btn-volver').onclick = () => {
+      window.location.href = tipoCarpeta === 'materiales'
+        ? (esModoAlumno ? `materialesAlumno.html?siglas=${encodeURIComponent(siglas)}` : `materiales.html?siglas=${encodeURIComponent(siglas)}`)
+        : (esModoAlumno ? `clasesGrabadasAlumno.html?siglas=${encodeURIComponent(siglas)}` : `clases-grabadas.html?siglas=${encodeURIComponent(siglas)}`);
+    };
+
+    document.getElementById('btn-cerrar-sesion').onclick = () => {
+      localStorage.removeItem("adminSesion");
+      sessionStorage.removeItem("adminSesion");
+      localStorage.removeItem("usuarioLogueado");
+      sessionStorage.removeItem("usuarioLogueado");
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    };
+
+    function leerCacheCarpeta() {
+      try {
+        const raw = sessionStorage.getItem(cacheKey) || localStorage.getItem(cacheKey);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function guardarCacheCarpeta(payload) {
+      try {
+        const serialized = JSON.stringify(payload);
+        sessionStorage.setItem(cacheKey, serialized);
+        localStorage.setItem(cacheKey, serialized);
+      } catch (e) {}
+    }
+
+    function aplicarCarpetaEnVista(encontrada, tipo, origen, rowId = null, carpetasArr = null, carpetaIdx = -1) {
+      carpetaActual = encontrada;
+      tipoCarpeta = tipo;
+      origenDatos = origen;
+      uniRowId = rowId;
+      uniCarpetasArray = carpetasArr;
+      uniCarpetaIndex = carpetaIdx;
+
+      document.getElementById('nombre-carpeta-titulo').textContent = `📁 ${carpetaActual.nombre || carpetaActual.titulo || 'Carpeta'}`;
+
+      if (tipoCarpeta === 'materiales') {
+        if (btnAgregarVideo) btnAgregarVideo.style.display = 'none';
+        if (subtituloCarpeta) {
+          subtituloCarpeta.textContent = esModoAlumno
+            ? 'Selecciona un material o documento PDF para abrirlo.'
+            : 'Materiales registrados en esta carpeta.';
+        }
+        listaMateriales = extraerMaterialesDeCarpeta(carpetaActual);
+        listaVideos = [];
+      } else {
+        if (btnAgregarVideo && !esModoAlumno) btnAgregarVideo.style.display = '';
+        if (subtituloCarpeta) {
+          subtituloCarpeta.textContent = esModoAlumno
+            ? 'Selecciona una clase grabada para reproducirla.'
+            : 'Agrega los enlaces de tus clases grabadas (YouTube Oculto o Bunny.net).';
+        }
+        listaVideos = Array.isArray(carpetaActual.videos) ? carpetaActual.videos : [];
+        listaMateriales = [];
+      }
+    }
+
+    function convertirAEmbedUrl(url) {
+      if (!url) return '';
+      const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (ytMatch && ytMatch[1]) {
+        return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0`;
+      }
+      return url;
+    }
+
+    function extraerMaterialesDeCarpeta(carpeta) {
+      if (!carpeta || typeof carpeta !== 'object') return [];
+      const candidatos =
+        carpeta.archivos ||
+        carpeta.materiales ||
+        carpeta.pdfs ||
+        carpeta.documentos ||
+        carpeta.items ||
+        carpeta.contenido ||
+        [];
+      if (!Array.isArray(candidatos)) return [];
+      return esModoAlumno ? candidatos.filter(a => a && a.oculto !== true) : candidatos;
+    }
+
+    function obtenerFuentePdf(item) {
+      if (!item || typeof item !== 'object') return '';
+      return (
+        item.pdfBase64 ||
+        item.pdf_base64 ||
+        item.base64 ||
+        item.url ||
+        item.enlace ||
+        item.link ||
+        item.archivo_url ||
+        item.pdf_url ||
+        item.fileUrl ||
+        ''
+      );
+    }
+
+    window.abrirPdfAlumno = function(index) {
+      const item = listaMateriales[index];
+      const fuente = obtenerFuentePdf(item);
+      if (!fuente) {
+        alert("No se encontró el archivo PDF disponible.");
+        return;
+      }
+
+      if (fuente.startsWith("data:application/pdf") || fuente.startsWith("data:")) {
+        const win = window.open();
+        if (win) {
+          win.document.write(`<iframe src="${fuente}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+        }
+      } else {
+        window.open(fuente, "_blank", "noopener,noreferrer");
+      }
+    };
+
+    async function cargarDatosCarpeta() {
+      const cacheInicial = leerCacheCarpeta();
+      if (cacheInicial && cacheInicial.carpeta) {
+        aplicarCarpetaEnVista(
+          cacheInicial.carpeta,
+          cacheInicial.tipo || 'clases',
+          cacheInicial.origen || 'clases_grabadas',
+          cacheInicial.uniRowId ?? null,
+          cacheInicial.uniCarpetasArray ?? null,
+          cacheInicial.uniCarpetaIndex ?? -1
+        );
+        renderizarContenido();
+      }
+
+      try {
+        let encontrada = null;
+        let tipoResuelto = 'clases';
+        let origenResuelto = 'clases_grabadas';
+        let rowIdResuelto = null;
+        let carpetasArrResuelto = null;
+        let carpetaIdxResuelto = -1;
+
+        // 1. Buscar en tabla materiales
+        if (rawFolderId !== null && rawFolderId !== '') {
+          const numericId = Number(rawFolderId);
+          if (!Number.isNaN(numericId)) {
+            const { data, error } = await supabase
+              .from('materiales')
+              .select('*')
+              .eq('id', numericId)
+              .maybeSingle();
+
+            if (!error && data) {
+              encontrada = data;
+              tipoResuelto = 'materiales';
+              origenResuelto = 'materiales';
+            }
+          }
+
+          if (!encontrada) {
+            const { data: allMats } = await supabase.from('materiales').select('*');
+            if (Array.isArray(allMats)) {
+              const match = allMats.find((m, idx) =>
+                String(m.id ?? idx) === String(rawFolderId)
+              );
+              if (match) {
+                encontrada = match;
+                tipoResuelto = 'materiales';
+                origenResuelto = 'materiales';
+              }
+            }
+          }
+        }
+
+        // 2. Buscar en tabla clases_grabadas
+        if (!encontrada && rawFolderId !== null && rawFolderId !== '') {
+          const numericId = Number(rawFolderId);
+          if (!Number.isNaN(numericId)) {
+            const { data, error } = await supabase
+              .from('clases_grabadas')
+              .select('*')
+              .eq('id', numericId)
+              .maybeSingle();
+
+            if (!error && data) {
+              encontrada = data;
+              tipoResuelto = 'clases';
+              origenResuelto = 'clases_grabadas';
+            }
+          }
+
+          if (!encontrada) {
+            const { data: allClases } = await supabase.from('clases_grabadas').select('*');
+            if (Array.isArray(allClases)) {
+              const match = allClases.find((c, idx) =>
+                String(c.id ?? idx) === String(rawFolderId)
+              );
+              if (match) {
+                encontrada = match;
+                tipoResuelto = 'clases';
+                origenResuelto = 'clases_grabadas';
+              }
+            }
+          }
+        }
+
+        // 3. Buscar dentro de universidades
+        if (!encontrada) {
+          const { data: uniMatch } = await supabase
+            .from('universidades')
+            .select('*')
+            .ilike('siglas', siglaLim)
+            .limit(1);
+
+          let uniData = (Array.isArray(uniMatch) && uniMatch.length > 0) ? uniMatch[0] : null;
+          if (!uniData) {
+            const { data: unis } = await supabase.from('universidades').select('*');
+            if (Array.isArray(unis)) {
+              uniData = unis.find(u => String(u.siglas || u.nombre || "").trim().toLowerCase() === siglaLim) || null;
+            }
+          }
+
+          if (uniData) {
+            const rawMats = uniData.materiales;
+            const carpetasMats = Array.isArray(rawMats)
+              ? rawMats
+              : (rawMats && typeof rawMats === 'object' && Array.isArray(rawMats.carpetas) ? rawMats.carpetas : []);
+            if (Array.isArray(carpetasMats)) {
+              const idxMat = carpetasMats.findIndex((c, idx) => String(c.id ?? idx) === String(rawFolderId));
+              if (idxMat !== -1) {
+                encontrada = carpetasMats[idxMat];
+                tipoResuelto = 'materiales';
+                origenResuelto = 'universidades_materiales';
+                rowIdResuelto = uniData.id;
+                carpetasArrResuelto = carpetasMats;
+                carpetaIdxResuelto = idxMat;
+              }
+            }
+
+            if (!encontrada) {
+              const rawCarpetasClases = uniData.clasesGrabadas || uniData.clases_grabadas || uniData.clases || [];
+              if (Array.isArray(rawCarpetasClases)) {
+                const idxClase = rawCarpetasClases.findIndex((c, idx) => String(c.id ?? idx) === String(rawFolderId));
+                if (idxClase !== -1) {
+                  encontrada = rawCarpetasClases[idxClase];
+                  tipoResuelto = 'clases';
+                  origenResuelto = 'universidades_clases';
+                  rowIdResuelto = uniData.id;
+                  carpetasArrResuelto = rawCarpetasClases;
+                  carpetaIdxResuelto = idxClase;
+                }
+              }
+            }
+          }
+        }
+
+        if (!encontrada) {
+          if (!cacheInicial || !cacheInicial.carpeta) {
+            document.getElementById('nombre-carpeta-titulo').textContent = "Carpeta no encontrada";
+            renderizarContenido();
+          }
+          return;
+        }
+
+        aplicarCarpetaEnVista(
+          encontrada,
+          tipoResuelto,
+          origenResuelto,
+          rowIdResuelto,
+          carpetasArrResuelto,
+          carpetaIdxResuelto
+        );
+
+        guardarCacheCarpeta({
+          carpeta: encontrada,
+          tipo: tipoResuelto,
+          origen: origenResuelto,
+          uniRowId: rowIdResuelto,
+          uniCarpetasArray: carpetasArrResuelto,
+          uniCarpetaIndex: carpetaIdxResuelto
+        });
+      } catch (e) {
+        console.error("Error al cargar carpeta:", e);
+        if (!cacheInicial || !cacheInicial.carpeta) {
+          document.getElementById('nombre-carpeta-titulo').textContent = "Carpeta no encontrada";
+        }
+      }
+      renderizarContenido();
+    }
+
+    function renderizarContenido() {
+      const container = document.getElementById('video-container');
+      container.innerHTML = '';
+
+      if (tipoCarpeta === 'materiales') {
+        if (listaMateriales.length === 0) {
+          container.innerHTML = `<p style="font-size: 13px; color: #94a3b8; font-style: italic; text-align: center; padding: 20px;">Aún no hay materiales disponibles en esta carpeta.</p>`;
+          return;
+        }
+
+        listaMateriales.forEach((item, index) => {
+          const titulo = item.titulo || item.nombre || item.name || `Material ${index + 1}`;
+          const descripcion = item.descripcion || item.detalle || 'Documento PDF de estudio';
+          const tienePdf = Boolean(obtenerFuentePdf(item));
+
+          const botonAbrir = tienePdf
+            ? `<button type="button" class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="abrirPdfAlumno(${index})">Ver PDF ↗</button>`
+            : `<span style="font-size: 12px; color: #94a3b8;">Sin enlace</span>`;
+
+          container.innerHTML += `
+            <div class="video-item">
+              <div class="video-info" ${tienePdf ? `onclick="abrirPdfAlumno(${index})"` : ''}>
+                <span style="font-size: 24px;">📄</span>
+                <div>
+                  <div class="video-title">${titulo}</div>
+                  <div class="video-desc">${descripcion}</div>
+                </div>
+              </div>
+              <div class="video-actions">
+                ${botonAbrir}
+              </div>
+            </div>
+          `;
+        });
+        return;
+      }
+
+      if (listaVideos.length === 0) {
+        container.innerHTML = `<p style="font-size: 13px; color: #94a3b8; font-style: italic; text-align: center; padding: 20px;">${esModoAlumno ? 'Aún no hay videos disponibles en esta carpeta.' : 'Aún no hay videos en esta carpeta. Haz clic en "+ Agregar Video".'}</p>`;
+        return;
+      }
+
+      listaVideos.forEach((video, index) => {
+        const botonesAdmin = esModoAlumno ? '' : `
+          <button type="button" class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editarVideo(${index})">Editar</button>
+          <button type="button" class="btn-secondary" style="padding: 6px 12px; font-size: 12px; color: #f87171; border-color: rgba(239,68,68,0.3);" onclick="eliminarVideo(${index})">Eliminar</button>
+        `;
+
+        container.innerHTML += `
+          <div class="video-item">
+            <div class="video-info" onclick="reproducirVideo(${index})">
+              <span style="font-size: 24px;">🎬</span>
+              <div>
+                <div class="video-title">${video.titulo}</div>
+                <div class="video-desc">${video.descripcion || 'Clic para reproducir clase'}</div>
+              </div>
+            </div>
+            <div class="video-actions">
+              <button type="button" class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="reproducirVideo(${index})">▶ Ver</button>
+              ${botonesAdmin}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    window.reproducirVideo = function(index) {
+      const video = listaVideos[index];
+      if (!video) return;
+      const wrapper = document.getElementById('player-wrapper');
+      const iframe = document.getElementById('video-iframe');
+      document.getElementById('player-titulo').textContent = video.titulo;
+      iframe.src = convertirAEmbedUrl(video.url);
+      wrapper.style.display = 'block';
+      wrapper.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.cerrarReproductor = function() {
+      document.getElementById('player-wrapper').style.display = 'none';
+      document.getElementById('video-iframe').src = '';
+    };
+
+    window.abrirModalVideo = function(index = null) {
+      if (esModoAlumno || tipoCarpeta !== 'clases') return;
+      editandoVideoIndex = index;
+      const modal = document.getElementById('modal-video');
+      const inputTitulo = document.getElementById('input-video-titulo');
+      const inputUrl = document.getElementById('input-video-url');
+      const inputDesc = document.getElementById('input-video-desc');
+      const modalTitle = document.getElementById('modal-video-titulo');
+
+      if (index !== null) {
+        modalTitle.textContent = "Editar Video";
+        inputTitulo.value = listaVideos[index].titulo || '';
+        inputUrl.value = listaVideos[index].url || '';
+        inputDesc.value = listaVideos[index].descripcion || '';
+      } else {
+        modalTitle.textContent = "Agregar Nuevo Video";
+        inputTitulo.value = '';
+        inputUrl.value = '';
+        inputDesc.value = '';
+      }
+
+      modal.style.display = 'flex';
+      inputTitulo.focus();
+    };
+
+    window.cerrarModalVideo = function() {
+      document.getElementById('modal-video').style.display = 'none';
+      editandoVideoIndex = null;
+    };
+
+    async function sincronizarVideosSupabase() {
+      if (origenDatos === 'universidades_clases' && uniRowId && Array.isArray(uniCarpetasArray) && uniCarpetaIndex !== -1) {
+        uniCarpetasArray[uniCarpetaIndex] = { ...uniCarpetasArray[uniCarpetaIndex], videos: listaVideos };
+        const { error } = await supabase
+          .from('universidades')
+          .update({ clasesGrabadas: uniCarpetasArray })
+          .eq('id', uniRowId);
+        if (error) throw error;
+        return;
+      }
+
+      const { error } = await supabase
+        .from('clases_grabadas')
+        .update({ videos: listaVideos })
+        .eq('id', carpetaActual.id);
+      if (error) throw error;
+    }
+
+    window.guardarVideo = async function() {
+      if (esModoAlumno || tipoCarpeta !== 'clases') return;
+      const titulo = document.getElementById('input-video-titulo').value.trim();
+      const url = document.getElementById('input-video-url').value.trim();
+      const descripcion = document.getElementById('input-video-desc').value.trim();
+
+      if (!titulo || !url) {
+        alert('Por favor ingresa el título y el enlace del video.');
+        return;
+      }
+
+      try {
+        if (editandoVideoIndex !== null) {
+          listaVideos[editandoVideoIndex] = { ...listaVideos[editandoVideoIndex], titulo, url, descripcion };
+        } else {
+          listaVideos.push({ id: Date.now(), titulo, url, descripcion });
+        }
+
+        await sincronizarVideosSupabase();
+        guardarCacheCarpeta({
+          carpeta: { ...carpetaActual, videos: listaVideos },
+          tipo: tipoCarpeta,
+          origen: origenDatos,
+          uniRowId,
+          uniCarpetasArray,
+          uniCarpetaIndex
+        });
+        cerrarModalVideo();
+        renderizarContenido();
+      } catch (e) {
+        console.error("Error al guardar video:", e);
+        alert("Hubo un error al guardar el video en Supabase.");
+      }
+    };
+
+    window.editarVideo = function(index) {
+      if (esModoAlumno) return;
+      abrirModalVideo(index);
+    };
+
+    window.eliminarVideo = async function(index) {
+      if (esModoAlumno) return;
+      if (confirm(`¿Eliminar el video "${listaVideos[index].titulo}"?`)) {
+        try {
+          listaVideos.splice(index, 1);
+          await sincronizarVideosSupabase();
+          guardarCacheCarpeta({
+            carpeta: { ...carpetaActual, videos: listaVideos },
+            tipo: tipoCarpeta,
+            origen: origenDatos,
+            uniRowId,
+            uniCarpetasArray,
+            uniCarpetaIndex
+          });
+          renderizarContenido();
+        } catch (e) {
+          console.error("Error al eliminar video:", e);
+        }
+      }
+    };
+
+    cargarDatosCarpeta();
+  </script>
+</body>
+</html>

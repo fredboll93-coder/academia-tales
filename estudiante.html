@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel del Estudiante - Academia TALES</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #080d1a 45%, #030712 100%); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; min-height: 100vh; position: relative; overflow-x: hidden;">
+
+  <!-- EFECTOS DE LUZ Y FONDO -->
+  <div style="position: absolute; top: -100px; left: 15%; width: 450px; height: 450px; background: rgba(59, 130, 246, 0.12); filter: blur(120px); border-radius: 50%; pointer-events: none; z-index: 0;"></div>
+  <div style="position: absolute; top: 40%; right: 10%; width: 500px; height: 500px; background: rgba(99, 102, 241, 0.1); filter: blur(140px); border-radius: 50%; pointer-events: none; z-index: 0;"></div>
+
+  <!-- ENCABEZADO SUPERIOR -->
+  <header style="width: 100%; background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 22px 40px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 10;">
+    <div style="max-width: 60%;">
+      <p style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.25rem; color: #ffffff; margin: 0; line-height: 1.4; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+        "El éxito es la suma de pequeños esfuerzos repetidos día tras día."
+      </p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+      <img src="logo.png" alt="Logo Tales" style="height: 75px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">
+      <span id="saludoAlumno" style="font-weight: 700; font-size: 1rem; color: #ffffff; letter-spacing: 0.5px; text-transform: uppercase;">
+        HOLA ESTUDIANTE
+      </span>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main style="max-width: 1200px; margin: 25px auto; padding: 0 40px; box-sizing: border-box; position: relative; z-index: 10;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <h2 style="font-size: 1.35rem; font-weight: 700; color: #e2e8f0; margin: 0; border-left: 4px solid #3b82f6; padding-left: 12px; text-shadow: 0 2px 8px rgba(0,0,0,0.4);">
+        Universidades Disponibles
+      </h2>
+      
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="background: rgba(11, 15, 25, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px); border-radius: 8px; padding: 4px; display: flex; gap: 4px;">
+          <button id="btnVistaGrid" title="Vista Cuadrícula" style="background-color: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: background 0.2s;">
+            <i class="fa-solid fa-border-all"></i>
+          </button>
+          <button id="btnVistaList" title="Vista Lista" style="background-color: transparent; color: #9ca3af; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: background 0.2s;">
+            <i class="fa-solid fa-list"></i>
+          </button>
+        </div>
+
+        <!-- Menú Hamburguesa -->
+        <div style="position: relative;">
+          <button id="btnMenuToggle" style="background: rgba(11, 15, 25, 0.7); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div id="menuDesplegable" style="display: none; position: absolute; right: 0; top: 44px; background-color: #0b0f19; border: 1px solid #1f2937; border-radius: 10px; min-width: 190px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; overflow: hidden;">
+            <button id="btnCambiarPass" style="width: 100%; text-align: left; background: none; border: none; color: #e2e8f0; padding: 12px 16px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1f2937;" onmouseover="this.style.backgroundColor='#1f2937'" onmouseout="this.style.backgroundColor='transparent'">
+              <i class="fa-solid fa-key" style="color: #60a5fa;"></i> Cambiar contraseña
+            </button>
+            <button id="btnCerrarSesion" style="width: 100%; text-align: left; background: none; border: none; color: #f87171; padding: 12px 16px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;" onmouseover="this.style.backgroundColor='#1f2937'" onmouseout="this.style.backgroundColor='transparent'">
+              <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENEDOR DE UNIVERSIDADES -->
+    <div id="contenedorUniversidades" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 260px)); justify-content: center; gap: 40px; margin-top: 30px;">
+    </div>
+  </main>
+
+  <!-- MODAL PARA CAMBIAR CONTRASEÑA CON OJITO VISIBLE -->
+  <div id="modalCambiarPass" style="display: none; position: fixed; inset: 0; background: rgba(3, 7, 18, 0.75); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 1000; padding: 20px;">
+    <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; width: 100%; max-width: 400px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 12px;">
+        <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-key" style="color: #60a5fa;"></i> Cambiar Contraseña
+        </h3>
+        <button id="btnCerrarModal" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">&times;</button>
+      </div>
+
+      <form id="formCambiarPass" style="display: flex; flex-direction: column; gap: 16px;">
+        
+        <!-- Campo: Contraseña Actual -->
+        <div>
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Contraseña Actual</label>
+          <div style="position: relative; width: 100%; display: flex; align-items: center;">
+            <input type="password" id="passActual" required style="width: 100%; background: #030712; border: 1px solid #334155; border-radius: 8px; padding: 10px 40px 10px 14px; color: white; font-size: 0.9rem; box-sizing: border-box; outline: none;">
+            <button type="button" class="btn-toggle-pass" data-target="passActual" style="position: absolute; right: 8px; background: transparent; border: none; color: #60a5fa; cursor: pointer; padding: 6px; font-size: 1rem; display: flex; align-items: center; justify-content: center; z-index: 20;">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Campo: Nueva Contraseña -->
+        <div>
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Nueva Contraseña</label>
+          <div style="position: relative; width: 100%; display: flex; align-items: center;">
+            <input type="password" id="passNueva" required style="width: 100%; background: #030712; border: 1px solid #334155; border-radius: 8px; padding: 10px 40px 10px 14px; color: white; font-size: 0.9rem; box-sizing: border-box; outline: none;">
+            <button type="button" class="btn-toggle-pass" data-target="passNueva" style="position: absolute; right: 8px; background: transparent; border: none; color: #60a5fa; cursor: pointer; padding: 6px; font-size: 1rem; display: flex; align-items: center; justify-content: center; z-index: 20;">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Campo: Confirmar Nueva Contraseña -->
+        <div>
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Confirmar Nueva Contraseña</label>
+          <div style="position: relative; width: 100%; display: flex; align-items: center;">
+            <input type="password" id="passConfirmar" required style="width: 100%; background: #030712; border: 1px solid #334155; border-radius: 8px; padding: 10px 40px 10px 14px; color: white; font-size: 0.9rem; box-sizing: border-box; outline: none;">
+            <button type="button" class="btn-toggle-pass" data-target="passConfirmar" style="position: absolute; right: 8px; background: transparent; border: none; color: #60a5fa; cursor: pointer; padding: 6px; font-size: 1rem; display: flex; align-items: center; justify-content: center; z-index: 20;">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="msgModal" style="display: none; font-size: 0.85rem; padding: 8px 12px; border-radius: 6px; text-align: center;"></div>
+
+        <div style="display: flex; gap: 10px; margin-top: 8px;">
+          <button type="button" id="btnCancelarModal" style="flex: 1; background: #1e293b; color: #94a3b8; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Cancelar</button>
+          <button type="submit" style="flex: 1; background: #2563eb; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: background 0.2s;">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE AVISO DE MATRÍCULA (MODERNO Y ELEGANTE) -->
+  <div id="modalMatricula" style="display: none; position: fixed; inset: 0; background: rgba(3, 7, 18, 0.75); backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 1100; padding: 20px;">
+    <div style="background: linear-gradient(145deg, #0b0f19 0%, #030712 100%); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 20px; width: 100%; max-width: 440px; padding: 32px; box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 30px rgba(239, 68, 68, 0.1); text-align: center; position: relative;">
+      
+      <!-- Círculo decorativo con icono -->
+      <div style="width: 64px; height: 64px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.6rem; color: #f87171;"></i>
+      </div>
+
+      <h3 style="margin: 0 0 10px 0; font-size: 1.35rem; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">Aviso de Matrícula</h3>
+      
+      <p id="msgMatriculaTexto" style="font-size: 0.95rem; color: #94a3b8; line-height: 1.6; margin: 0 0 28px 0;"></p>
+      
+      <button id="btnCerrarMatricula" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);" onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'">
+        Entendido
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+  import { supabase } from './supabaseClient.js';
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    function extraerPrimerNombre(cadenaNombre) {
+      if (!cadenaNombre) return "ESTUDIANTE";
+      let texto = cadenaNombre.trim();
+
+      if (texto.includes(",")) {
+        const partes = texto.split(",");
+        const nombres = partes[1].trim().split(" ");
+        return nombres[0];
+      }
+
+      const palabras = texto.split(/\s+/);
+      if (palabras.length >= 3) {
+        return palabras[2];
+      } else if (palabras.length === 2) {
+        return palabras[1];
+      }
+
+      return palabras[0];
+    }
+
+    let universidadesList = [];
+    let simulacrosList = [];
+
+    let alumnoCadenaCompleta = null;
+    let alumnoObjetoReferencia = null;
+
+    try {
+      const sesion = JSON.parse(sessionStorage.getItem('alumnoSesion'));
+      if (sesion) {
+        alumnoCadenaCompleta = sesion.nombre || sesion.nombres;
+        alumnoObjetoReferencia = sesion;
+      }
+    } catch (e) {}
+
+    const codigoIngresado = sessionStorage.getItem('alumnoCodigo') || 
+                            localStorage.getItem('alumnoCodigo') || 
+                            sessionStorage.getItem('codigoLogueado') ||
+                            (alumnoObjetoReferencia && (alumnoObjetoReferencia.codigo || alumnoObjetoReferencia.dni));
+
+    try {
+      const cachedUnis = JSON.parse(sessionStorage.getItem('tales_unis_cache') || 'null');
+      const cachedSims = JSON.parse(sessionStorage.getItem('tales_sims_cache') || 'null');
+      if (Array.isArray(cachedUnis) && cachedUnis.length > 0) universidadesList = cachedUnis;
+      if (Array.isArray(cachedSims) && cachedSims.length > 0) simulacrosList = cachedSims;
+    } catch (e) {}
+
+    // 2. MENÚ DESPLEGABLE Y SESIÓN
+    const btnMenuToggle = document.getElementById("btnMenuToggle");
+    const menuDesplegable = document.getElementById("menuDesplegable");
+
+    btnMenuToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      menuDesplegable.style.display = menuDesplegable.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", () => {
+      menuDesplegable.style.display = "none";
+    });
+
+    document.getElementById("btnCerrarSesion").addEventListener("click", (e) => {
+      e.stopPropagation();
+      sessionStorage.clear();
+      localStorage.removeItem("usuarioLogueado");
+      window.location.href = "index.html";
+    });
+
+    // 3. MOSTRAR / OCULTAR CONTRASEÑA (OJITO)
+    const toggleBtns = document.querySelectorAll(".btn-toggle-pass");
+    toggleBtns.forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const targetId = btn.getAttribute("data-target");
+        const input = document.getElementById(targetId);
+        const icon = btn.querySelector("i");
+
+        if (input.type === "password") {
+          input.type = "text";
+          icon.className = "fa-solid fa-eye-slash";
+          btn.style.color = "#3b82f6";
+        } else {
+          input.type = "password";
+          icon.className = "fa-solid fa-eye";
+          btn.style.color = "#60a5fa";
+        }
+      });
+    });
+
+    // 4. LÓGICA DE CAMBIO DE CONTRASEÑA EN SUPABASE
+    const modal = document.getElementById("modalCambiarPass");
+    const btnCambiarPass = document.getElementById("btnCambiarPass");
+    const btnCerrarModal = document.getElementById("btnCerrarModal");
+    const btnCancelarModal = document.getElementById("btnCancelarModal");
+    const formCambiarPass = document.getElementById("formCambiarPass");
+    const msgModal = document.getElementById("msgModal");
+
+    btnCambiarPass.addEventListener("click", () => {
+      menuDesplegable.style.display = "none";
+      msgModal.style.display = "none";
+      formCambiarPass.reset();
+
+      toggleBtns.forEach(btn => {
+        const targetId = btn.getAttribute("data-target");
+        const input = document.getElementById(targetId);
+        const icon = btn.querySelector("i");
+        input.type = "password";
+        icon.className = "fa-solid fa-eye";
+        btn.style.color = "#60a5fa";
+      });
+
+      modal.style.display = "flex";
+    });
+
+    function ocultarModal() {
+      modal.style.display = "none";
+    }
+
+    btnCerrarModal.addEventListener("click", ocultarModal);
+    btnCancelarModal.addEventListener("click", ocultarModal);
+
+    formCambiarPass.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const actVal = document.getElementById("passActual").value.trim();
+      const nueVal = document.getElementById("passNueva").value.trim();
+      const confVal = document.getElementById("passConfirmar").value.trim();
+
+      if (nueVal !== confVal) {
+        msgModal.style.display = "block";
+        msgModal.style.background = "rgba(220, 38, 38, 0.2)";
+        msgModal.style.color = "#f87171";
+        msgModal.textContent = "Las nuevas contraseñas no coinciden.";
+        return;
+      }
+
+      if (nueVal.length < 4) {
+        msgModal.style.display = "block";
+        msgModal.style.background = "rgba(220, 38, 38, 0.2)";
+        msgModal.style.color = "#f87171";
+        msgModal.textContent = "La nueva contraseña debe tener al menos 4 caracteres.";
+        return;
+      }
+
+      const codB = String(codigoIngresado || "").trim().toLowerCase();
+      const passLocal = codB ? (localStorage.getItem(`passAlumno_${codB}`) || "") : "";
+      const passRealActual = alumnoObjetoReferencia
+        ? (alumnoObjetoReferencia.password || alumnoObjetoReferencia.pass || passLocal || "")
+        : passLocal;
+
+      if (passRealActual && passRealActual !== actVal) {
+        msgModal.style.display = "block";
+        msgModal.style.background = "rgba(220, 38, 38, 0.2)";
+        msgModal.style.color = "#f87171";
+        msgModal.textContent = "La contraseña actual ingresada es incorrecta.";
+        return;
+      }
+
+      let actualizado = false;
+
+      for (const uni of universidadesList) {
+        if (uni && uni.alumnos && Array.isArray(uni.alumnos)) {
+          let huboCambioEnUni = false;
+          const alumnosActualizados = uni.alumnos.map(alumno => {
+            const codA = String(alumno.codigo || alumno.dni || alumno.id || "").trim().toLowerCase();
+            const nomA = String(alumno.nombre || alumno.nombres || "").trim().toLowerCase();
+            const nomB = String(alumnoCadenaCompleta || "").trim().toLowerCase();
+
+            if ((codB && codA === codB) || (nomB && nomA === nomB)) {
+              huboCambioEnUni = true;
+              actualizado = true;
+              return { ...alumno, password: nueVal, pass: nueVal };
+            }
+            return alumno;
+          });
+
+          if (huboCambioEnUni) {
+            uni.alumnos = alumnosActualizados;
+            await supabase
+              .from('universidades')
+              .update({ alumnos: alumnosActualizados })
+              .eq('siglas', uni.siglas);
+          }
+        }
+      }
+
+      if (codB) {
+        localStorage.setItem(`passAlumno_${codB}`, nueVal);
+      }
+
+      try {
+        const sesion = JSON.parse(sessionStorage.getItem('alumnoSesion')) || {};
+        sesion.password = nueVal;
+        sesion.pass = nueVal;
+        sessionStorage.setItem('alumnoSesion', JSON.stringify(sesion));
+        if (alumnoObjetoReferencia) {
+          alumnoObjetoReferencia.password = nueVal;
+          alumnoObjetoReferencia.pass = nueVal;
+        }
+        sessionStorage.setItem('tales_unis_cache', JSON.stringify(universidadesList));
+      } catch (err) {}
+
+      if (actualizado) {
+        msgModal.style.display = "block";
+        msgModal.style.background = "rgba(16, 185, 129, 0.2)";
+        msgModal.style.color = "#34d399";
+        msgModal.textContent = "¡Contraseña actualizada correctamente!";
+        
+        setTimeout(() => {
+          ocultarModal();
+        }, 1500);
+      } else {
+        msgModal.style.display = "block";
+        msgModal.style.background = "rgba(220, 38, 38, 0.2)";
+        msgModal.style.color = "#f87171";
+        msgModal.textContent = "No se encontró el registro del alumno para guardar la contraseña.";
+      }
+    });
+
+    // 5. MODAL DE AVISO DE MATRÍCULA
+    const modalMatricula = document.getElementById("modalMatricula");
+    const msgMatriculaTexto = document.getElementById("msgMatriculaTexto");
+    const btnCerrarMatricula = document.getElementById("btnCerrarMatricula");
+
+    btnCerrarMatricula.addEventListener("click", () => {
+      modalMatricula.style.display = "none";
+    });
+
+    // 6. RENDERIZADO DE UNIVERSIDADES CREADAS POR EL ADMINISTRADOR EN SUPABASE
+    const contenedor = document.getElementById("contenedorUniversidades");
+    const btnVistaGrid = document.getElementById("btnVistaGrid");
+    const btnVistaList = document.getElementById("btnVistaList");
+    let modoVista = "grid";
+
+    function aplicarDatosAlumno() {
+      universidadesList.forEach(uni => {
+        if (uni && uni.alumnos && Array.isArray(uni.alumnos)) {
+          const match = uni.alumnos.find(a => {
+            const codA = String(a.codigo || a.dni || a.id || "").trim().toLowerCase();
+            const codB = String(codigoIngresado || "").trim().toLowerCase();
+            const nomA = String(a.nombre || a.nombres || "").trim().toLowerCase();
+            const nomB = String(alumnoCadenaCompleta || "").trim().toLowerCase();
+            return (codB && codA === codB) || (nomB && nomA === nomB);
+          });
+
+          if (match) {
+            if (!alumnoCadenaCompleta) alumnoCadenaCompleta = match.nombre || match.nombres;
+            alumnoObjetoReferencia = match;
+          }
+        }
+      });
+
+      if (alumnoCadenaCompleta) {
+        const primerNombre = extraerPrimerNombre(alumnoCadenaCompleta);
+        document.getElementById("saludoAlumno").textContent = `HOLA ${primerNombre.toUpperCase()}`;
+      }
+    }
+
+    function renderizarUniversidades() {
+      if (universidadesList.length === 0) {
+        contenedor.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 50px; background: rgba(11, 15, 25, 0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; color: #94a3b8;">
+            <p style="margin: 0;">No hay universidades creadas en este momento por la administración.</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (modoVista === "grid") {
+        contenedor.style.display = "grid";
+        contenedor.style.gridTemplateColumns = "repeat(auto-fit, minmax(220px, 260px))";
+        contenedor.style.justifyContent = "center";
+        contenedor.style.gap = "40px";
+      } else {
+        contenedor.style.display = "flex";
+        contenedor.style.flexDirection = "column";
+        contenedor.style.alignItems = "center";
+        contenedor.style.gap = "20px";
+      }
+
+      contenedor.innerHTML = "";
+      universidadesList.forEach(uniData => {
+        const siglas = uniData.siglas || uniData.nombre || "";
+        const nombreCompleto = uniData.nombre_completo || uniData.nombreCompleto || siglas;
+        const logoSrc = uniData.logo_url || uniData.logo || 'logo.png';
+        const uniKey = siglas;
+
+        const card = document.createElement("div");
+        
+        if (modoVista === "grid") {
+          card.style.cssText = "background: transparent; border: none; padding: 15px; cursor: pointer; transition: transform 0.3s ease; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box;";
+        } else {
+          card.style.cssText = "background: transparent; border: none; padding: 10px 20px; cursor: pointer; transition: transform 0.3s ease; display: flex; align-items: center; gap: 20px; width: 100%; max-width: 600px; box-sizing: border-box;";
+        }
+
+        if (modoVista === "grid") {
+          card.innerHTML = `
+            <div style="margin-bottom: 14px; display: flex; align-items: center; justify-content: center;">
+              <img src="${logoSrc}" alt="${siglas}" class="logo-flotante" style="width: 105px; height: 105px; object-fit: contain; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5)); transition: transform 0.3s ease, filter 0.3s ease;" onerror="this.src='logo.png'">
+            </div>
+            <h3 style="font-size: 1.45rem; font-weight: 700; color: #ffffff; margin: 0 0 4px 0; text-shadow: 0 2px 8px rgba(0,0,0,0.6);">${siglas}</h3>
+            <p style="font-size: 0.85rem; color: #e2e8f0; opacity: 0.9; margin: 0; line-height: 1.3; text-shadow: 0 1px 4px rgba(0,0,0,0.6);">${nombreCompleto}</p>
+          `;
+        } else {
+          card.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <img src="${logoSrc}" alt="${siglas}" style="width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));" onerror="this.src='logo.png'">
+            </div>
+            <div style="text-align: left; flex-grow: 1;">
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">${siglas}</h3>
+              <p style="font-size: 0.85rem; color: #e2e8f0; opacity: 0.9; margin: 0;">${nombreCompleto}</p>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 0.9rem;"></i>
+          `;
+        }
+
+        card.addEventListener("mouseenter", () => {
+          card.style.transform = "translateY(-6px)";
+          const img = card.querySelector(".logo-flotante");
+          if (img) {
+            img.style.transform = "scale(1.12)";
+            img.style.filter = "drop-shadow(0 10px 20px rgba(59, 130, 246, 0.5))";
+          }
+        });
+
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "translateY(0)";
+          const img = card.querySelector(".logo-flotante");
+          if (img) {
+            img.style.transform = "scale(1)";
+            img.style.filter = "drop-shadow(0 6px 12px rgba(0,0,0,0.5))";
+          }
+        });
+
+        // VALIDACIÓN INTELIGENTE CON SUPABASE: Matrícula O Habilitación en algún Simulacro de la Universidad
+        card.addEventListener("click", () => {
+          let estaMatriculado = false;
+          let estaHabilitadoSimulacro = false;
+
+          const codB = String(codigoIngresado || "").trim().toLowerCase();
+          const nomB = String(alumnoCadenaCompleta || "").trim().toLowerCase();
+
+          if (uniData.alumnos && Array.isArray(uniData.alumnos)) {
+            estaMatriculado = uniData.alumnos.some(a => {
+              const codA = String(a.codigo || a.dni || a.id || "").trim().toLowerCase();
+              const nomA = String(a.nombre || a.nombres || "").trim().toLowerCase();
+              return (codB && codA === codB) || (nomB && nomA === nomB);
+            });
+          }
+
+          const simulacrosDeEstaUni = simulacrosList.filter(s => {
+            const sSiglas = String(s.universidad_siglas || "").trim().toLowerCase();
+            return sSiglas && sSiglas === String(siglas).trim().toLowerCase();
+          });
+
+          if (!estaMatriculado && simulacrosDeEstaUni.length > 0) {
+            estaHabilitadoSimulacro = simulacrosDeEstaUni.some(sim => {
+              let listaAlumnosSim = sim.alumnos || sim.alumnosHabilitados || sim.habilitados || sim.codigos;
+              if (typeof listaAlumnosSim === 'string') {
+                listaAlumnosSim = listaAlumnosSim.split(/[\n,;]+/).map(c => c.trim());
+              }
+              if (!listaAlumnosSim || !Array.isArray(listaAlumnosSim)) return false;
+              
+              return listaAlumnosSim.some(aluSim => {
+                if (!aluSim) return false;
+                if (typeof aluSim === 'object') {
+                  const codSim = String(aluSim.codigo || aluSim.dni || aluSim.id || "").trim().toLowerCase();
+                  const nomSim = String(aluSim.nombre || aluSim.nombres || "").trim().toLowerCase();
+                  const habilitadoEstado = aluSim.habilitado !== false && aluSim.activo !== false;
+                  return ((codB && codSim === codB) || (nomB && nomSim === nomB)) && habilitadoEstado;
+                }
+                return codB && String(aluSim).trim().toLowerCase() === codB;
+              });
+            });
+          }
+
+          if (estaMatriculado || estaHabilitadoSimulacro) {
+            localStorage.setItem("universidadSeleccionada", uniKey);
+            sessionStorage.setItem("uniActual", uniKey);
+            window.location.href = `detalleUniversidad.html?uni=${encodeURIComponent(uniKey)}`;
+          } else {
+            const nombreEstudianteDisplay = alumnoCadenaCompleta || "Estudiante";
+            msgMatriculaTexto.innerHTML = `<b>${nombreEstudianteDisplay}</b>, no estás matriculado en esta universidad, por favor contáctate con la Academia Tales al WhatsApp <b>990 259 827</b>, para su matrícula.`;
+            modalMatricula.style.display = "flex";
+          }
+        });
+
+        contenedor.appendChild(card);
+      });
+    }
+
+    btnVistaGrid.addEventListener("click", () => {
+      modoVista = "grid";
+      btnVistaGrid.style.backgroundColor = "#3b82f6";
+      btnVistaGrid.style.color = "white";
+      btnVistaList.style.backgroundColor = "transparent";
+      btnVistaList.style.color = "#9ca3af";
+      renderizarUniversidades();
+    });
+
+    btnVistaList.addEventListener("click", () => {
+      modoVista = "list";
+      btnVistaList.style.backgroundColor = "#3b82f6";
+      btnVistaList.style.color = "white";
+      btnVistaGrid.style.backgroundColor = "transparent";
+      btnVistaGrid.style.color = "#9ca3af";
+      renderizarUniversidades();
+    });
+
+    aplicarDatosAlumno();
+    renderizarUniversidades();
+
+    try {
+      const [resUnis, resSims] = await Promise.all([
+        supabase.from('universidades').select('*').order('siglas', { ascending: true }),
+        supabase.from('simulacros').select('id, titulo, universidad_siglas, alumnos')
+      ]);
+
+      if (!resUnis.error && Array.isArray(resUnis.data)) {
+        universidadesList = resUnis.data;
+        try { sessionStorage.setItem('tales_unis_cache', JSON.stringify(universidadesList)); } catch (e) {}
+      }
+      if (!resSims.error && Array.isArray(resSims.data)) {
+        simulacrosList = resSims.data;
+        try { sessionStorage.setItem('tales_sims_cache', JSON.stringify(simulacrosList)); } catch (e) {}
+      }
+
+      aplicarDatosAlumno();
+      renderizarUniversidades();
+    } catch (e) {
+      console.error("Error al obtener universidades desde Supabase:", e);
+    }
+  });
+</script>
+</body>
+</html>

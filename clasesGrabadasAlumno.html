@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clases Grabadas - Academia Tales</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.7) 0%, rgba(10, 15, 30, 0.9) 100%), 
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .top-bar {
+      background: rgba(11, 18, 32, 0.85);
+      border: 3px solid rgba(148, 163, 184, 0.15);
+      border-top: 3px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 12px 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .main-card {
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-top: 2px solid rgba(148, 163, 184, 0.4);
+      border-radius: 24px;
+      padding: 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(148, 163, 184, 0.2);
+    }
+
+    .btn-nav-top {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-nav-top:hover {
+      background: rgba(59, 130, 246, 0.3);
+      color: #fff;
+    }
+
+    /* Tarjetas de Carpetas */
+    .folder-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .folder-item {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .folder-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(59, 130, 246, 0.45);
+      background: rgba(30, 41, 59, 0.75);
+    }
+
+    .folder-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .folder-icon {
+      font-size: 22px;
+    }
+
+    .folder-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-container">
+
+    <!-- Barra Superior -->
+    <div class="top-bar">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="logo.png" alt="Logo" style="width: 90px; height: 90px; object-fit: contain; margin-top: -6px;">
+        <div style="margin-top: 5px;">
+          <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #f8fafc;">Clases Grabadas – <span id="uni-siglas-header"></span></h2>
+          <p style="margin: 0; font-size: 13px; color: #94a3b8;">Academia Tales • Panel del Alumno</p>
+        </div>
+      </div>
+
+      <!-- Botones de navegación rápida, cerrar sesión y volver -->
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="#" id="linkSimulacros" class="btn-nav-top"><i class="fa-solid fa-file-signature"></i> Simulacros</a>
+        <a href="#" id="linkMateriales" class="btn-nav-top"><i class="fa-solid fa-file-pdf"></i> Materiales</a>
+        
+        <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 5px;">
+          <button id="btn-cerrar-sesion" class="btn-secondary" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); padding: 5px 12px; font-size: 12px;">
+            <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+          </button>
+          <button id="btn-volver" class="btn-secondary" style="padding: 5px 12px; font-size: 12px;">
+            <i class="fa-solid fa-arrow-left"></i> Volver
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel Principal -->
+    <div class="main-card">
+      <div class="header-section">
+        <div>
+          <h1 style="font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px;">Clases Grabadas Disponibles</h1>
+          <p style="font-size: 13px; color: #94a3b8;">Selecciona una carpeta para visualizar las sesiones grabadas del ciclo.</p>
+        </div>
+      </div>
+
+      <!-- Lista de Carpetas -->
+      <div id="folder-container" class="folder-list">
+        <!-- Se llena dinámicamente -->
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const siglas = urlParams.get('siglas') || urlParams.get('uni') || localStorage.getItem('universidadSeleccionada') || sessionStorage.getItem('uniActual') || 'UNAP';
+    const siglaLim = String(siglas).trim().toLowerCase();
+    const cacheKey = `tales_carpetas_clases_${siglaLim}`;
+
+    document.getElementById('uni-siglas-header').textContent = siglas;
+    
+    document.getElementById('linkSimulacros').href = `simulacrosAlumno.html?siglas=${encodeURIComponent(siglas)}`;
+    document.getElementById('linkMateriales').href = `materialesAlumno.html?siglas=${encodeURIComponent(siglas)}`;
+
+    document.getElementById('btn-volver').onclick = () => {
+      window.location.href = `detalleUniversidad.html?uni=${encodeURIComponent(siglas)}`;
+    };
+
+    document.getElementById('btn-cerrar-sesion').onclick = () => {
+      sessionStorage.clear();
+      localStorage.removeItem("usuarioLogueado");
+      window.location.href = "index.html";
+    };
+
+    let carpetasClases = [];
+
+    function leerCacheCarpetas() {
+      try {
+        const raw = sessionStorage.getItem(cacheKey) || localStorage.getItem(cacheKey);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function guardarCacheCarpetas(lista) {
+      try {
+        const serialized = JSON.stringify(lista);
+        sessionStorage.setItem(cacheKey, serialized);
+        localStorage.setItem(cacheKey, serialized);
+      } catch (e) {}
+    }
+
+    async function cargarCarpetas() {
+      const container = document.getElementById('folder-container');
+      const cacheInicial = leerCacheCarpetas();
+
+      if (cacheInicial && cacheInicial.length > 0) {
+        carpetasClases = cacheInicial;
+        renderizarCarpetas();
+      } else {
+        container.innerHTML = `<p style="font-size: 13px; color: #94a3b8; text-align: center; padding: 20px;">Cargando carpetas de clases...</p>`;
+      }
+
+      try {
+        let encontradas = [];
+
+        const { data: uniMatch, error: errUni } = await supabase
+          .from('universidades')
+          .select('*')
+          .ilike('siglas', siglaLim)
+          .limit(1);
+
+        let uniData = (!errUni && Array.isArray(uniMatch) && uniMatch.length > 0) ? uniMatch[0] : null;
+
+        if (!uniData) {
+          const { data: unis } = await supabase.from('universidades').select('*');
+          if (Array.isArray(unis)) {
+            uniData = unis.find(u => String(u.siglas || u.nombre || "").trim().toLowerCase() === siglaLim) || null;
+          }
+        }
+
+        if (uniData) {
+          const rawCarpetas = uniData.clasesGrabadas || uniData.clases_grabadas || uniData.clases || [];
+          if (Array.isArray(rawCarpetas)) {
+            encontradas = rawCarpetas.filter(c => c && c.habilitado !== false && c.activo !== false);
+          }
+        }
+
+        if (encontradas.length === 0) {
+          const { data: tablaClases, error: errClases } = await supabase
+            .from('clases_grabadas')
+            .select('*');
+
+          if (!errClases && Array.isArray(tablaClases)) {
+            encontradas = tablaClases.filter(c => {
+              const sUni = String(c.universidad_siglas || c.universidad || c.siglas || "").trim().toLowerCase();
+              return (!sUni || sUni === siglaLim) && c.habilitado !== false && c.activo !== false;
+            });
+          }
+        }
+
+        carpetasClases = encontradas;
+        guardarCacheCarpetas(carpetasClases);
+      } catch (e) {
+        console.error("Error al cargar carpetas de clases desde Supabase:", e);
+        if (!cacheInicial || cacheInicial.length === 0) {
+          carpetasClases = [];
+        }
+      }
+
+      renderizarCarpetas();
+    }
+
+    function renderizarCarpetas() {
+      const container = document.getElementById('folder-container');
+      container.innerHTML = '';
+
+      if (carpetasClases.length === 0) {
+        container.innerHTML = `<p style="font-size: 13px; color: #94a3b8; font-style: italic; text-align: center; padding: 20px;">Aún no hay carpetas de clases grabadas disponibles por el momento.</p>`;
+        return;
+      }
+
+      carpetasClases.forEach((carpeta, idx) => {
+        const folderId = carpeta.id ?? idx;
+        const nombreCarpeta = carpeta.nombre || carpeta.titulo || `Carpeta ${idx + 1}`;
+        container.innerHTML += `
+          <div class="folder-item" onclick="abrirContenidoCarpeta('${encodeURIComponent(folderId)}')">
+            <div class="folder-info">
+              <span class="folder-icon">📁</span>
+              <span class="folder-name">${nombreCarpeta}</span>
+            </div>
+            <span style="font-size: 13px; color: #60a5fa; font-weight: 600;">Ver clases →</span>
+          </div>
+        `;
+      });
+    }
+
+    window.abrirContenidoCarpeta = function(folderId) {
+      window.location.href = `contenido-carpeta.html?siglas=${encodeURIComponent(siglas)}&folderId=${folderId}&modo=alumno`;
+    };
+
+    cargarCarpetas();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rindiendo Examen - Academia TALES</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.7) 0%, rgba(10, 15, 30, 0.9) 100%), 
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      overflow: hidden;
+    }
+
+    .main-container {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100%;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 10px;
+    }
+
+    .top-bar {
+      background: rgba(11, 18, 32, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-bottom: 2px solid rgba(148, 163, 184, 0.3);
+      border-radius: 16px;
+      padding: 10px 25px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .content-layout {
+      display: flex;
+      gap: 15px;
+      flex: 1;
+      height: calc(100vh - 90px);
+      overflow: hidden;
+    }
+
+    .exam-column {
+      flex: 0 0 80%;
+      height: 100%;
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 16px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
+    }
+
+    .answers-column {
+      flex: 0 0 calc(20% - 15px);
+      height: 100%;
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 16px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .btn-terminar {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-terminar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-secundario-modal {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-secundario-modal:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-cartilla-modal {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-cartilla-modal:hover {
+      transform: translateY(-2px);
+    }
+
+    .pdf-viewer-container {
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 15px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .pdf-viewer-container canvas {
+      max-width: 100%;
+      height: auto !important;
+      border-radius: 6px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+      pointer-events: none;
+    }
+
+    .areas-nav-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .area-tab-btn {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #94a3b8;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .area-tab-btn:hover {
+      border-color: #38bdf8;
+      color: #fff;
+      background: rgba(30, 41, 59, 0.9);
+    }
+
+    .area-tab-btn.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      border-color: #60a5fa;
+      color: white;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .preguntas-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .pregunta-card {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .pregunta-num {
+      font-weight: 700;
+      font-size: 12px;
+      color: #f8fafc;
+    }
+
+    .opciones-grupo {
+      display: flex;
+      gap: 4px;
+    }
+
+    .opcion-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #cbd5e1;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .opcion-btn:hover {
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .opcion-btn.selected {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      color: white;
+      box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      display: none;
+    }
+    .modal-card {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 16px;
+      padding: 25px;
+      width: 480px;
+      max-width: 92%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-container">
+
+    <div class="top-bar">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="logo.png" alt="Logo" style="width: 45px; height: 45px; object-fit: contain;">
+        <div>
+          <h2 id="tituloExamenTop" style="margin: 0; font-size: 16px; font-weight: 700; color: #f8fafc;">Examen de Admisión</h2>
+          <p style="margin: 0; font-size: 11px; color: #94a3b8;">Academia Tales • Panel del Alumno</p>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 15px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.25); padding: 8px 16px; border-radius: 12px;">
+        <div>
+          <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Postulante</div>
+          <div id="alumnoNombreTop" style="font-size: 13px; font-weight: 700; color: #f8fafc;">Cargando...</div>
+        </div>
+        <div style="width: 1px; height: 28px; background: rgba(148,163,184,0.25);"></div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div>
+            <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Carrera</div>
+            <select id="selectCarreraAlumno" style="margin-top: 2px; width: auto; min-width: 200px; background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(148, 163, 184, 0.35); color: #ffffff; font-size: 12px; padding: 4px 8px; border-radius: 6px; outline: none; font-weight: 600; transition: width 0.2s ease;">
+              <option value="" style="color: #000;">SELECCIONE CARRERA</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Grupo</div>
+            <div id="badgeGrupoAlumno" style="margin-top: 2px; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; text-align: center;">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div id="cronometroBox" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 12px; border-radius: 10px; font-weight: 700; font-size: 13px; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-clock"></i> <span id="tiempoRestante">--:--</span>
+        </div>
+
+        <button id="btnTerminarExamen" class="btn-terminar">
+          <i class="fa-solid fa-check-circle"></i> Terminar y Enviar
+        </button>
+      </div>
+    </div>
+
+    <div class="content-layout">
+      
+      <div class="exam-column">
+        <div class="pdf-viewer-container" id="pdfViewerBox" oncontextmenu="return false;">
+          <div style="color: #94a3b8; font-size: 14px; margin: auto;">Cargando examen...</div>
+        </div>
+      </div>
+
+      <div class="answers-column">
+        <div style="font-size: 13px; font-weight: 700; color: #38bdf8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Áreas de Evaluación</div>
+        
+        <div class="areas-nav-container" id="contenedorAreasTabs"></div>
+
+        <div id="tituloRangoActivo" style="font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Selecciona un área</div>
+
+        <div class="preguntas-scroll-area" id="contenedorPreguntasArea"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="modalFlotante" class="modal-overlay">
+    <div class="modal-card">
+      <h3 id="modalTitulo" style="color: #38bdf8; font-size: 18px; font-weight: 700;">Aviso</h3>
+      <p id="modalMensaje" style="color: #cbd5e1; font-size: 13px; line-height: 1.5; text-align: left;"></p>
+      <div id="modalBotones" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px;"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 's' || e.key.toLowerCase() === 'p')) {
+        e.preventDefault();
+      }
+    });
+
+    function cederFrame() {
+      return new Promise(resolve => requestAnimationFrame(() => resolve()));
+    }
+
+    async function cargarDocumentoPdf(pdfSource) {
+      if (pdfSource.startsWith('data:')) {
+        const base64 = pdfSource.split(';base64,')[1];
+        const raw = window.atob(base64);
+        const uint8Array = new Uint8Array(raw.length);
+        for (let i = 0; i < raw.length; i++) {
+          uint8Array[i] = raw.charCodeAt(i);
+        }
+        return pdfjsLib.getDocument({ data: uint8Array }).promise;
+      }
+
+      try {
+        const resp = await fetch(pdfSource);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const buffer = await resp.arrayBuffer();
+        return pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+      } catch (fetchErr) {
+        return pdfjsLib.getDocument(pdfSource).promise;
+      }
+    }
+
+    async function renderizarPdfSinDescarga(pdfSource, container) {
+      try {
+        const pdf = await cargarDocumentoPdf(pdfSource);
+        container.innerHTML = '';
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1.4 });
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          container.appendChild(canvas);
+
+          await page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise;
+
+          if (pageNum < pdf.numPages) {
+            await cederFrame();
+          }
+        }
+        return true;
+      } catch (error) {
+        console.error("Error al renderizar PDF protegido:", error);
+        container.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #f87171; text-align: center; padding: 20px;">No se pudo cargar el documento PDF del examen.</div>`;
+        return false;
+      }
+    }
+
+    let yaEnviadoEnSesion = false;
+
+    function obtenerClaveIdentidadAlumno(alumno) {
+      return String(alumno?.codigo || alumno?.dni || alumno?.id || alumno?.nombres || alumno?.nombre || "postulante")
+        .trim()
+        .toLowerCase();
+    }
+
+    function obtenerRegistroPrevioAlumno(simulacro, alumno) {
+      const idAlum = obtenerClaveIdentidadAlumno(alumno);
+      const simId = simulacro?.id || 'simulacro_activo';
+
+      let registroEnSimulacro = null;
+      if (Array.isArray(simulacro?.alumnos)) {
+        registroEnSimulacro = simulacro.alumnos.find(a => {
+          if (!a || typeof a !== 'object') return false;
+          const codA = String(a.codigo || a.dni || a.id || "").trim().toLowerCase();
+          const nomA = String(a.nombres || a.nombre || "").trim().toLowerCase();
+          const codB = String(alumno?.codigo || alumno?.dni || alumno?.id || "").trim().toLowerCase();
+          const nomB = String(alumno?.nombres || alumno?.nombre || "").trim().toLowerCase();
+          return (codA && codB && codA === codB) || (nomA && nomB && nomA === nomB);
+        }) || null;
+      }
+
+      if (registroEnSimulacro && (registroEnSimulacro.habilitado === true || String(registroEnSimulacro.estado).toLowerCase() === 'habilitado')) {
+        localStorage.removeItem(`resultado_${simId}_${idAlum}`);
+        if (alumno?.codigo || alumno?.nombres) {
+          localStorage.removeItem(`resultado_${simId}_${alumno.codigo || alumno.nombres}`);
+        }
+        return null;
+      }
+
+      let registroLocal = null;
+      try {
+        const rawLocal = localStorage.getItem(`resultado_${simId}_${idAlum}`);
+        if (rawLocal) registroLocal = JSON.parse(rawLocal);
+      } catch (e) {}
+
+      const bloqueadoEnDb = registroEnSimulacro && (
+        registroEnSimulacro.habilitado === false ||
+        registroEnSimulacro.activo === false ||
+        String(registroEnSimulacro.estado).toLowerCase() === 'deshabilitado' ||
+        registroEnSimulacro.rindio === true ||
+        registroEnSimulacro.finalizado === true
+      );
+
+      if (bloqueadoEnDb || (registroLocal && (registroLocal.rindio === true || typeof registroLocal.puntaje === 'number'))) {
+        return {
+          rindio: true,
+          habilitado: false,
+          puntaje: typeof registroEnSimulacro?.puntaje === 'number'
+            ? registroEnSimulacro.puntaje
+            : (typeof registroLocal?.puntaje === 'number' ? registroLocal.puntaje : 0),
+          respuestas: registroEnSimulacro?.respuestas || registroLocal?.respuestas || {},
+          aciertosPorArea: registroEnSimulacro?.aciertosPorArea || registroLocal?.aciertosPorArea || [],
+          carrera: registroEnSimulacro?.carrera || registroLocal?.carrera || alumno?.carrera || "Sin especificar",
+          grupo: registroEnSimulacro?.grupo || registroLocal?.grupo || alumno?.grupo || "A"
+        };
+      }
+
+      return null;
+    }
+
+    function bloquearMarcadoRespuestas() {
+      document.querySelectorAll('.opcion-btn').forEach(btn => {
+        btn.disabled = true;
+        btn.style.cursor = 'not-allowed';
+        btn.style.opacity = '0.7';
+      });
+      const btnTerminar = document.getElementById("btnTerminarExamen");
+      if (btnTerminar) {
+        btnTerminar.disabled = true;
+        btnTerminar.style.opacity = '0.6';
+        btnTerminar.style.cursor = 'not-allowed';
+      }
+      const selectCarrera = document.getElementById("selectCarreraAlumno");
+      if (selectCarrera) {
+        selectCarrera.disabled = true;
+      }
+    }
+
+    window.verDocumentoExamen = async function(tipo) {
+      const sim = window.__simulacroActual || {};
+      const pdfViewerBox = document.getElementById("pdfViewerBox");
+      document.getElementById("modalFlotante").style.display = 'none';
+
+      let fuentePdf = "";
+      if (tipo === 'solucionario') {
+        fuentePdf = sim.solucionario_url || sim.solucionarioPdf || sim.solucionarioBase64 || sim.solucionario || "";
+      } else {
+        fuentePdf = sim.pdf_url || sim.pdfBase64 || sim.archivoSimulacroBase64 || sim.archivoSimulacro || "";
+      }
+
+      if (fuentePdf) {
+        pdfViewerBox.innerHTML = `<div style="color: #94a3b8; font-size: 14px; margin: auto;">Cargando ${tipo === 'solucionario' ? 'solucionario' : 'simulacro'}...</div>`;
+        await renderizarPdfSinDescarga(fuentePdf, pdfViewerBox);
+      } else {
+        pdfViewerBox.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8; font-style: italic; padding: 20px; text-align: center;">${tipo === 'solucionario' ? 'No se encontró el PDF del solucionario para este simulacro.' : 'No se encontró el contenido PDF guardado para este simulacro.'}</div>`;
+      }
+    };
+
+    window.abrirCartillaFinalizada = function() {
+      const datos = window.__datosCartillaActual || {};
+      try {
+        sessionStorage.setItem('cartilla_datos_actuales', JSON.stringify(datos));
+      } catch (e) {}
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const siglaUni = encodeURIComponent(urlParams.get('uni') || urlParams.get('siglas') || 'UNAP');
+      const simId = encodeURIComponent(window.__simulacroActual?.id ?? '');
+      const idx = urlParams.get('idx') ? `&idx=${encodeURIComponent(urlParams.get('idx'))}` : '';
+      window.location.href = `ver-cartilla.html?uni=${siglaUni}&id=${simId}${idx}`;
+    };
+
+    function mostrarModalExamenYaRendido(datosPrevios, simulacro, siglasUni, alumno, esRecienFinalizado, porTiempoAgotado = false) {
+      yaEnviadoEnSesion = true;
+      if (window.timerIntervalRef) clearInterval(window.timerIntervalRef);
+      bloquearMarcadoRespuestas();
+
+      const nombreCompleto = alumno?.nombres || alumno?.nombre || "Postulante";
+      const carreraNombre = datosPrevios?.carrera || alumno?.carrera || "Sin especificar";
+      const grupoNombre = datosPrevios?.grupo || alumno?.grupo || "A";
+      const puntajeNum = typeof datosPrevios?.puntaje === 'number' ? datosPrevios.puntaje : 0;
+
+      window.__datosCartillaActual = {
+        alumno,
+        respuestas: datosPrevios?.respuestas || {},
+        carrera: carreraNombre,
+        grupo: grupoNombre,
+        cartillaPdf: simulacro?.cartilla_url || simulacro?.cartilla_pdf || simulacro?.cartillaPdf || ""
+      };
+
+      const aciertosLista = Array.isArray(datosPrevios?.aciertosPorArea) ? datosPrevios.aciertosPorArea : [];
+      const aciertosHtml = aciertosLista.length > 0
+        ? `<br><b>Aciertos por área:</b><ul style="margin: 4px 0 0 18px; padding: 0; color: #e2e8f0; list-style-type: disc;">${aciertosLista.map(item => `<li>${item.area}: ${item.aciertos}</li>`).join('')}</ul>`
+        : '';
+
+      let avisoSuperior = "";
+      if (porTiempoAgotado) {
+        document.getElementById("modalTitulo").textContent = "⏰ Tu tiempo se terminó";
+        avisoSuperior = `<div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; font-weight: 600;">Tu tiempo se terminó. Tu examen ha sido enviado y calificado automáticamente.</div>`;
+      } else if (esRecienFinalizado) {
+        document.getElementById("modalTitulo").textContent = "¡Examen Finalizado!";
+      } else {
+        document.getElementById("modalTitulo").textContent = "Ya rendiste este simulacro";
+        avisoSuperior = `<div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; font-weight: 600;">Solo se permite dar este simulacro una sola vez. Tu intento ya fue registrado y calificado.</div>`;
+      }
+
+      document.getElementById("modalMensaje").innerHTML = `
+        ${avisoSuperior}
+        <b>Alumno:</b> ${nombreCompleto}<br>
+        <b>Carrera:</b> ${carreraNombre}<br>
+        <b>Grupo:</b> ${grupoNombre}${aciertosHtml}<br><br>
+        <b>Puntaje obtenido:</b> <span style="color: #38bdf8; font-size: 17px; font-weight: 800;">${puntajeNum.toFixed(7)} puntos</span>
+      `;
+
+      const urlVerAmbos = `ver-simulacro-solucionario.html?uni=${encodeURIComponent(siglasUni)}&id=${encodeURIComponent(simulacro?.id ?? '')}`;
+
+      const btnCont = document.getElementById("modalBotones");
+      btnCont.innerHTML = `
+        <button type="button" class="btn-cartilla-modal" onclick="window.abrirCartillaFinalizada()">
+          <i class="fa-solid fa-file-lines"></i> Mostrar Cartilla
+        </button>
+        <button type="button" class="btn-secundario-modal" onclick="window.location.href='${urlVerAmbos}'">
+          <i class="fa-solid fa-columns"></i> Ver Simulacro y Solucionario
+        </button>
+        <button type="button" class="btn-terminar" onclick="window.location.href='simulacrosAlumno.html?siglas=${encodeURIComponent(siglasUni)}'">
+          Volver a Simulacros
+        </button>
+      `;
+
+      document.getElementById("modalFlotante").style.display = 'flex';
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const siglaUni = urlParams.get('uni') || urlParams.get('siglas') || localStorage.getItem('universidadSeleccionada') || sessionStorage.getItem('uniActual') || 'UNAP';
+      const simIdParam = urlParams.get('id') || sessionStorage.getItem('simulacroActivoId');
+      const simIdxParam = urlParams.get('idx');
+
+      let simulacroActivo = null;
+      let uniData = {};
+      const siglaLim = String(siglaUni).trim().toLowerCase();
+
+      try {
+        const cachedUnis = JSON.parse(sessionStorage.getItem('tales_unis_cache') || 'null');
+        if (Array.isArray(cachedUnis)) {
+          const matchUni = cachedUnis.find(u => String(u.siglas || u.nombre || "").trim().toLowerCase() === siglaLim);
+          if (matchUni) uniData = matchUni;
+        }
+        if (simIdParam) {
+          const caches = [
+            sessionStorage.getItem(`tales_admin_sims_${siglaLim}`),
+            sessionStorage.getItem('tales_sims_cache')
+          ];
+          for (const rawCache of caches) {
+            if (!rawCache) continue;
+            const parsed = JSON.parse(rawCache);
+            if (Array.isArray(parsed)) {
+              const found = parsed.find(s => String(s.id) === String(simIdParam));
+              if (found && (found.pdf_url !== undefined || found.claves !== undefined)) {
+                simulacroActivo = found;
+                break;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+
+      if (!simulacroActivo || !uniData?.carreras) {
+        try {
+          const promesaUni = supabase
+            .from('universidades')
+            .select('*')
+            .ilike('siglas', siglaUni)
+            .single();
+
+          const promesaSim = (simIdParam !== null && simIdParam !== "")
+            ? supabase.from('simulacros').select('*').eq('id', simIdParam).single()
+            : supabase.from('simulacros').select('*').order('id', { ascending: true });
+
+          const [resUni, resSim] = await Promise.all([promesaUni, promesaSim]);
+
+          if (!resUni.error && resUni.data) {
+            uniData = resUni.data;
+          }
+
+          if (!resSim.error && resSim.data) {
+            if (!Array.isArray(resSim.data)) {
+              simulacroActivo = resSim.data;
+            } else {
+              const listaOrdenada = resSim.data
+                .filter(sim => {
+                  const sUni = String(sim.universidad_siglas || sim.universidad || sim.siglas || "").trim().toLowerCase();
+                  return sUni === siglaLim;
+                })
+                .sort((a, b) => {
+                  const idA = Number(a.id);
+                  const idB = Number(b.id);
+                  if (!Number.isNaN(idA) && !Number.isNaN(idB) && idA !== idB) {
+                    return idA - idB;
+                  }
+                  const timeA = a.creado_en ? new Date(a.creado_en).getTime() : 0;
+                  const timeB = b.creado_en ? new Date(b.creado_en).getTime() : 0;
+                  return timeA - timeB;
+                });
+
+              if (simIdParam !== null && simIdParam !== "") {
+                simulacroActivo = listaOrdenada.find(s => String(s.id) === String(simIdParam)) || null;
+              }
+
+              if (!simulacroActivo && simIdxParam !== null && simIdxParam !== "") {
+                const idxNum = parseInt(simIdxParam, 10);
+                if (!Number.isNaN(idxNum) && listaOrdenada[idxNum]) {
+                  simulacroActivo = listaOrdenada[idxNum];
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Error al obtener simulacro desde Supabase:", e);
+        }
+      }
+
+      if (!simulacroActivo) {
+        alert("No se encontró información del simulacro activo.");
+        window.location.href = `simulacrosAlumno.html?siglas=${encodeURIComponent(siglaUni)}`;
+        return;
+      }
+
+      window.__simulacroActual = simulacroActivo;
+
+      document.getElementById("tituloExamenTop").textContent = simulacroActivo.titulo || simulacroActivo.nombre || "Evaluación de Admisión";
+
+      let codigoIngresado = String(sessionStorage.getItem('alumnoCodigo') || localStorage.getItem('alumnoCodigo') || "").trim().toLowerCase();
+      let alumnoLogueado = null;
+
+      if (simulacroActivo.alumnos && Array.isArray(simulacroActivo.alumnos)) {
+        if (codigoIngresado) {
+          alumnoLogueado = simulacroActivo.alumnos.find(a => a && typeof a === 'object' && String(a.codigo || a.dni || a.id || "").trim().toLowerCase() === codigoIngresado);
+        }
+        if (!alumnoLogueado) {
+          alumnoLogueado = simulacroActivo.alumnos[0];
+        }
+      }
+
+      let sesion = {};
+      try {
+        sesion = JSON.parse(sessionStorage.getItem('alumnoSesion') || localStorage.getItem('usuarioLogueado') || '{}');
+      } catch (e) {}
+
+      if (!alumnoLogueado) {
+        alumnoLogueado = {
+          codigo: sesion.codigo || sesion.dni || codigoIngresado || "",
+          nombres: sesion.nombre || sesion.nombres || "Postulante Invitado",
+          carrera: sesion.carrera || ""
+        };
+      } else {
+        if (!alumnoLogueado.nombres && !alumnoLogueado.nombre && (sesion.nombre || sesion.nombres)) {
+          alumnoLogueado.nombres = sesion.nombre || sesion.nombres;
+        }
+        if (!alumnoLogueado.carrera && sesion.carrera) {
+          alumnoLogueado.carrera = sesion.carrera;
+        }
+      }
+
+      document.getElementById("alumnoNombreTop").textContent = alumnoLogueado.nombres || alumnoLogueado.nombre || "Postulante";
+
+      const selectCarrera = document.getElementById("selectCarreraAlumno");
+      const badgeGrupo = document.getElementById("badgeGrupoAlumno");
+      const carrerasUni = uniData.carreras || [];
+
+      let optionsHtml = `<option value="" style="color: #000;">SELECCIONE CARRERA</option>`;
+      carrerasUni.forEach(c => {
+        const nombreC = typeof c === 'string' ? c : (c.nombre || c.carrera || '');
+        if (nombreC) {
+          const nombreMayus = nombreC.trim().toUpperCase();
+          optionsHtml += `<option value="${nombreMayus}" style="color: #000; background: #fff;">${nombreMayus}</option>`;
+        }
+      });
+      selectCarrera.innerHTML = optionsHtml;
+
+      function ajustarAnchoSelect() {
+        const textoSeleccionado = selectCarrera.options[selectCarrera.selectedIndex]?.text || "SELECCIONE CARRERA";
+        const spanTemp = document.createElement("span");
+        spanTemp.style.visibility = "hidden";
+        spanTemp.style.position = "absolute";
+        spanTemp.style.whiteSpace = "nowrap";
+        spanTemp.style.font = window.getComputedStyle(selectCarrera).font;
+        spanTemp.textContent = textoSeleccionado;
+        document.body.appendChild(spanTemp);
+        const anchoTexto = spanTemp.getBoundingClientRect().width;
+        document.body.removeChild(spanTemp);
+        
+        selectCarrera.style.width = Math.max(200, anchoTexto + 45) + "px";
+      }
+
+      let carreraGuardada = (alumnoLogueado.carrera || alumnoLogueado.especialidad || alumnoLogueado.programa || "").trim().toUpperCase();
+
+      function actualizarGrupoSegunCarrera(nombreCarrera) {
+        if (!nombreCarrera) {
+          badgeGrupo.textContent = "--";
+          return;
+        }
+        
+        let grupoEncontrado = "A";
+        const encontrada = carrerasUni.find(c => {
+          const cNom = typeof c === 'string' ? c : (c.nombre || c.carrera || '');
+          return cNom.trim().toUpperCase() === nombreCarrera.trim().toUpperCase();
+        });
+        
+        if (encontrada && typeof encontrada === 'object') {
+          grupoEncontrado = encontrada.grupo || encontrada.area || "A";
+        }
+
+        badgeGrupo.textContent = grupoEncontrado;
+        alumnoLogueado.carrera = nombreCarrera.trim().toUpperCase();
+        alumnoLogueado.grupo = grupoEncontrado;
+      }
+
+      if (carreraGuardada) {
+        let optionToSelect = Array.from(selectCarrera.options).find(opt => opt.value.trim().toUpperCase() === carreraGuardada);
+        if (!optionToSelect) {
+          const newOpt = document.createElement('option');
+          newOpt.value = carreraGuardada;
+          newOpt.textContent = carreraGuardada;
+          newOpt.style.color = '#000';
+          newOpt.style.background = '#fff';
+          selectCarrera.appendChild(newOpt);
+        }
+        selectCarrera.value = carreraGuardada;
+        actualizarGrupoSegunCarrera(carreraGuardada);
+      }
+
+      ajustarAnchoSelect();
+
+      selectCarrera.addEventListener("change", () => {
+        actualizarGrupoSegunCarrera(selectCarrera.value);
+        ajustarAnchoSelect();
+      });
+
+      const registroPrevio = obtenerRegistroPrevioAlumno(simulacroActivo, alumnoLogueado);
+      if (registroPrevio) {
+        document.getElementById("tiempoRestante").textContent = "00:00";
+        await window.verDocumentoExamen('simulacro');
+        mostrarModalExamenYaRendido(registroPrevio, simulacroActivo, siglaUni, alumnoLogueado, false, false);
+        return;
+      }
+
+      const numPreguntas = parseInt(simulacroActivo.preguntas) || 100;
+      const alternativasStr = simulacroActivo.alternativas || "ABCDE";
+      const opcionesList = alternativasStr.split('');
+
+      let areasList = [];
+      if (simulacroActivo.areas && Array.isArray(simulacroActivo.areas) && simulacroActivo.areas.length > 0) {
+        areasList = simulacroActivo.areas.map((a, i) => ({
+          nombre: a.nombre || a.curso || `Área ${i + 1}`,
+          desde: parseInt(a.inicio !== undefined ? a.inicio : (a.desde !== undefined ? a.desde : 1)),
+          hasta: parseInt(a.fin !== undefined ? a.fin : (a.hasta !== undefined ? a.hasta : numPreguntas))
+        }));
+      }
+
+      if (areasList.length === 0) {
+        const nombresBase = ["Matemáticas", "Ciencias Sociales", "Ciencia y Tecnología", "Comunicación", "Inglés"];
+        const tamBloque = Math.floor(numPreguntas / nombresBase.length);
+        areasList = nombresBase.map((nombre, i) => {
+          const desde = i * tamBloque + 1;
+          const hasta = (i === nombresBase.length - 1) ? numPreguntas : (i + 1) * tamBloque;
+          return { nombre, desde, hasta };
+        });
+      }
+
+      let respuestasAlumno = {};
+
+      const tabsContainer = document.getElementById("contenedorAreasTabs");
+      const preguntasContainer = document.getElementById("contenedorPreguntasArea");
+      const tituloRangoEl = document.getElementById("tituloRangoActivo");
+
+      function mostrarArea(indexArea) {
+        tabsContainer.querySelectorAll('.area-tab-btn').forEach((btn, idx) => {
+          if (idx === indexArea) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+
+        const area = areasList[indexArea];
+        const desde = parseInt(area.desde) || 1;
+        const hasta = parseInt(area.hasta) || numPreguntas;
+
+        tituloRangoEl.textContent = `Preguntas ${desde} al ${hasta}`;
+
+        let gridHtml = '';
+        for (let p = desde; p <= hasta; p++) {
+          let opcionesHtml = '';
+          opcionesList.forEach(letra => {
+            const isSelected = respuestasAlumno[p] === letra ? 'selected' : '';
+            opcionesHtml += `<button type="button" class="opcion-btn ${isSelected}" data-pregunta="${p}" data-opcion="${letra}" onclick="seleccionarRespuesta(${p}, '${letra}')">${letra}</button>`;
+          });
+
+          gridHtml += `
+            <div class="pregunta-card">
+              <span class="pregunta-num">${p}.</span>
+              <div class="opciones-grupo" id="grupo-preg-${p}">
+                ${opcionesHtml}
+              </div>
+            </div>
+          `;
+        }
+
+        preguntasContainer.innerHTML = gridHtml;
+      }
+
+      tabsContainer.innerHTML = '';
+      areasList.forEach((area, aIdx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `area-tab-btn ${aIdx === 0 ? 'active' : ''}`;
+        btn.textContent = area.nombre;
+        btn.onclick = () => mostrarArea(aIdx);
+        tabsContainer.appendChild(btn);
+      });
+
+      if (areasList.length > 0) {
+        mostrarArea(0);
+      }
+
+      window.seleccionarRespuesta = function(preguntaNum, opcionLetra) {
+        if (yaEnviadoEnSesion) return;
+        respuestasAlumno[preguntaNum] = opcionLetra;
+        const grupo = document.getElementById(`grupo-preg-${preguntaNum}`);
+        if (grupo) {
+          grupo.querySelectorAll('.opcion-btn').forEach(btn => {
+            if (btn.getAttribute('data-opcion') === opcionLetra) {
+              btn.classList.add('selected');
+            } else {
+              btn.classList.remove('selected');
+            }
+          });
+        }
+      };
+
+      const simIdKey = simulacroActivo.id || simIdParam || 'simulacro_activo';
+      const idAlumKey = obtenerClaveIdentidadAlumno(alumnoLogueado);
+      const storageTimerKey = `tiempoRestante_${simIdKey}_${idAlumKey}`;
+      
+      let duracionMinutos = parseInt(simulacroActivo.duracion) || 120;
+      let tiempoRestanteSegundos = localStorage.getItem(storageTimerKey);
+
+      if (tiempoRestanteSegundos !== null) {
+        tiempoRestanteSegundos = parseInt(tiempoRestanteSegundos);
+      } else {
+        tiempoRestanteSegundos = duracionMinutos * 60;
+      }
+
+      const cronometroEl = document.getElementById("tiempoRestante");
+
+      function formatearTiempo(segundos) {
+        const hrs = Math.floor(segundos / 3600);
+        const mins = Math.floor((segundos % 3600) / 60);
+        const secs = segundos % 60;
+        return `${hrs > 0 ? hrs + ':' : ''}${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      }
+
+      cronometroEl.textContent = formatearTiempo(tiempoRestanteSegundos);
+
+      function finalizarPorTiempoAgotado() {
+        if (yaEnviadoEnSesion) return;
+        window.__tiempoAgotadoAutomatico = true;
+        if (window.timerIntervalRef) clearInterval(window.timerIntervalRef);
+        localStorage.removeItem(storageTimerKey);
+        cronometroEl.textContent = "00:00";
+        procesarCalificacionYFin(respuestasAlumno, simulacroActivo, siglaUni, alumnoLogueado, true);
+      }
+
+      function iniciarCronometro() {
+        if (window.timerIntervalRef) clearInterval(window.timerIntervalRef);
+        cronometroEl.textContent = formatearTiempo(tiempoRestanteSegundos);
+
+        if (tiempoRestanteSegundos <= 0) {
+          finalizarPorTiempoAgotado();
+          return;
+        }
+
+        window.timerIntervalRef = setInterval(() => {
+          if (yaEnviadoEnSesion) {
+            clearInterval(window.timerIntervalRef);
+            return;
+          }
+          if (tiempoRestanteSegundos <= 1) {
+            tiempoRestanteSegundos = 0;
+            finalizarPorTiempoAgotado();
+            return;
+          }
+          tiempoRestanteSegundos--;
+          localStorage.setItem(storageTimerKey, tiempoRestanteSegundos);
+          cronometroEl.textContent = formatearTiempo(tiempoRestanteSegundos);
+        }, 1000);
+      }
+
+      history.pushState(null, null, window.location.href);
+      window.addEventListener('popstate', function () {
+        history.pushState(null, null, window.location.href);
+        if (yaEnviadoEnSesion) return;
+        clearInterval(window.timerIntervalRef);
+        localStorage.removeItem(storageTimerKey);
+        procesarCalificacionYFin(respuestasAlumno, simulacroActivo, siglaUni, alumnoLogueado, true);
+      });
+
+      const pdfViewerBox = document.getElementById("pdfViewerBox");
+      const rawPdf = simulacroActivo.pdf_url || simulacroActivo.pdfBase64 || simulacroActivo.archivoSimulacroBase64 || simulacroActivo.archivoSimulacro;
+
+      if (rawPdf) {
+        await renderizarPdfSinDescarga(rawPdf, pdfViewerBox);
+      } else {
+        pdfViewerBox.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8; font-style: italic; padding: 20px; text-align: center;">No se encontró el contenido PDF guardado para este simulacro.</div>`;
+      }
+
+      iniciarCronometro();
+
+      document.getElementById("btnTerminarExamen").addEventListener("click", () => {
+        if (yaEnviadoEnSesion || window.__tiempoAgotadoAutomatico) return;
+        if (confirm("¿Estás seguro de terminar y enviar tu examen? Solo tienes un intento y una vez enviado no podrás modificar tus respuestas.")) {
+          clearInterval(window.timerIntervalRef);
+          localStorage.removeItem(storageTimerKey);
+          procesarCalificacionYFin(respuestasAlumno, simulacroActivo, siglaUni, alumnoLogueado, false);
+        }
+      });
+    });
+
+    function mostrarModalAlerta(titulo, mensaje) {
+      document.getElementById("modalTitulo").textContent = titulo;
+      document.getElementById("modalMensaje").innerHTML = mensaje;
+      const btnCont = document.getElementById("modalBotones");
+      btnCont.innerHTML = `<button type="button" class="btn-terminar" onclick="document.getElementById('modalFlotante').style.display='none'">Aceptar</button>`;
+      document.getElementById("modalFlotante").style.display = 'flex';
+    }
+
+    async function persistirIntentoEnSupabase(simulacro, alumno, puntajeTotal, respuestas, grupoAlumno, aciertosPorArea = []) {
+      if (!simulacro || simulacro.id === undefined || simulacro.id === null) return;
+      try {
+        let alumnosActualizados = Array.isArray(simulacro.alumnos)
+          ? simulacro.alumnos.map(a => ({ ...(typeof a === 'object' ? a : {}) }))
+          : [];
+
+        const idxExistente = alumnosActualizados.findIndex(a => {
+          const codA = String(a.codigo || a.dni || a.id || "").trim().toLowerCase();
+          const nomA = String(a.nombres || a.nombre || "").trim().toLowerCase();
+          const codB = String(alumno.codigo || alumno.dni || alumno.id || "").trim().toLowerCase();
+          const nomB = String(alumno.nombres || alumno.nombre || "").trim().toLowerCase();
+          return (codA && codB && codA === codB) || (nomA && nomB && nomA === nomB);
+        });
+
+        const baseObj = idxExistente !== -1 ? alumnosActualizados[idxExistente] : alumno;
+
+        const payloadAlumno = {
+          ...baseObj,
+          codigo: alumno.codigo || baseObj.codigo || "",
+          nombres: alumno.nombres || alumno.nombre || baseObj.nombres || "Postulante",
+          carrera: alumno.carrera || baseObj.carrera || "",
+          grupo: grupoAlumno,
+          habilitado: false,
+          activo: false,
+          estado: 'Deshabilitado',
+          rindio: true,
+          finalizado: true,
+          puntaje: puntajeTotal,
+          respuestas: respuestas,
+          aciertosPorArea: aciertosPorArea,
+          fecha_envio: new Date().toISOString()
+        };
+
+        if (idxExistente !== -1) {
+          alumnosActualizados[idxExistente] = payloadAlumno;
+        } else {
+          alumnosActualizados.push(payloadAlumno);
+        }
+
+        simulacro.alumnos = alumnosActualizados;
+
+        const { error } = await supabase
+          .from('simulacros')
+          .update({ alumnos: alumnosActualizados })
+          .eq('id', simulacro.id);
+
+        if (error) {
+          console.error("Error actualizando alumnos en Supabase:", error);
+        }
+      } catch (e) {
+        console.error("Error al guardar intento en Supabase:", e);
+      }
+    }
+
+    function parsearObjetoSeguro(valor) {
+      if (!valor) return null;
+      if (typeof valor === 'string') {
+        const trimmed = valor.trim();
+        if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+          try {
+            return JSON.parse(trimmed);
+          } catch (e) {
+            return null;
+          }
+        }
+        return null;
+      }
+      return typeof valor === 'object' ? valor : null;
+    }
+
+    function obtenerPuntajeAreaParaGrupo(simulacro, configGrupo, area) {
+      const nombreArea = String(area?.nombre || area?.curso || "").trim();
+      const nombreAreaLower = nombreArea.toLowerCase();
+
+      const extraerNumero = (val) => {
+        if (val === undefined || val === null || val === "") return null;
+        if (typeof val === 'number') return Number.isNaN(val) ? null : val;
+        if (typeof val === 'string') {
+          const n = parseFloat(val);
+          return Number.isNaN(n) ? null : n;
+        }
+        if (typeof val === 'object') {
+          return extraerNumero(
+            val.puntajePregunta ?? val.puntaje_pregunta ?? val.puntaje ?? val.valor ?? val.correcta ?? val.puntos
+          );
+        }
+        return null;
+      };
+
+      const buscarEnMapaAreas = (mapa) => {
+        if (!mapa || typeof mapa !== 'object') return null;
+        if (Array.isArray(mapa)) {
+          const match = mapa.find(item => {
+            const nom = String(item?.nombre || item?.curso || item?.area || "").trim().toLowerCase();
+            return nom && nom === nombreAreaLower;
+          });
+          return match ? extraerNumero(match) : null;
+        }
+        if (nombreArea && mapa[nombreArea] !== undefined) {
+          return extraerNumero(mapa[nombreArea]);
+        }
+        const claveMatch = Object.keys(mapa).find(k => k.trim().toLowerCase() === nombreAreaLower);
+        return claveMatch ? extraerNumero(mapa[claveMatch]) : null;
+      };
+
+      if (configGrupo && typeof configGrupo === 'object') {
+        const desdeAreasGrupo = buscarEnMapaAreas(configGrupo.areas) ?? buscarEnMapaAreas(configGrupo.ponderaciones);
+        if (desdeAreasGrupo !== null) return desdeAreasGrupo;
+
+        const directoGrupo = buscarEnMapaAreas(configGrupo);
+        if (directoGrupo !== null) return directoGrupo;
+
+        const baseGrupo = extraerNumero(configGrupo.puntajePregunta ?? configGrupo.puntaje_pregunta ?? configGrupo.correcta ?? configGrupo.puntaje);
+        if (baseGrupo !== null) return baseGrupo;
+      }
+
+      const desdeAreaObj = extraerNumero(area);
+      if (desdeAreaObj !== null) return desdeAreaObj;
+
+      const desdeSim = extraerNumero(simulacro?.puntajePregunta ?? simulacro?.puntaje_pregunta ?? simulacro?.puntajePorPregunta ?? simulacro?.puntaje);
+      if (desdeSim !== null) return desdeSim;
+
+      return 5;
+    }
+
+    function procesarCalificacionYFin(respuestas, simulacro, siglasUni, alumno, forzadoPorTiempo) {
+      if (yaEnviadoEnSesion) return;
+      yaEnviadoEnSesion = true;
+
+      let puntajeTotal = 0;
+      let clavesObj = {};
+      const aciertosPorArea = [];
+
+      if (typeof simulacro.claves === 'string') {
+        let claveStr = simulacro.claves.trim();
+        if (claveStr.startsWith('{') || claveStr.startsWith('[')) {
+          try { clavesObj = JSON.parse(claveStr); } catch(e) { clavesObj = {}; }
+        } else {
+          for (let i = 0; i < claveStr.length; i++) {
+            clavesObj[i + 1] = claveStr[i];
+          }
+        }
+      } else if (typeof simulacro.claves === 'object' && simulacro.claves !== null) {
+        clavesObj = simulacro.claves;
+      }
+
+      const grupoAlumno = String(alumno?.grupo || "A").trim() || "A";
+      const grupoKeyLower = grupoAlumno.toLowerCase();
+
+      const gruposRaw = parsearObjetoSeguro(simulacro.grupos);
+      const puntajesPorGrupoRaw = parsearObjetoSeguro(simulacro.puntajesPorGrupo) || parsearObjetoSeguro(simulacro.puntajes);
+
+      const obtenerConfigDeFuente = (fuente) => {
+        if (!fuente || typeof fuente !== 'object') return null;
+        if (Array.isArray(fuente)) {
+          return fuente.find(g => String(g?.grupo || g?.nombre || g?.id || "").trim().toLowerCase() === grupoKeyLower) || null;
+        }
+        if (fuente[grupoAlumno] !== undefined) return fuente[grupoAlumno];
+        const matchKey = Object.keys(fuente).find(k => k.trim().toLowerCase() === grupoKeyLower);
+        return matchKey ? fuente[matchKey] : null;
+      };
+
+      const configGrupo = obtenerConfigDeFuente(gruposRaw) || obtenerConfigDeFuente(puntajesPorGrupoRaw) || {};
+
+      let areasConfig = [];
+      const areasGrupo = parsearObjetoSeguro(configGrupo?.areas) || parsearObjetoSeguro(configGrupo?.ponderaciones);
+      if (Array.isArray(areasGrupo) && areasGrupo.length > 0) {
+        areasConfig = areasGrupo;
+      } else if (Array.isArray(simulacro.areas) && simulacro.areas.length > 0) {
+        areasConfig = simulacro.areas;
+      } else {
+        const areasSimParsed = parsearObjetoSeguro(simulacro.areas);
+        if (Array.isArray(areasSimParsed)) areasConfig = areasSimParsed;
+      }
+
+      const numPreguntas = parseInt(simulacro.preguntas) || 100;
+
+      if (areasConfig.length > 0) {
+        areasConfig.forEach((area, idxArea) => {
+          let inicio = parseInt(area.inicio !== undefined ? area.inicio : (area.desde !== undefined ? area.desde : 1));
+          let fin = parseInt(area.fin !== undefined ? area.fin : (area.hasta !== undefined ? area.hasta : numPreguntas));
+          if (Number.isNaN(inicio) || inicio < 1) inicio = 1;
+          if (Number.isNaN(fin) || fin > numPreguntas) fin = numPreguntas;
+
+          const puntajePreguntaArea = obtenerPuntajeAreaParaGrupo(simulacro, configGrupo, area);
+
+          let correctasEnArea = 0;
+          for (let p = inicio; p <= fin; p++) {
+            let respAlumno = String(respuestas[p] || "").trim().toUpperCase();
+            let claveCorrecta = "";
+
+            if (Array.isArray(clavesObj)) {
+              claveCorrecta = String(clavesObj[p - 1] || "").trim().toUpperCase();
+            } else if (typeof clavesObj === 'object') {
+              claveCorrecta = String(clavesObj[p] || clavesObj[`p${p}`] || "").trim().toUpperCase();
+            }
+
+            if (respAlumno && respAlumno === claveCorrecta) {
+              correctasEnArea++;
+            }
+          }
+
+          aciertosPorArea.push({
+            area: String(area?.nombre || area?.curso || `Área ${idxArea + 1}`).trim(),
+            aciertos: correctasEnArea
+          });
+
+          puntajeTotal += (correctasEnArea * puntajePreguntaArea);
+        });
+      } else {
+        let valCorrecta = obtenerPuntajeAreaParaGrupo(simulacro, configGrupo, null);
+        let valIncorrecta = parseFloat(configGrupo?.incorrecta) || 0;
+        let valBlanco = parseFloat(configGrupo?.blanco) || 0;
+        let totalAciertos = 0;
+
+        for (let i = 1; i <= numPreguntas; i++) {
+          let respAlumno = String(respuestas[i] || "").trim().toUpperCase();
+          let claveCorrecta = "";
+
+          if (Array.isArray(clavesObj)) {
+            claveCorrecta = String(clavesObj[i - 1] || "").trim().toUpperCase();
+          } else if (typeof clavesObj === 'object') {
+            claveCorrecta = String(clavesObj[i] || clavesObj[`p${i}`] || "").trim().toUpperCase();
+          }
+
+          if (!respAlumno) {
+            puntajeTotal += valBlanco;
+          } else if (respAlumno === claveCorrecta) {
+            totalAciertos++;
+            puntajeTotal += valCorrecta;
+          } else {
+            puntajeTotal += valIncorrecta;
+          }
+        }
+
+        aciertosPorArea.push({
+          area: "General",
+          aciertos: totalAciertos
+        });
+      }
+
+      const idAlum = obtenerClaveIdentidadAlumno(alumno);
+      const datosResultado = {
+        rindio: true,
+        habilitado: false,
+        finalizado: true,
+        puntaje: puntajeTotal,
+        respuestas: respuestas,
+        aciertosPorArea: aciertosPorArea,
+        carrera: alumno.carrera,
+        grupo: grupoAlumno,
+        fecha_envio: new Date().toISOString()
+      };
+
+      localStorage.setItem(`resultado_${simulacro.id}_${idAlum}`, JSON.stringify(datosResultado));
+      if (alumno.codigo || alumno.nombres) {
+        localStorage.setItem(`resultado_${simulacro.id}_${alumno.codigo || alumno.nombres}`, JSON.stringify(datosResultado));
+      }
+
+      persistirIntentoEnSupabase(simulacro, alumno, puntajeTotal, respuestas, grupoAlumno, aciertosPorArea);
+      mostrarModalExamenYaRendido(datosResultado, simulacro, siglasUni, alumno, true, Boolean(forzadoPorTiempo));
+    }
+  </script>
+  <script type="module">
+  window.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("modalFlotante");
+    const titulo = document.getElementById("modalTitulo");
+    const mensaje = document.getElementById("modalMensaje");
+    const botones = document.getElementById("modalBotones");
+    const btnTerminar = document.getElementById("btnTerminarExamen");
+    const tiempoEl = document.getElementById("tiempoRestante");
+
+    if (!modal || !titulo || !mensaje || !botones) return;
+
+    let envioAutorizadoPorConfirmacion = false;
+
+    function obtenerPreguntasSinMarcar() {
+      const numsPreguntas = new Set();
+
+      document.querySelectorAll("[data-pregunta]").forEach((el) => {
+        const n = parseInt(el.getAttribute("data-pregunta"), 10);
+        if (!Number.isNaN(n) && n > 0) numsPreguntas.add(n);
+      });
+
+      document.querySelectorAll(".pregunta-num").forEach((el) => {
+        const match = (el.textContent || "").match(/\d+/);
+        if (match) {
+          const n = parseInt(match[0], 10);
+          if (!Number.isNaN(n) && n > 0) numsPreguntas.add(n);
+        }
+      });
+
+      const ordenadas = Array.from(numsPreguntas).sort((a, b) => a - b);
+      const faltantes = [];
+
+      for (const p of ordenadas) {
+        const grupo = document.getElementById(`grupo-preg-${p}`);
+        const haySeleccion = grupo
+          ? Boolean(grupo.querySelector(".opcion-btn.selected"))
+          : Boolean(document.querySelector(`.opcion-btn[data-pregunta="${p}"].selected`));
+
+        if (!haySeleccion) {
+          faltantes.push(p);
+        }
+      }
+
+      return faltantes;
+    }
+
+    // 1. Botón "Terminar y Enviar": exige que todas las preguntas estén marcadas
+    if (btnTerminar) {
+      btnTerminar.addEventListener(
+        "click",
+        (e) => {
+          if (window.__tiempoAgotadoAutomatico) {
+            return;
+          }
+
+          if (envioAutorizadoPorConfirmacion) {
+            envioAutorizadoPorConfirmacion = false;
+            return;
+          }
+
+          const faltantes = obtenerPreguntasSinMarcar();
+          if (faltantes.length > 0) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            titulo.textContent = "⚠️ Te faltan marcar preguntas";
+            mensaje.innerHTML = `
+              Aún tienes preguntas sin marcar en tu cartilla. Debes marcar todas las preguntas antes de enviar tu examen.<br><br>
+              <b>${faltantes.length === 1 ? "Pregunta pendiente:" : "Preguntas pendientes:"}</b><br>
+              <div style="margin-top: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 10px; padding: 10px 12px; color: #fbbf24; font-weight: 700; word-break: break-word;">
+                ${faltantes.join(", ")}
+              </div>
+            `;
+
+            botones.innerHTML = `
+              <button type="button" id="btnEntendidoFaltantes" class="btn-secundario-modal">
+                Entendido, volver a la cartilla
+              </button>
+            `;
+
+            modal.style.display = "flex";
+
+            document.getElementById("btnEntendidoFaltantes").onclick = () => {
+              modal.style.display = "none";
+            };
+          }
+        },
+        true
+      );
+    }
+
+    // 2. Flecha de retroceder: advierte antes de salir, sin bloquear por preguntas sin marcar
+    history.pushState(null, "", window.location.href);
+    window.addEventListener(
+      "popstate",
+      (e) => {
+        history.pushState(null, "", window.location.href);
+
+        if (window.__tiempoAgotadoAutomatico) {
+          return;
+        }
+
+        const actual = (titulo.textContent || "").trim();
+        if (actual.includes("Finalizado") || actual.includes("Ya rendiste") || actual.includes("tiempo")) {
+          return;
+        }
+
+        e.stopImmediatePropagation();
+
+        titulo.textContent = "⚠️ ¿Deseas salir del examen?";
+        mensaje.innerHTML =
+          "Si retrocedes o sales de esta ventana, <b>se dará por terminado tu examen</b> con las respuestas que hayas marcado hasta ahora y no podrás volver a entrar.<br><br>¿Qué deseas hacer?";
+
+        botones.innerHTML = `
+          <button type="button" id="btnSeguirAqui" class="btn-secundario-modal">Seguir en el examen</button>
+          <button type="button" id="btnConfirmarSalida" class="btn-terminar" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">Salir y terminar</button>
+        `;
+
+        modal.style.display = "flex";
+
+        document.getElementById("btnSeguirAqui").onclick = () => {
+          modal.style.display = "none";
+        };
+
+        document.getElementById("btnConfirmarSalida").onclick = () => {
+          modal.style.display = "none";
+          envioAutorizadoPorConfirmacion = true;
+          if (btnTerminar) {
+            btnTerminar.click();
+          }
+        };
+      },
+      true
+    );
+  });
+</script>
+</body>
+</html>

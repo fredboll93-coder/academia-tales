@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Universidad - Academia Tales</title>
+  <link rel="stylesheet" href="src/style.css">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(2, 6, 23, 0.7) 0%, rgba(10, 15, 30, 0.9) 100%), 
+                  url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 20px;
+      box-sizing: border-box;
+      margin: 0;
+    }
+    .main-card {
+      background: rgba(11, 18, 32, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-top: 2px solid rgba(148, 163, 184, 0.4);
+      border-radius: 20px;
+      padding: 25px 35px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .option-card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .option-card:hover {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.5);
+      transform: translateY(-4px);
+    }
+
+    /* Estilos exclusivos de la ventanita modal de Resultados de Admisión */
+    .adm-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .adm-modal-overlay.active {
+      display: flex;
+    }
+    .adm-modal-box {
+      background: rgba(15, 23, 42, 0.97);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-top: 2px solid rgba(59, 130, 246, 0.65);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px 28px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.75);
+      color: #f8fafc;
+      box-sizing: border-box;
+    }
+    .adm-file-item {
+      background: rgba(30, 41, 59, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .adm-badge {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.45);
+      color: #93c5fd;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .adm-btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .adm-btn-primary:hover:not(:disabled) {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+    .adm-btn-primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .adm-btn-secondary {
+      background: rgba(148, 163, 184, 0.14);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      color: #e2e8f0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .adm-btn-secondary:hover {
+      background: rgba(148, 163, 184, 0.25);
+    }
+    .adm-btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .adm-btn-danger:hover {
+      background: rgba(239, 68, 68, 0.28);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Contenedor general ajustado para evitar scroll -->
+  <div style="width: 100%; max-width: 900px; margin: 0 auto; padding: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+
+    <!-- Barra Superior compacta y alineada -->
+    <div style="background: rgba(11, 18, 32, 0.85); border: 3px solid rgba(148, 163, 184, 0.15); border-top: 3px solid rgba(148, 163, 184, 0.4); border-radius: 20px; padding: 8px 30px; backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="logo.png" alt="Logo" style="width: 75px; height: 75px; object-fit: contain;">
+        <div>
+          <h2 style="margin: 0 0 2px 0; font-size: 18px; font-weight: 700; color: #f8fafc;">Panel de Universidad</h2>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">Academia Tales • Gestión Académica</p>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" onclick="abrirModalCarruselUniversidad()" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s;">🖼️ Carrusel</button>
+          <button onclick="cerrarSesionPanel()" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 6px 14px; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s;">Cerrar Sesión</button>
+        </div>
+        <button onclick="window.location.href='admin.html'" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;">← Volver a Universidades</button>
+      </div>
+    </div>
+
+    <!-- Tarjeta Principal de la Universidad y Módulos -->
+    <div class="main-card" style="margin: 0; width: 100%; box-sizing: border-box;">
+      <div id="uni-header" style="display: flex; align-items: center; gap: 15px;">
+        <img id="uni-logo" src="" alt="Logo" style="width: 55px; height: 55px; object-fit: contain;">
+        <div>
+          <h1 id="uni-siglas" style="margin: 0 0 2px 0; font-size: 20px; font-weight: 700; color: #f8fafc;"></h1>
+          <p id="uni-nombre" style="margin: 0; font-size: 13px; color: #94a3b8;"></p>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid rgba(148, 163, 184, 0.1); margin: 15px 0;">
+
+      <h2 style="font-size: 14px; letter-spacing: 1.5px; color: #cbd5e1; text-transform: uppercase; margin-bottom: 0;">Gestión Académica</h2>
+
+      <div class="options-grid">
+        <div class="option-card" onclick="window.location.href='simulacros.html?siglas=' + (new URLSearchParams(window.location.search).get('siglas'))">
+          <div style="font-size: 28px; margin-bottom: 8px;">📝</div>
+          <h3 style="margin: 0 0 4px 0; font-size: 15px; color: #fff;">Simulacros</h3>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">Evaluaciones y exámenes tipo admisión.</p>
+        </div>
+
+        <div class="option-card" onclick="window.location.href='clases-grabadas.html?siglas=' + (new URLSearchParams(window.location.search).get('siglas') || 'UNAP')">
+          <div style="font-size: 28px; margin-bottom: 8px;">🎥</div>
+          <h3 style="margin: 0 0 4px 0; font-size: 15px; color: #fff;">Clases Grabadas</h3>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">Accede a las sesiones de video pasadas.</p>
+        </div>
+
+        <div class="option-card" onclick="window.location.href='materiales.html?siglas=' + (new URLSearchParams(window.location.search).get('siglas') || 'UNAP')">
+          <div style="font-size: 28px; margin-bottom: 8px;">📁</div>
+          <h3 style="margin: 0 0 4px 0; font-size: 15px; color: #fff;">Materiales</h3>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">PDFs, separatas y recursos de estudio.</p>
+        </div>
+
+        <div class="option-card" onclick="abrirModalResultadosAdmision()">
+          <div style="font-size: 28px; margin-bottom: 8px;">📊</div>
+          <h3 style="margin: 0 0 4px 0; font-size: 15px; color: #fff;">Resultados de Admisión</h3>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">Últimos 3 exámenes y puntajes de ingreso.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Ventanita Modal: Carrusel de la Universidad (vista del alumno) -->
+  <div id="modal-carrusel-universidad" class="adm-modal-overlay" onclick="if(event.target === this) cerrarModalCarruselUniversidad()">
+    <div class="adm-modal-box">
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(148, 163, 184, 0.15); padding-bottom: 14px; margin-bottom: 16px;">
+        <div>
+          <h3 style="margin: 0 0 3px 0; font-size: 18px; color: #f8fafc;">🖼️ Carrusel de Universidad (<span id="carrusel-uni-siglas">UNAP</span>)</h3>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">Imágenes exclusivas que verá el alumno en el carrusel lateral al entrar a esta universidad.</p>
+        </div>
+        <button type="button" onclick="cerrarModalCarruselUniversidad()" title="Cerrar" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.25); color: #cbd5e1; width: 32px; height: 32px; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+
+      <div style="background: rgba(30, 41, 59, 0.45); border: 1px dashed rgba(96, 165, 250, 0.4); border-radius: 14px; padding: 14px 16px; margin-bottom: 18px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 600; color: #cbd5e1; margin-bottom: 4px;">Título (opcional)</label>
+            <input type="text" id="carrusel-uni-titulo" placeholder="Ej. Clases Magistrales" style="width: 100%; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(148, 163, 184, 0.25); color: #e2e8f0; padding: 8px 10px; border-radius: 10px; font-size: 12px; box-sizing: border-box;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 600; color: #cbd5e1; margin-bottom: 4px;">Subtítulo (opcional)</label>
+            <input type="text" id="carrusel-uni-subtitulo" placeholder="Ej. Academia Tales" style="width: 100%; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(148, 163, 184, 0.25); color: #e2e8f0; padding: 8px 10px; border-radius: 10px; font-size: 12px; box-sizing: border-box;">
+          </div>
+        </div>
+        <label style="display: block; font-size: 12px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Seleccionar imagen:</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+          <input type="file" id="carrusel-uni-file" accept="image/*" style="flex: 1; min-width: 210px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(148, 163, 184, 0.25); color: #e2e8f0; padding: 8px 10px; border-radius: 10px; font-size: 12px;">
+          <button type="button" id="carrusel-uni-btn-guardar" onclick="guardarImagenCarruselUniversidad()" class="adm-btn-primary">Agregar Imagen</button>
+        </div>
+        <p id="carrusel-uni-status" style="margin: 8px 0 0 0; font-size: 12px; color: #94a3b8;"></p>
+      </div>
+
+      <div id="carrusel-uni-lista" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px;"></div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(148, 163, 184, 0.15);">
+        <button type="button" onclick="cerrarModalCarruselUniversidad()" style="background: rgba(148, 163, 184, 0.16); border: 1px solid rgba(148, 163, 184, 0.3); color: #f8fafc; padding: 8px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ventanita Modal: Resultados de Admisión (Últimos 3 PDFs) -->
+  <div id="modal-resultados-admision" class="adm-modal-overlay" onclick="if(event.target === this) cerrarModalResultadosAdmision()">
+    <div class="adm-modal-box">
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(148, 163, 184, 0.15); padding-bottom: 14px; margin-bottom: 16px;">
+        <div>
+          <h3 style="margin: 0 0 3px 0; font-size: 18px; color: #f8fafc;">📊 Resultados de Admisión (<span id="adm-modal-siglas">UNAP</span>)</h3>
+          <p style="margin: 0; font-size: 12px; color: #94a3b8;">Calcula el rango referencial de ingreso por carrera según quienes cubrieron vacante en los últimos 3 exámenes (referencia orientativa, no un puntaje fijo garantizado).</p>
+        </div>
+        <button type="button" onclick="cerrarModalResultadosAdmision()" title="Cerrar" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.25); color: #cbd5e1; width: 32px; height: 32px; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+
+      <div style="background: rgba(30, 41, 59, 0.45); border: 1px dashed rgba(96, 165, 250, 0.4); border-radius: 14px; padding: 14px 16px; margin-bottom: 18px;">
+        <div id="adm-edit-banner" style="display: none; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fcd34d; font-size: 12px; padding: 6px 10px; border-radius: 8px; margin-bottom: 10px; justify-content: space-between; align-items: center;">
+          <span id="adm-edit-label">Reemplazando archivo...</span>
+          <button type="button" onclick="cancelarEdicionResultado()" style="background: none; border: none; color: #fcd34d; text-decoration: underline; cursor: pointer; font-size: 11px;">Cancelar</button>
+        </div>
+
+        <label style="display: block; font-size: 12px; font-weight: 600; color: #cbd5e1; margin-bottom: 8px;">Seleccionar archivo de resultados (PDF):</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+          <input type="file" id="adm-pdf-input" accept="application/pdf,.pdf" style="flex: 1; min-width: 210px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(148, 163, 184, 0.25); color: #e2e8f0; padding: 8px 10px; border-radius: 10px; font-size: 12px;">
+          <button type="button" id="adm-btn-guardar" onclick="guardarResultadoAdmisionPDF()" class="adm-btn-primary">Guardar Resultado</button>
+        </div>
+        <p id="adm-status-msg" style="margin: 8px 0 0 0; font-size: 12px; color: #94a3b8;"></p>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+        <h4 style="margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; color: #cbd5e1;">Archivos Guardados (<span id="adm-count">0</span>/3)</h4>
+        <span style="font-size: 11px; color: #94a3b8;">El 1.° es el más reciente</span>
+      </div>
+
+      <div id="adm-lista-archivos"></div>
+
+      <div id="adm-resumen-carreras-wrap" style="display: none; margin-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.15); padding-top: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <h4 style="margin: 0; font-size: 13px; color: #93c5fd;">Rango de Puntaje Referencial por Carrera</h4>
+          <span id="adm-total-carreras" style="font-size: 11px; color: #94a3b8;"></span>
+        </div>
+        <p style="margin: 0 0 8px 0; font-size: 11px; color: #94a3b8;">Rango aproximado (mínimo – máximo de ingresantes en los exámenes cargados). Es orientativo y no garantiza ingreso con un puntaje exacto.</p>
+        <div id="adm-lista-carreras" style="max-height: 190px; overflow-y: auto; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 10px; padding: 8px 12px; font-size: 12px;"></div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(148, 163, 184, 0.15);">
+        <button type="button" onclick="cerrarModalResultadosAdmision()" style="background: rgba(148, 163, 184, 0.16); border: 1px solid rgba(148, 163, 184, 0.3); color: #f8fafc; padding: 8px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/detalleUniversidad.js"></script>
+
+  <!-- Lógica de Resultados de Admisión y Carrusel por Universidad sincronizada en Supabase -->
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = window.SUPABASE_URL || 'https://veoyldrbaypjllzzkovc.supabase.co';
+    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_w8bSgcq_28dQ3rh6Ki0RPA_-vC-iMv6';
+
+    const supabaseClient =
+      window.supabaseClient ||
+      window.supabase ||
+      (SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.trim().length > 10
+        ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        : null);
+
+    window.cerrarSesionPanel = async function () {
+      try {
+        if (supabaseClient && supabaseClient.auth && typeof supabaseClient.auth.signOut === 'function') {
+          await supabaseClient.auth.signOut();
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        sessionStorage.clear();
+        Object.keys(localStorage).forEach((k) => {
+          if (k.startsWith('sb-') || k.toLowerCase().includes('session') || k.toLowerCase().includes('auth') || k.toLowerCase().includes('usuario')) {
+            localStorage.removeItem(k);
+          }
+        });
+        window.location.href = 'index.html';
+      }
+    };
+
+    function getSiglasActual() {
+      return (new URLSearchParams(window.location.search).get('siglas') || 'UNAP').toUpperCase();
+    }
+
+    // --- Lógica de Carrusel por Universidad ---
+    async function renderizarCarruselUniversidad() {
+      const siglas = getSiglasActual();
+      document.getElementById('carrusel-uni-siglas').textContent = siglas;
+      const listaEl = document.getElementById('carrusel-uni-lista');
+      listaEl.innerHTML = `<p style="color:#94a3b8;font-size:12px;">Cargando imágenes...</p>`;
+
+      if (!supabaseClient) {
+        listaEl.innerHTML = `<p style="color:#f87171;font-size:12px;">No hay conexión con Supabase.</p>`;
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from('carrusel_universidades')
+        .select('*')
+        .eq('universidad_siglas', siglas)
+        .order('orden', { ascending: true })
+        .order('id', { ascending: true });
+
+      if (error) {
+        listaEl.innerHTML = `<p style="color:#f87171;font-size:12px;">Error al cargar: ${error.message}</p>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        listaEl.innerHTML = `<p style="color:#94a3b8;font-size:12px;grid-column:1/-1;">Aún no hay imágenes en el carrusel de ${siglas}.</p>`;
+        return;
+      }
+
+      listaEl.innerHTML = data.map((slide) => `
+        <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+          <img src="${slide.imagen_url}" alt="${slide.titulo || siglas}" style="width: 100%; height: 110px; object-fit: cover;">
+          <div style="padding: 8px 10px; display: flex; flex-direction: column; gap: 4px;">
+            <strong style="font-size: 12px; color: #f8fafc;">${slide.titulo || 'Sin título'}</strong>
+            <span style="font-size: 11px; color: #94a3b8;">${slide.subtitulo || ''}</span>
+            <button type="button" onclick="eliminarImagenCarruselUniversidad(${slide.id})" class="adm-btn-danger" style="margin-top: 6px; width: 100%;">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.abrirModalCarruselUniversidad = async function () {
+      document.getElementById('carrusel-uni-status').textContent = '';
+      document.getElementById('modal-carrusel-universidad').classList.add('active');
+      await renderizarCarruselUniversidad();
+    };
+
+    window.cerrarModalCarruselUniversidad = function () {
+      document.getElementById('modal-carrusel-universidad').classList.remove('active');
+      document.getElementById('carrusel-uni-file').value = '';
+      document.getElementById('carrusel-uni-titulo').value = '';
+      document.getElementById('carrusel-uni-subtitulo').value = '';
+      document.getElementById('carrusel-uni-status').textContent = '';
+    };
+
+    window.guardarImagenCarruselUniversidad = async function () {
+      const inputFile = document.getElementById('carrusel-uni-file');
+      const titulo = document.getElementById('carrusel-uni-titulo').value.trim();
+      const subtitulo = document.getElementById('carrusel-uni-subtitulo').value.trim();
+      const statusEl = document.getElementById('carrusel-uni-status');
+      const btnGuardar = document.getElementById('carrusel-uni-btn-guardar');
+      const siglas = getSiglasActual();
+
+      if (!inputFile.files || inputFile.files.length === 0) {
+        statusEl.style.color = '#f87171';
+        statusEl.textContent = 'Por favor selecciona una imagen primero.';
+        return;
+      }
+
+      const file = inputFile.files[0];
+      btnGuardar.disabled = true;
+      btnGuardar.textContent = 'Subiendo...';
+      statusEl.style.color = '#93c5fd';
+      statusEl.textContent = 'Subiendo imagen a la nube...';
+
+      try {
+        const nombreLimpio = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const ruta = `carrusel_universidades/${siglas}/${Date.now()}_${nombreLimpio}`;
+
+        const { error: upErr } = await supabaseClient.storage
+          .from('logos-universidades')
+          .upload(ruta, file, { upsert: true, cacheControl: '3600' });
+
+        if (upErr) throw upErr;
+
+        const { data: pub } = supabaseClient.storage
+          .from('logos-universidades')
+          .getPublicUrl(ruta);
+
+        const { data: existentes } = await supabaseClient
+          .from('carrusel_universidades')
+          .select('id')
+          .eq('universidad_siglas', siglas);
+
+        const { error: insErr } = await supabaseClient
+          .from('carrusel_universidades')
+          .insert([{
+            universidad_siglas: siglas,
+            imagen_url: pub.publicUrl,
+            titulo,
+            subtitulo,
+            orden: (existentes?.length || 0) + 1
+          }]);
+
+        if (insErr) throw insErr;
+
+        inputFile.value = '';
+        document.getElementById('carrusel-uni-titulo').value = '';
+        document.getElementById('carrusel-uni-subtitulo').value = '';
+        statusEl.style.color = '#34d399';
+        statusEl.textContent = '✓ Imagen agregada al carrusel de ' + siglas + '.';
+        await renderizarCarruselUniversidad();
+      } catch (err) {
+        console.error(err);
+        statusEl.style.color = '#f87171';
+        statusEl.textContent = 'Error al subir imagen: ' + (err?.message || err);
+      } finally {
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = 'Agregar Imagen';
+      }
+    };
+
+    window.eliminarImagenCarruselUniversidad = async function (id) {
+      const statusEl = document.getElementById('carrusel-uni-status');
+      try {
+        const { error } = await supabaseClient
+          .from('carrusel_universidades')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        statusEl.style.color = '#34d399';
+        statusEl.textContent = '✓ Imagen eliminada.';
+        await renderizarCarruselUniversidad();
+      } catch (err) {
+        statusEl.style.color = '#f87171';
+        statusEl.textContent = 'No se pudo eliminar: ' + (err?.message || err);
+      }
+    };
+
+    const MAX_ARCHIVOS = 3;
+    let indiceEdicion = null;
+    let archivosActuales = [];
+    let promediosActuales = {};
+
+    function getStorageKey() {
+      return 'tales_resultados_admision_' + getSiglasActual();
+    }
+
+    function getPromediosStorageKey() {
+      return 'tales_promedios_carrera_' + getSiglasActual();
+    }
+
+    function leerCacheLocal() {
+      try {
+        const rawArch = localStorage.getItem(getStorageKey());
+        const rawProm = localStorage.getItem(getPromediosStorageKey());
+        archivosActuales = rawArch ? JSON.parse(rawArch).slice(0, MAX_ARCHIVOS) : [];
+        promediosActuales = rawProm ? JSON.parse(rawProm) : {};
+      } catch (e) {
+        archivosActuales = [];
+        promediosActuales = {};
+      }
+    }
+
+    async function cargarDesdeNubeYCache() {
+      leerCacheLocal();
+      if (!supabaseClient || typeof supabaseClient.from !== 'function') {
+        return { archivos: archivosActuales, promedios: promediosActuales, desdeNube: false };
+      }
+
+      const { data, error } = await supabaseClient
+        .from('resultados_admision_resumen')
+        .select('archivos_json, promedios_carrera_json')
+        .eq('universidad_siglas', getSiglasActual())
+        .maybeSingle();
+
+      if (error) {
+        throw new Error('Error al leer en Supabase: ' + error.message);
+      }
+
+      if (data) {
+        archivosActuales = Array.isArray(data.archivos_json) ? data.archivos_json.slice(0, MAX_ARCHIVOS) : [];
+        promediosActuales = data.promedios_carrera_json || {};
+        localStorage.setItem(getStorageKey(), JSON.stringify(archivosActuales));
+        localStorage.setItem(getPromediosStorageKey(), JSON.stringify(promediosActuales));
+      }
+
+      return { archivos: archivosActuales, promedios: promediosActuales, desdeNube: true };
+    }
+
+    async function guardarEnNubeYCache(listaArchivos) {
+      const recortada = listaArchivos.slice(0, MAX_ARCHIVOS);
+
+      const acumulador = {};
+      recortada.forEach((archivo) => {
+        const carreras = archivo.carreras || {};
+        Object.entries(carreras).forEach(([carreraNombre, info]) => {
+          const minExamen = Number(info.puntaje_minimo_corte);
+          const maxExamen = Number(info.puntaje_maximo);
+          const promExamen = Number(info.promedio);
+
+          if (!acumulador[carreraNombre]) {
+            acumulador[carreraNombre] = {
+              carrera: carreraNombre,
+              sumaMinimos: 0,
+              sumaMaximos: 0,
+              sumaPromedios: 0,
+              rangoMinAbsoluto: Infinity,
+              rangoMaxAbsoluto: -Infinity,
+              examenesCount: 0,
+              detalles: []
+            };
+          }
+
+          acumulador[carreraNombre].sumaMinimos += minExamen;
+          acumulador[carreraNombre].sumaMaximos += maxExamen;
+          acumulador[carreraNombre].sumaPromedios += promExamen;
+          acumulador[carreraNombre].rangoMinAbsoluto = Math.min(acumulador[carreraNombre].rangoMinAbsoluto, minExamen);
+          acumulador[carreraNombre].rangoMaxAbsoluto = Math.max(acumulador[carreraNombre].rangoMaxAbsoluto, maxExamen);
+          acumulador[carreraNombre].examenesCount += 1;
+          acumulador[carreraNombre].detalles.push({
+            archivo: archivo.nombreArchivo,
+            minimoExamen: minExamen.toFixed(7),
+            maximoExamen: maxExamen.toFixed(7),
+            promedioExamen: promExamen.toFixed(7),
+            ingresantes: info.ingresantes
+          });
+        });
+      });
+
+      const promediosConsolidados = {};
+      Object.entries(acumulador).forEach(([carreraNombre, data]) => {
+        const n = data.examenesCount;
+        const rangoMinProm = n > 0 ? (data.sumaMinimos / n) : 0;
+        const rangoMaxProm = n > 0 ? (data.sumaMaximos / n) : 0;
+        const promedioFinal = n > 0 ? (data.sumaPromedios / n) : 0;
+
+        promediosConsolidados[carreraNombre] = {
+          carrera: carreraNombre,
+          rango_minimo: Number(rangoMinProm.toFixed(7)),
+          rango_maximo: Number(rangoMaxProm.toFixed(7)),
+          rango_minimo_formateado: rangoMinProm.toFixed(7),
+          rango_maximo_formateado: rangoMaxProm.toFixed(7),
+          rango_minimo_historico: Number(data.rangoMinAbsoluto.toFixed(7)),
+          rango_maximo_historico: Number(data.rangoMaxAbsoluto.toFixed(7)),
+          rango_texto: `${rangoMinProm.toFixed(7)} – ${rangoMaxProm.toFixed(7)}`,
+          promedio_objetivo: Number(promedioFinal.toFixed(7)),
+          promedio_formateado: promedioFinal.toFixed(7),
+          examenes_considerados: n,
+          detalles: data.detalles,
+          actualizado_en: new Date().toISOString()
+        };
+      });
+
+      if (!supabaseClient || typeof supabaseClient.from !== 'function') {
+        throw new Error('No se pudo inicializar el cliente de Supabase.');
+      }
+
+      const { error } = await supabaseClient
+        .from('resultados_admision_resumen')
+        .upsert({
+          universidad_siglas: getSiglasActual(),
+          archivos_json: recortada,
+          promedios_carrera_json: promediosConsolidados,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'universidad_siglas' });
+
+      if (error) {
+        throw new Error('No se pudo guardar en Supabase: ' + error.message);
+      }
+
+      archivosActuales = recortada;
+      promediosActuales = promediosConsolidados;
+      localStorage.setItem(getStorageKey(), JSON.stringify(archivosActuales));
+      localStorage.setItem(getPromediosStorageKey(), JSON.stringify(promediosActuales));
+
+      return promediosConsolidados;
+    }
+
+    function asegurarPdfJs() {
+      return new Promise((resolve, reject) => {
+        if (window.pdfjsLib) {
+          resolve(window.pdfjsLib);
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        script.onload = () => {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          resolve(window.pdfjsLib);
+        };
+        script.onerror = () => reject(new Error('No se pudo cargar el lector de PDF.'));
+        document.head.appendChild(script);
+      });
+    }
+
+    async function extraerLineasPDF(file) {
+      const pdfjsLib = await asegurarPdfJs();
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const todasLasLineas = [];
+
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const page = await pdf.getPage(p);
+        const textContent = await page.getTextContent();
+
+        const filasMap = [];
+        textContent.items.forEach((item) => {
+          const texto = (item.str || '').trim();
+          if (!texto) return;
+          const y = item.transform[5];
+          const x = item.transform[4];
+          let fila = filasMap.find((f) => Math.abs(f.y - y) <= 3.5);
+          if (!fila) {
+            fila = { y, items: [] };
+            filasMap.push(fila);
+          }
+          fila.items.push({ x, texto });
+        });
+
+        filasMap.sort((a, b) => b.y - a.y);
+        filasMap.forEach((fila) => {
+          fila.items.sort((a, b) => a.x - b.x);
+          const lineaTexto = fila.items.map((i) => i.texto).join(' ').replace(/\s+/g, ' ').trim();
+          if (lineaTexto) todasLasLineas.push(lineaTexto);
+        });
+      }
+      return todasLasLineas;
+    }
+
+    function analizarResultadosPorCarrera(lineas) {
+      const carreras = {};
+      let carreraActual = 'GENERAL';
+
+      const regexFilaPostulante = /(\d{1,4}\.\d{2,7})\s+\d+\s+\d+\s+(CUBRIO VACANTE|NO CUBRIO VACANTE|ANULADO|AUSENTE)/i;
+      const regexSoloPuntajeYCondicion = /(\d{1,4}\.\d{2,7}).*?(CUBRIO VACANTE|NO CUBRIO VACANTE|ANULADO|AUSENTE)/i;
+
+      for (let i = 0; i < lineas.length; i++) {
+        const linea = lineas[i];
+        const upper = linea.toUpperCase();
+
+        if (
+          upper.startsWith('UNIVERSIDAD NACIONAL') ||
+          upper.startsWith('DIRECCION DE ADMISION') ||
+          upper.startsWith('DIRECCIÓN DE ADMISIÓN') ||
+          upper.startsWith('EXAMEN DE ADMISION') ||
+          upper.startsWith('EXAMEN DE ADMISIÓN') ||
+          upper.startsWith('RESULTADOS GENERALES') ||
+          upper.startsWith('MODALIDAD:') ||
+          upper.includes('APELLIDOS Y NOMBRES') ||
+          upper.startsWith('PÁGINA') ||
+          upper.startsWith('PAGINA')
+        ) {
+          continue;
+        }
+
+        if (/^(ESCUELA|CARRERA|ESPECIALIDAD)\s*:/i.test(linea)) {
+          carreraActual = linea.replace(/^(ESCUELA|CARRERA|ESPECIALIDAD)\s*:\s*/i, '').trim().toUpperCase();
+          if (!carreras[carreraActual]) {
+            carreras[carreraActual] = { puntajesCubrieron: [] };
+          }
+          continue;
+        }
+
+        const match = linea.match(regexFilaPostulante) || linea.match(regexSoloPuntajeYCondicion);
+        if (match) {
+          const puntaje = parseFloat(match[1]);
+          const condicion = match[2].toUpperCase();
+
+          if (condicion === 'CUBRIO VACANTE' && !isNaN(puntaje) && puntaje > 0) {
+            if (!carreras[carreraActual]) {
+              carreras[carreraActual] = { puntajesCubrieron: [] };
+            }
+            carreras[carreraActual].puntajesCubrieron.push(puntaje);
+          }
+        }
+      }
+
+      const resultadoCarreras = {};
+      Object.entries(carreras).forEach(([nombre, data]) => {
+        const lista = data.puntajesCubrieron;
+        if (lista.length > 0) {
+          const suma = lista.reduce((acc, val) => acc + val, 0);
+          const promedio = suma / lista.length;
+          resultadoCarreras[nombre] = {
+            ingresantes: lista.length,
+            puntaje_maximo: Number(Math.max(...lista).toFixed(7)),
+            puntaje_minimo_corte: Number(Math.min(...lista).toFixed(7)),
+            promedio: Number(promedio.toFixed(7))
+          };
+        }
+      });
+
+      return resultadoCarreras;
+    }
+
+    function renderizarModal() {
+      const siglas = getSiglasActual();
+      document.getElementById('adm-modal-siglas').textContent = siglas;
+      document.getElementById('adm-count').textContent = archivosActuales.length;
+
+      const contenedorLista = document.getElementById('adm-lista-archivos');
+      if (archivosActuales.length === 0) {
+        contenedorLista.innerHTML = `
+          <div style="text-align: center; padding: 18px; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(148, 163, 184, 0.12); border-radius: 12px; color: #94a3b8; font-size: 12px;">
+            Aún no hay archivos de resultados guardados en la nube para <strong>${siglas}</strong>.<br>
+            Sube tu primer PDF arriba para calcular el rango referencial por carrera.
+          </div>
+        `;
+      } else {
+        const etiquetasOrden = ['1.° Más reciente', '2.° Intermedio', '3.° Más antiguo'];
+        contenedorLista.innerHTML = archivosActuales.map((arch, idx) => {
+          const numCarreras = Object.keys(arch.carreras || {}).length;
+          return `
+            <div class="adm-file-item">
+              <div style="min-width: 0; flex: 1;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+                  <span class="adm-badge">${etiquetasOrden[idx] || (idx + 1) + '.°'}</span>
+                  <strong style="font-size: 13px; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 ${arch.nombreArchivo}</strong>
+                </div>
+                <div style="font-size: 11px; color: #94a3b8;">
+                  Guardado: ${arch.fechaLegible} • <strong>${numCarreras}</strong> carreras procesadas (solo vacantes cubiertas)
+                </div>
+              </div>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="adm-btn-secondary" onclick="prepararEdicionResultado(${idx})">Modificar</button>
+                <button type="button" class="adm-btn-danger" onclick="eliminarResultadoAdmision(${idx})" title="Eliminar archivo">✕</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const listaCarreras = Object.values(promediosActuales || {});
+      const wrapCarreras = document.getElementById('adm-resumen-carreras-wrap');
+
+      if (listaCarreras.length > 0) {
+        wrapCarreras.style.display = 'block';
+        document.getElementById('adm-total-carreras').textContent = `${listaCarreras.length} carreras con rango`;
+        document.getElementById('adm-lista-carreras').innerHTML = listaCarreras
+          .sort((a, b) => a.carrera.localeCompare(b.carrera))
+          .map((c) => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(148, 163, 184, 0.1); gap: 10px;">
+              <span style="color: #e2e8f0; font-weight: 500;">${c.carrera}</span>
+              <span style="color: #34d399; font-weight: 700; font-family: monospace; white-space: nowrap;">${c.rango_texto || (c.rango_minimo_formateado + ' – ' + c.rango_maximo_formateado)} pts <span style="color: #94a3b8; font-weight: 400;">(${c.examenes_considerados}/3)</span></span>
+            </div>
+          `).join('');
+      } else {
+        wrapCarreras.style.display = 'none';
+      }
+    }
+
+    window.abrirModalResultadosAdmision = async function () {
+      cancelarEdicionResultado();
+      const statusMsg = document.getElementById('adm-status-msg');
+      statusMsg.style.color = '#93c5fd';
+      statusMsg.textContent = 'Cargando resultados guardados desde la nube...';
+      document.getElementById('modal-resultados-admision').classList.add('active');
+
+      try {
+        await cargarDesdeNubeYCache();
+        renderizarModal();
+        statusMsg.textContent = '';
+      } catch (err) {
+        renderizarModal();
+        statusMsg.style.color = '#f87171';
+        statusMsg.textContent = err.message;
+      }
+    };
+
+    window.cerrarModalResultadosAdmision = function () {
+      document.getElementById('modal-resultados-admision').classList.remove('active');
+      cancelarEdicionResultado();
+    };
+
+    window.prepararEdicionResultado = function (idx) {
+      if (!archivosActuales[idx]) return;
+      indiceEdicion = idx;
+      document.getElementById('adm-edit-banner').style.display = 'flex';
+      document.getElementById('adm-edit-label').textContent = `Modificando archivo #${idx + 1}: ${archivosActuales[idx].nombreArchivo}`;
+      document.getElementById('adm-btn-guardar').textContent = 'Actualizar Archivo';
+      document.getElementById('adm-pdf-input').value = '';
+      document.getElementById('adm-status-msg').style.color = '#fcd34d';
+      document.getElementById('adm-status-msg').textContent = 'Selecciona el nuevo PDF que reemplazará a este archivo.';
+    };
+
+    window.cancelarEdicionResultado = function () {
+      indiceEdicion = null;
+      document.getElementById('adm-edit-banner').style.display = 'none';
+      document.getElementById('adm-btn-guardar').textContent = 'Guardar Resultado';
+      document.getElementById('adm-pdf-input').value = '';
+    };
+
+    window.eliminarResultadoAdmision = async function (idx) {
+      const statusMsg = document.getElementById('adm-status-msg');
+      try {
+        const copia = [...archivosActuales];
+        copia.splice(idx, 1);
+        await guardarEnNubeYCache(copia);
+        if (indiceEdicion === idx) cancelarEdicionResultado();
+        statusMsg.style.color = '#34d399';
+        statusMsg.textContent = '✓ Eliminado en la nube y rangos recalculados.';
+        renderizarModal();
+      } catch (err) {
+        statusMsg.style.color = '#f87171';
+        statusMsg.textContent = err.message;
+      }
+    };
+
+    window.guardarResultadoAdmisionPDF = async function () {
+      const input = document.getElementById('adm-pdf-input');
+      const statusMsg = document.getElementById('adm-status-msg');
+      const btnGuardar = document.getElementById('adm-btn-guardar');
+
+      if (!input.files || input.files.length === 0) {
+        statusMsg.style.color = '#f87171';
+        statusMsg.textContent = 'Por favor selecciona un archivo PDF primero.';
+        return;
+      }
+
+      const file = input.files[0];
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        statusMsg.style.color = '#f87171';
+        statusMsg.textContent = 'El archivo debe estar en formato PDF.';
+        return;
+      }
+
+      try {
+        btnGuardar.disabled = true;
+        statusMsg.style.color = '#93c5fd';
+        statusMsg.textContent = 'Analizando PDF y calculando rangos de vacantes cubiertas por carrera...';
+
+        const lineas = await extraerLineasPDF(file);
+        const carrerasCalculadas = analizarResultadosPorCarrera(lineas);
+        const totalCarreras = Object.keys(carrerasCalculadas).length;
+
+        if (totalCarreras === 0) {
+          statusMsg.style.color = '#fbbf24';
+          statusMsg.textContent = 'No se detectaron registros con "CUBRIO VACANTE" en este PDF.';
+          btnGuardar.disabled = false;
+          return;
+        }
+
+        const nuevoRegistro = {
+          id: Date.now(),
+          nombreArchivo: file.name,
+          fechaISO: new Date().toISOString(),
+          fechaLegible: new Date().toLocaleDateString('es-PE', {
+            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+          }),
+          carreras: carrerasCalculadas
+        };
+
+        let listaActualizada = [...archivosActuales];
+
+        if (indiceEdicion !== null && listaActualizada[indiceEdicion]) {
+          listaActualizada[indiceEdicion] = nuevoRegistro;
+        } else {
+          listaActualizada.unshift(nuevoRegistro);
+          if (listaActualizada.length > MAX_ARCHIVOS) {
+            listaActualizada = listaActualizada.slice(0, MAX_ARCHIVOS);
+          }
+        }
+
+        await guardarEnNubeYCache(listaActualizada);
+        cancelarEdicionResultado();
+
+        statusMsg.style.color = '#34d399';
+        statusEl.textContent = `✓ Guardado en la nube (${totalCarreras} carreras analizadas). Rangos actualizados.`;
+        renderizarModal();
+      } catch (error) {
+        console.error(error);
+        statusMsg.style.color = '#f87171';
+        statusMsg.textContent = error.message;
+      } finally {
+        btnGuardar.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>
