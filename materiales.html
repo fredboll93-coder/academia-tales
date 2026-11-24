@@ -372,6 +372,66 @@
       box-shadow: 0 25px 50px rgba(0,0,0,0.7);
     }
 
+    .modal-visor-box {
+      max-width: 960px;
+      width: 95%;
+      height: 88vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 24px;
+    }
+
+    .modal-visor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .modal-visor-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #f8fafc;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .modal-visor-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .btn-abrir-externo {
+      padding: 7px 14px;
+      background: rgba(59, 130, 246, 0.18);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .btn-abrir-externo:hover {
+      background: rgba(59, 130, 246, 0.3);
+      color: #fff;
+    }
+
+    .visor-frame {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 12px;
+      background: #0f172a;
+    }
+
     .modal-title {
       font-size: 16px;
       font-weight: 800;
@@ -516,6 +576,20 @@
     </div>
   </div>
 
+  <!-- MODAL VISOR PDF -->
+  <div class="modal-overlay" id="modal-visor-pdf">
+    <div class="modal-box modal-visor-box">
+      <div class="modal-visor-header">
+        <div class="modal-visor-title" id="visor-pdf-titulo">Documento PDF</div>
+        <div class="modal-visor-actions">
+          <a id="visor-pdf-externo" href="#" target="_blank" rel="noopener noreferrer" class="btn-abrir-externo">Abrir en pestaña</a>
+          <button class="btn-cancel" style="margin-top:0; padding:7px 14px; font-size:12px;" onclick="cerrarModal('modal-visor-pdf')">Cerrar</button>
+        </div>
+      </div>
+      <iframe id="visor-pdf-frame" class="visor-frame" title="Visor de PDF"></iframe>
+    </div>
+  </div>
+
   <script type="module">
     import { supabase } from './supabaseClient.js';
 
@@ -527,6 +601,7 @@
     let editandoCarpetaId = null;
     let editandoArchivoId = null;
     let tempPdfBase64 = "";
+    let visorBlobUrl = null;
 
     let listaCarpetasMateriales = [];
 
@@ -598,6 +673,13 @@
 
     window.cerrarModal = function(id) {
       document.getElementById(id).style.display = "none";
+      if (id === "modal-visor-pdf") {
+        document.getElementById("visor-pdf-frame").src = "";
+        if (visorBlobUrl) {
+          URL.revokeObjectURL(visorBlobUrl);
+          visorBlobUrl = null;
+        }
+      }
       editandoCarpetaId = null;
       editandoArchivoId = null;
       tempPdfBase64 = "";
@@ -880,6 +962,10 @@
           return;
         }
         try {
+          if (visorBlobUrl) {
+            URL.revokeObjectURL(visorBlobUrl);
+            visorBlobUrl = null;
+          }
           const base64Data = fileObj.pdfBase64.includes(",")
             ? fileObj.pdfBase64.split(",")[1]
             : fileObj.pdfBase64;
@@ -890,12 +976,12 @@
           }
           const byteArray = new Uint8Array(byteNumbers);
           const blob = new Blob([byteArray], { type: "application/pdf" });
-          const blobUrl = URL.createObjectURL(blob);
-          const win = window.open(blobUrl, "_blank");
-          if (!win) {
-            alert("El navegador bloqueó la ventana emergente. Permite ventanas emergentes para ver el PDF.");
-          }
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+          visorBlobUrl = URL.createObjectURL(blob);
+
+          document.getElementById("visor-pdf-titulo").innerText = fileObj.nombre || "Documento PDF";
+          document.getElementById("visor-pdf-frame").src = visorBlobUrl;
+          document.getElementById("visor-pdf-externo").href = visorBlobUrl;
+          document.getElementById("modal-visor-pdf").style.display = "flex";
         } catch (e) {
           console.error("Error al abrir PDF:", e);
           alert("No se pudo mostrar el archivo PDF.");
