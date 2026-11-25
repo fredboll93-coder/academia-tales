@@ -67,9 +67,8 @@
       overflow-x: auto;
     }
     .hoja-escala-wrapper {
-      display: flex;
-      justify-content: center;
-      width: fit-content;
+      display: block;
+      width: 980px;
     }
     .cartilla-hoja {
       width: 980px;
@@ -462,18 +461,19 @@
       }
       .hoja-contenedor {
         width: 100%;
-        overflow-x: hidden;
+        overflow: hidden;
         justify-content: flex-start;
+        padding-bottom: 12px;
       }
       .hoja-escala-wrapper {
-        transform-origin: top left;
+        transform-origin: 0 0;
       }
     }
 
     @media print {
       body { background: #fff; padding: 0; }
       .header-bar, .aviso-rotar-pantalla { display: none !important; }
-      .hoja-contenedor { padding: 0; overflow: visible; }
+      .hoja-contenedor { padding: 0; overflow: visible; height: auto !important; }
       .hoja-escala-wrapper { transform: none !important; width: auto !important; height: auto !important; }
       .cartilla-hoja { box-shadow: none; width: 100%; min-width: 0; }
     }
@@ -657,15 +657,18 @@
 
       if (window.innerWidth <= 768) {
         const anchoDisponible = contenedor.clientWidth || (window.innerWidth - 20);
-        const anchoHoja = hoja.offsetWidth || 980;
-        const escala = Math.min(1, anchoDisponible / anchoHoja);
+        const anchoReal = 980;
+        const altoReal = hoja.scrollHeight || hoja.offsetHeight || 1100;
+        const escala = Math.min(1, anchoDisponible / anchoReal);
         wrapper.style.transform = `scale(${escala})`;
-        wrapper.style.width = `${anchoHoja * escala}px`;
-        wrapper.style.height = `${hoja.offsetHeight * escala}px`;
+        wrapper.style.width = `${anchoReal}px`;
+        wrapper.style.height = `${altoReal}px`;
+        contenedor.style.height = `${Math.ceil(altoReal * escala) + 12}px`;
       } else {
         wrapper.style.transform = "";
         wrapper.style.width = "";
         wrapper.style.height = "";
+        contenedor.style.height = "";
       }
     }
 
@@ -783,6 +786,19 @@
       }
     }
 
+    function obtenerGrupoPorCarrera(carrerasLista, nombreCarrera) {
+      const lim = String(nombreCarrera || "").trim().toUpperCase();
+      if (!lim || !Array.isArray(carrerasLista)) return "";
+      const encontrada = carrerasLista.find((c) => {
+        const nom = typeof c === "string" ? c : (c?.nombre || c?.carrera || "");
+        return String(nom).trim().toUpperCase() === lim;
+      });
+      if (encontrada && typeof encontrada === "object") {
+        return String(encontrada.grupo || encontrada.area || "").trim().toUpperCase();
+      }
+      return "";
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
       asegurarLogoEnCartilla();
 
@@ -798,13 +814,21 @@
       construirBarraTiempo();
 
       let simData = {};
+      let uniData = {};
       try {
+        const promesas = [];
         if (simId) {
-          const { data } = await supabase.from("simulacros").select("*").eq("id", simId).single();
-          if (data) simData = data;
+          promesas.push(supabase.from("simulacros").select("*").eq("id", simId).single());
+        } else {
+          promesas.push(Promise.resolve({ data: null }));
         }
+        promesas.push(supabase.from("universidades").select("*").ilike("siglas", siglaUni).single());
+
+        const [resSim, resUni] = await Promise.all(promesas);
+        if (resSim?.data) simData = resSim.data;
+        if (resUni?.data) uniData = resUni.data;
       } catch (e) {
-        console.error("Error obteniendo simulacro:", e);
+        console.error("Error obteniendo datos:", e);
       }
 
       let datosGuardados = {};
@@ -832,7 +856,20 @@
       const alumno = datosGuardados.alumno || {};
       const respuestas = datosGuardados.respuestas || {};
       const carrera = datosGuardados.carrera || alumno.carrera || "";
-      const grupo = String(datosGuardados.grupo || alumno.grupo || "A").trim().toUpperCase();
+
+      let carrerasCache = uniData?.carreras;
+      if (!Array.isArray(carrerasCache)) {
+        try {
+          const cachedUnis = JSON.parse(sessionStorage.getItem("tales_unis_cache") || "null");
+          const matchUni = Array.isArray(cachedUnis)
+            ? cachedUnis.find((u) => String(u.siglas || u.nombre || "").trim().toLowerCase() === String(siglaUni).trim().toLowerCase())
+            : null;
+          if (matchUni?.carreras) carrerasCache = matchUni.carreras;
+        } catch (e) {}
+      }
+
+      const grupoCarrera = obtenerGrupoPorCarrera(carrerasCache, carrera);
+      const grupo = grupoCarrera || String(datosGuardados.grupo || alumno.grupo || "A").trim().toUpperCase();
       const nombreAlumno = alumno.nombres || alumno.nombre || "Postulante";
 
       document.getElementById("subtituloCartilla").textContent = `${nombreAlumno} • ${siglaUni.toUpperCase()} • Grupo ${grupo}`;
