@@ -358,7 +358,82 @@
       }
     }
 
-    @media (max-width: 1024px) {
+    /* TABLET (769px a 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+        align-items: flex-start;
+        padding: 12px;
+      }
+
+      .main-container {
+        width: 100%;
+        height: auto;
+        max-height: none;
+        padding: 4px;
+        gap: 12px;
+      }
+
+      .top-bar {
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 14px 18px;
+        gap: 12px;
+      }
+
+      .top-bar-marca {
+        flex: 1 1 220px;
+      }
+
+      .top-bar-controles {
+        justify-content: flex-end;
+      }
+
+      .top-bar-postulante {
+        flex: 1 1 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 10px 14px;
+      }
+
+      #alumnoNombreTop {
+        white-space: nowrap;
+      }
+
+      .top-bar-carrera-grupo {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .content-layout {
+        flex-direction: row;
+        height: auto;
+        min-height: 540px;
+        overflow: visible;
+        gap: 12px;
+      }
+
+      .exam-column {
+        flex: 1 1 68%;
+        height: 560px;
+        padding: 12px;
+      }
+
+      .answers-column {
+        flex: 0 0 215px;
+        height: 560px;
+        padding: 12px;
+      }
+    }
+
+    /* CELULAR (hasta 768px) */
+    @media (max-width: 768px) {
       body {
         height: auto;
         min-height: 100vh;
@@ -477,7 +552,7 @@
       <div class="top-bar-postulante">
         <div style="min-width: 0;">
           <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Postulante</div>
-          <div id="alumnoNombreTop" style="font-size: 13px; font-weight: 700; color: #f8fafc; word-break: break-word;">Cargando...</div>
+          <div id="alumnoNombreTop" style="font-size: 13px; font-weight: 700; color: #f8fafc;">Cargando...</div>
         </div>
         <div style="width: 1px; height: 28px; background: rgba(148,163,184,0.25);"></div>
         <div class="top-bar-carrera-grupo">
