@@ -890,6 +890,25 @@
       document.getElementById("modalFlotante").style.display = 'flex';
     }
 
+    function normalizarNombreCarreraExamen(texto) {
+      return String(texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/\beduc\.?\b/g, "educacion")
+        .replace(/\bsec\.?\b/g, "secundaria")
+        .replace(/\bing\.?\b/g, "ingenieria")
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function extraerLetraGrupoExamen(valorGrupo) {
+      const txt = String(valorGrupo || "").trim().toUpperCase();
+      const match = txt.match(/(?:GRUPO\s*[:\-]?\s*)?\b([A-D])\b/);
+      return match ? match[1] : "";
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const siglaUni = urlParams.get('uni') || urlParams.get('siglas') || localStorage.getItem('universidadSeleccionada') || sessionStorage.getItem('uniActual') || 'UNAP';
@@ -1066,16 +1085,26 @@
           badgeGrupo.textContent = "--";
           return;
         }
-        
-        let grupoEncontrado = "A";
-        const encontrada = carrerasUni.find(c => {
-          const cNom = typeof c === 'string' ? c : (c.nombre || c.carrera || '');
-          return cNom.trim().toUpperCase() === nombreCarrera.trim().toUpperCase();
+
+        const targetNorm = normalizarNombreCarreraExamen(nombreCarrera);
+        let encontrada = carrerasUni.find(c => {
+          const cNom = normalizarNombreCarreraExamen(typeof c === 'string' ? c : (c.nombre || c.carrera || ''));
+          return cNom && cNom === targetNorm;
         });
-        
-        if (encontrada && typeof encontrada === 'object') {
-          grupoEncontrado = encontrada.grupo || encontrada.area || "A";
+
+        if (!encontrada) {
+          const tokens = targetNorm.split(" ").filter(t => t.length > 2);
+          encontrada = carrerasUni.find(c => {
+            const cNom = normalizarNombreCarreraExamen(typeof c === 'string' ? c : (c.nombre || c.carrera || ''));
+            if (!cNom) return false;
+            if (cNom.includes(targetNorm) || targetNorm.includes(cNom)) return true;
+            return tokens.length >= 2 && tokens.every(tok => cNom.includes(tok));
+          });
         }
+
+        const grupoEncontrado = (encontrada && typeof encontrada === 'object')
+          ? (extraerLetraGrupoExamen(encontrada.grupo || encontrada.area || "") || "A")
+          : (extraerLetraGrupoExamen(alumnoLogueado.grupo) || "A");
 
         badgeGrupo.textContent = grupoEncontrado;
         alumnoLogueado.carrera = nombreCarrera.trim().toUpperCase();
@@ -1698,4 +1727,4 @@
 </script>
 </body>
 </html>
-```[cite: 18]
+```[cite: 14, 20]
