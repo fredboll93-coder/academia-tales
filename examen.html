@@ -335,7 +335,7 @@
       text-align: center;
     }
 
-    @media (max-width: 1366px) and (orientation: portrait) {
+    @media (hover: none) and (pointer: coarse) {
       .aviso-rotar-pantalla {
         display: flex;
         align-items: flex-start;
@@ -355,6 +355,12 @@
         font-size: 15px;
         margin-top: 2px;
         flex-shrink: 0;
+      }
+    }
+
+    @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+      .aviso-rotar-pantalla {
+        display: none;
       }
     }
 
