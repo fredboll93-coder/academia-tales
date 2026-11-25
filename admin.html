@@ -261,11 +261,36 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      // Configuración de contraseña
+    // Configuración de contraseña
       const btnAbrir = document.getElementById("btn-abrir-config-admin");
       const modal = document.getElementById("modal-config-admin");
       const btnCancelar = document.getElementById("btn-cancelar-pass");
       const btnGuardar = document.getElementById("btn-guardar-pass");
+
+      async function obtenerPassAdminRemota() {
+        try {
+          const { data, error } = await supabase
+            .from("configuracion")
+            .select("*")
+            .limit(1);
+
+          if (!error && Array.isArray(data) && data.length > 0) {
+            const fila = data[0];
+            const claveRemota = String(
+              fila.admin_password || fila.password_admin || fila.password || fila.clave || ""
+            ).trim();
+            if (claveRemota) {
+              return { clave: claveRemota, filaId: fila.id };
+            }
+            return { clave: "clave", filaId: fila.id };
+          }
+        } catch (e) {}
+
+        return {
+          clave: localStorage.getItem("adminPasswordCustom") || "clave",
+          filaId: null
+        };
+      }
 
       if (btnAbrir && modal) {
         btnAbrir.addEventListener("click", () => {
@@ -282,7 +307,7 @@
       }
 
       if (btnGuardar) {
-        btnGuardar.addEventListener("click", () => {
+        btnGuardar.addEventListener("click", async () => {
           const antigua = document.getElementById("input-pass-antigua").value.trim();
           const nueva = document.getElementById("input-pass-nueva").value.trim();
 
@@ -291,16 +316,41 @@
             return;
           }
 
-          const passActual = localStorage.getItem("adminPasswordCustom") || "clave";
+          const { clave: passActual, filaId } = await obtenerPassAdminRemota();
 
           if (antigua !== passActual) {
             alert("La contraseña actual es incorrecta.");
             return;
           }
 
-          localStorage.setItem("adminPasswordCustom", nueva);
-          alert("¡Contraseña de administrador cambiada con éxito!");
-          modal.style.display = "none";
+          try {
+            let guardadoOk = false;
+            if (filaId !== undefined && filaId !== null) {
+              const { error } = await supabase
+                .from("configuracion")
+                .update({ admin_password: nueva })
+                .eq("id", filaId);
+              if (!error) guardadoOk = true;
+            } else {
+              const { error } = await supabase
+                .from("configuracion")
+                .insert([{ admin_password: nueva }]);
+              if (!error) guardadoOk = true;
+            }
+
+            localStorage.setItem("adminPasswordCustom", nueva);
+
+            if (!guardadoOk) {
+              alert("Se guardó localmente, pero revisa en Supabase que exista la tabla 'configuracion' con la columna 'admin_password' para sincronizar en otros dispositivos.");
+              return;
+            }
+
+            alert("¡Contraseña de administrador cambiada con éxito!");
+            modal.style.display = "none";
+          } catch (e) {
+            localStorage.setItem("adminPasswordCustom", nueva);
+            alert("Hubo un problema al guardar en la base de datos.");
+          }
         });
       }
 
