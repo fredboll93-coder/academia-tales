@@ -429,7 +429,8 @@
             <img src="${s.imagen_url}" class="carrusel-img" alt="${titulo || siglasUni || 'Imagen'}">
             ${mostrarOverlay ? `
               <div class="carrusel-overlay">
-                <span class="carrusel-tag">${tag}</span>${titulo ? `<h4 class="carrusel-titulo">${titulo}</h4>` : ''}
+                <span class="carrusel-tag">${tag}</span>
+                ${titulo ? `<h4 class="carrusel-titulo">${titulo}</h4>` : ''}
               </div>
             ` : ''}
           </div>
@@ -732,4 +733,443 @@
         } else {
           const rMin = Number(infoCarrera.rango_minimo ?? infoCarrera.rango_minimo_formateado ?? 0);
           const rMax = Number(infoCarrera.rango_maximo ?? infoCarrera.rango_maximo_formateado ?? 0);
-          const rMinFmt = infoCarrera.rango_minimo_formateado || rMin.toFixed
+          const rMinFmt = infoCarrera.rango_minimo_formateado || rMin.toFixed(7);
+          const rMaxFmt = infoCarrera.rango_maximo_formateado || rMax.toFixed(7);
+          const nEx = Number(infoCarrera.examenes_considerados || examenesConsideradosNum || 0);
+
+          let estadoBadge = "";
+          let diagnosticoTexto = "";
+          let graficoHtml = "";
+
+          if (ultimoSim !== null) {
+            const pctPisoExacto = rMin > 0 ? (ultimoSim.puntaje / rMin) * 100 : 0;
+            const pctBarra = Math.max(0, Math.min(100, pctPisoExacto));
+            const colorBarra = ultimoSim.puntaje < rMin
+              ? "#fbbf24"
+              : (ultimoSim.puntaje <= rMax ? "#34d399" : "#38bdf8");
+
+            graficoHtml = `
+              <div style="background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; margin-bottom: 6px;">
+                  <span style="color: #cbd5e1; font-weight: 700;">Avance frente al piso mínimo referencial</span>
+                  <span style="font-family: monospace; font-weight: 800; color: ${colorBarra};">${pctPisoExacto.toFixed(1)}%</span>
+                </div>
+                <div style="width: 100%; height: 9px; background: rgba(51, 65, 85, 0.85); border-radius: 999px; overflow: hidden;">
+                  <div style="width: ${pctBarra.toFixed(1)}%; height: 100%; background: ${colorBarra}; border-radius: 999px; transition: width 0.3s ease;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #94a3b8; margin-top: 5px;">
+                  <span>0 pts (0%)</span>
+                  <span>Piso: ${rMinFmt} pts (100%)</span>
+                  <span>Techo: ${rMaxFmt} pts</span>
+                </div>
+              </div>
+            `;
+
+            if (ultimoSim.puntaje < rMin) {
+              const diffMin = (rMin - ultimoSim.puntaje).toFixed(2);
+              estadoBadge = `<span style="background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.45); color: #fbbf24; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800;">Por debajo del rango referencial</span>`;
+              diagnosticoTexto = `Tu último simulacro (${ultimoSim.puntaje.toFixed(2)} pts) está a <b>${diffMin} pts</b> del piso mínimo referencial (${rMinFmt} pts). Sigue reforzando temas clave para acercarte a la franja de ingreso.`;
+            } else if (ultimoSim.puntaje <= rMax) {
+              estadoBadge = `<span style="background: rgba(16, 185, 129, 0.18); border: 1px solid rgba(16, 185, 129, 0.45); color: #34d399; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800;">Dentro del rango referencial</span>`;
+              diagnosticoTexto = `Tu último simulacro (${ultimoSim.puntaje.toFixed(2)} pts) se ubica dentro del rango histórico de quienes cubrieron vacante (${rMinFmt} – ${rMaxFmt} pts). Mantén tu constancia y apunta a consolidar tu puntaje.`;
+            } else {
+              const margenSup = (ultimoSim.puntaje - rMax).toFixed(2);
+              estadoBadge = `<span style="background: rgba(56, 189, 248, 0.18); border: 1px solid rgba(56, 189, 248, 0.45); color: #38bdf8; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800;">Por encima del rango referencial</span>`;
+              diagnosticoTexto = `Tu último simulacro (${ultimoSim.puntaje.toFixed(2)} pts) supera el techo referencial (${rMaxFmt} pts) por <b>+${margenSup} pts</b>. No te confíes: cada examen varía y es clave dar lo mejor en todo el examen.`;
+            }
+          } else {
+            estadoBadge = `<span style="background: rgba(148, 163, 184, 0.18); border: 1px solid rgba(148, 163, 184, 0.35); color: #cbd5e1; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;">Sin simulacros rendidos aún</span>`;
+            diagnosticoTexto = `Aún no registras simulacros calificados en esta universidad. Rinde un simulacro para comparar tu puntaje frente a este rango.`;
+          }
+
+          rangoHtml = `
+            <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 14px; padding: 15px 18px; margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+                <span style="font-size: 12px; font-weight: 700; color: #93c5fd;">Rango Referencial de Ingreso (${nEx > 0 ? nEx + ' proceso(s)' : 'Histórico'})</span>
+                ${estadoBadge}
+              </div>
+              <div style="font-family: monospace; font-size: 15px; font-weight: 800; color: #34d399; margin-bottom: 8px;">
+                ${rMinFmt} – ${rMaxFmt} pts
+              </div>
+              ${graficoHtml}
+              <p style="margin: 0 0 10px 0; font-size: 12.5px; color: #e2e8f0; line-height: 1.5;">${diagnosticoTexto}</p>
+              <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #fbbf24; padding: 8px 12px; border-radius: 6px; font-size: 11.5px; color: #cbd5e1; line-height: 1.5;">
+                <div style="margin-bottom: 4px;"><b>Nota orientativa:</b> Referencia histórica de quienes cubrieron vacante; <b>no garantiza ingreso</b> y cada examen varía.</div>
+                <div>Aplica solo a la carrera de tu matrícula: tus simulacros se califican según tu grupo, por lo que cambiar a una carrera de otro grupo (p. ej., de A a B) altera el puntaje incluso con las mismas respuestas.</div>
+              </div>
+            </div>
+          `;
+        }
+
+        const resumenMetricasHtml = `
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px;">
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 12px; padding: 12px;">
+              <div style="font-size: 10.5px; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Simulacros Rendidos</div>
+              <div style="font-size: 18px; font-weight: 800; color: #f8fafc; margin-top: 4px;">${simsRendidos.length}</div>
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 12px; padding: 12px;">
+              <div style="font-size: 10.5px; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Último Puntaje</div>
+              <div style="font-size: 18px; font-weight: 800; color: #38bdf8; margin-top: 4px;">${ultimoSim !== null ? ultimoSim.puntaje.toFixed(2) + ' pts' : '--'}</div>
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 12px; padding: 12px;">
+              <div style="font-size: 10.5px; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Promedio Simulacros</div>
+              <div style="font-size: 18px; font-weight: 800; color: #a78bfa; margin-top: 4px;">${promSim !== null ? promSim.toFixed(2) + ' pts' : '--'}</div>
+            </div>
+          </div>
+        `;
+
+        const historialHtml = simsRendidos.length > 0
+          ? `<div style="max-height: 150px; overflow-y: auto; background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(148, 163, 184, 0.14); border-radius: 12px; padding: 8px 14px;">
+              ${simsRendidos.map((s, idx) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(148, 163, 184, 0.1); gap: 10px; font-size: 12.5px;">
+                  <span style="color: #e2e8f0; font-weight: 600;">${idx === 0 ? '★ ' : ''}${s.titulo}</span>
+                  <span style="font-family: monospace; font-weight: 800; color: #38bdf8;">${s.puntaje.toFixed(2)} pts</span>
+                </div>
+              `).join('')}
+            </div>`
+          : `<div style="background: rgba(15, 23, 42, 0.5); border: 1px dashed rgba(148, 163, 184, 0.2); border-radius: 12px; padding: 14px; text-align: center; font-size: 12px; color: #94a3b8;">
+              Aún no has completado ningún simulacro en ${siglasUni}.
+            </div>`;
+
+        contenedorProg.innerHTML = `
+          ${rangoHtml}
+          ${resumenMetricasHtml}
+          <div style="font-size: 12px; font-weight: 700; color: #cbd5e1; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px;">Historial de Simulacros</div>
+          ${historialHtml}
+        `;
+      }
+
+      async function abrirModalProgresoAlumno(siglasUni) {
+        const modal = document.getElementById("modalProgresoAlumno");
+        const selectCarrera = document.getElementById("progSelectCarrera");
+        const subtitulo = document.getElementById("progSubtituloAlumno");
+
+        document.getElementById("progUniSiglas").textContent = siglasUni;
+        const nombreMostrar = nombreAlumnoCompleto || sesion.nombre || sesion.nombres || "Estudiante";
+        subtitulo.textContent = `Postulante: ${nombreMostrar} • Referencia basada en quienes cubrieron vacante.`;
+
+        modal.classList.add("active");
+        document.getElementById("progContenidoDinamico").innerHTML = `
+          <div style="padding: 18px; text-align: center; color: #93c5fd; font-size: 12.5px;">Cargando tu progreso y rangos de admisión...</div>
+        `;
+
+        await cargarRangosDesdeSupabase(siglasUni);
+
+        const simsRendidos = obtenerSimulacrosRendidosAlumno(siglasUni);
+        const setCarreras = new Set();
+
+        Object.keys(rangosCarreraMapa || {}).forEach(c => {
+          const limp = limpiarNombreCarrera(c);
+          if (limp) setCarreras.add(limp);
+        });
+
+        const uniActualObj = universidadesList.find(u => String(u.siglas || u.nombre || "").trim().toLowerCase() === String(siglasUni).trim().toLowerCase());
+        if (uniActualObj && Array.isArray(uniActualObj.carreras)) {
+          uniActualObj.carreras.forEach(c => {
+            const nom = typeof c === 'string' ? c : (c.nombre || c.carrera || '');
+            const limp = limpiarNombreCarrera(nom);
+            if (limp) setCarreras.add(limp);
+          });
+        }
+
+        simsRendidos.forEach(s => {
+          const limp = limpiarNombreCarrera(s.carrera);
+          if (limp) setCarreras.add(limp);
+        });
+        if (sesion.carrera && String(sesion.carrera).trim()) {
+          const limp = limpiarNombreCarrera(sesion.carrera);
+          if (limp) setCarreras.add(limp);
+        }
+
+        const carrerasOrdenadas = Array.from(setCarreras).sort((a, b) => a.localeCompare(b));
+        selectCarrera.innerHTML = `<option value="">Selecciona una carrera...</option>` + carrerasOrdenadas
+          .map(c => `<option value="${c}">${c}</option>`)
+          .join('');
+
+        const carreraInicial = limpiarNombreCarrera(simsRendidos[0]?.carrera || sesion.carrera || "");
+        if (carreraInicial && carrerasOrdenadas.includes(carreraInicial)) {
+          selectCarrera.value = carreraInicial;
+        } else if (carrerasOrdenadas.length > 0) {
+          selectCarrera.value = carrerasOrdenadas[0];
+        }
+
+        selectCarrera.onchange = () => {
+          renderizarDetalleProgreso(siglasUni, selectCarrera.value);
+        };
+
+        renderizarDetalleProgreso(siglasUni, selectCarrera.value);
+      }
+
+      function pintarDetalleUniversidad() {
+        const uniData = universidadesList.find(u => {
+          const s = String(u.siglas || u.nombre || "").trim().toLowerCase();
+          return s === keyLim;
+        });
+
+        if (!uniKeyParam || !uniData) {
+          return false;
+        }
+
+        const siglasUni = uniData.siglas || uniData.nombre || uniKeyParam;
+        cargarCarruselDeUniversidad(siglasUni);
+        document.getElementById("uniLogo").src = uniData.logo_url || uniData.logo || "logo.png";
+        document.getElementById("uniSiglas").textContent = siglasUni;
+        document.getElementById("uniNombre").textContent = uniData.nombre_completo || uniData.nombreCompleto || siglasUni;
+
+        let alumnoNombreActual = nombreAlumnoCompleto;
+        if (!alumnoNombreActual) {
+          for (const u of universidadesList) {
+            if (u && u.alumnos && Array.isArray(u.alumnos)) {
+              const match = u.alumnos.find(a => String(a.codigo || a.dni || a.id || "").trim().toLowerCase() === codigoIngresado);
+              if (match && (match.nombre || match.nombres)) {
+                alumnoNombreActual = match.nombre || match.nombres;
+                nombreAlumnoCompleto = alumnoNombreActual;
+                break;
+              }
+            }
+          }
+        }
+
+        if (alumnoNombreActual) {
+          const primerNombre = extraerPrimerNombre(alumnoNombreActual);
+          document.getElementById("saludoAlumnoDetalle").textContent = `HOLA ${primerNombre.toUpperCase()}`;
+        } else if (codigoIngresado) {
+          document.getElementById("saludoAlumnoDetalle").textContent = `HOLA ALUMNO`;
+        }
+
+        // Simulacros de esta universidad desde Supabase
+        const listaSimulacros = simulacrosBD.filter(sim => {
+          const sUni = String(sim.universidad_siglas || sim.universidad || sim.siglas || "").trim().toLowerCase();
+          return sUni === String(siglasUni).trim().toLowerCase();
+        });
+
+        // 1. Verificar si está matriculado en Supabase
+        let estaMatriculado = false;
+        if (uniData.alumnos && Array.isArray(uniData.alumnos)) {
+          estaMatriculado = uniData.alumnos.some(a => {
+            const codA = String(a.codigo || a.dni || a.id || "").trim().toLowerCase();
+            const nomA = String(a.nombre || a.nombres || "").trim().toLowerCase();
+            const nomB = String(alumnoNombreActual || "").trim().toLowerCase();
+            return (codigoIngresado && codA === codigoIngresado) || (nomB && nomA === nomB);
+          });
+        }
+
+        // 2. Verificar si está habilitado en simulacros de Supabase
+        let estaHabilitadoSimulacro = false;
+        if (listaSimulacros.length > 0) {
+          estaHabilitadoSimulacro = listaSimulacros.some(sim => {
+            let listaHabilitados = sim.alumnos || sim.alumnosHabilitados || sim.habilitados || sim.codigos || [];
+            if (typeof listaHabilitados === 'string') {
+              listaHabilitados = listaHabilitados.split(/[\n,;]+/).map(c => c.trim().toLowerCase());
+            }
+            if (Array.isArray(listaHabilitados)) {
+              return listaHabilitados.some(item => {
+                if (!item) return false;
+                if (typeof item === 'object') {
+                  const c1 = String(item.codigo || '').trim().toLowerCase();
+                  const c2 = String(item.dni || '').trim().toLowerCase();
+                  const c3 = String(item.id || '').trim().toLowerCase();
+                  const n1 = String(item.nombre || item.apellidos || '').trim().toLowerCase();
+                  return c1 === codigoIngresado || c2 === codigoIngresado || c3 === codigoIngresado || (alumnoNombreActual && n1.includes(alumnoNombreActual.toLowerCase()));
+                }
+                return String(item).trim().toLowerCase() === codigoIngresado;
+              });
+            }
+            return false;
+          });
+        }
+
+        let esSoloSimulacro = sesion.soloSimulacros === true || (!estaMatriculado && estaHabilitadoSimulacro);
+        const tieneAcceso = estaMatriculado || estaHabilitadoSimulacro || sesion.codigo;
+
+        const bloqueSinAcceso = document.getElementById("bloqueSinAcceso");
+        const bloqueConAcceso = document.getElementById("bloqueConAcceso");
+        const badgeEstado = document.getElementById("badgeEstado");
+
+        if (!tieneAcceso) {
+          bloqueSinAcceso.style.display = "block";
+          bloqueConAcceso.style.display = "none";
+        } else {
+          bloqueSinAcceso.style.display = "none";
+          bloqueConAcceso.style.display = "block";
+
+          if (estaMatriculado && !esSoloSimulacro) {
+            badgeEstado.style.background = "rgba(16, 185, 129, 0.2)";
+            badgeEstado.style.color = "#34d399";
+            badgeEstado.style.border = "1px solid rgba(16, 185, 129, 0.4)";
+            badgeEstado.innerHTML = `<i class="fa-solid fa-circle-check"></i> Alumno Matriculado`;
+          } else {
+            badgeEstado.style.background = "rgba(245, 158, 11, 0.2)";
+            badgeEstado.style.color = "#fbbf24";
+            badgeEstado.style.border = "1px solid rgba(245, 158, 11, 0.4)";
+            badgeEstado.innerHTML = `<i class="fa-solid fa-clock"></i> Acceso por Simulacro Habilitado`;
+          }
+
+          // SIMULACROS DISPONIBLES
+          const contSimulacros = document.getElementById("contenedorSimulacros");
+          contSimulacros.innerHTML = "";
+
+          const tarjetaSimulacro = document.createElement("div");
+          tarjetaSimulacro.style.cssText = "background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; gap: 16px; box-sizing: border-box; cursor: pointer; transition: all 0.2s ease;";
+
+          tarjetaSimulacro.innerHTML = `
+            <div style="font-size: 1.6rem; color: #60a5fa; flex-shrink: 0;"><i class="fa-solid fa-file-signature"></i></div>
+            <div style="text-align: left; flex-grow: 1;">
+              <h4 style="margin: 0 0 2px 0; color: #ffffff; font-size: 1rem; font-weight: 700;">Simulacros de Admisión</h4>
+              <p style="margin: 0; color: #94a3b8; font-size: 0.82rem;">
+                ${listaSimulacros.length > 0 ? `${listaSimulacros.length} simulacro(s) disponible(s).` : 'Aún no hay simulacros disponibles. Haz clic para ver el panel.'}
+              </p>
+            </div>
+            <span style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; flex-shrink: 0;">
+              Ver <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+            </span>
+          `;
+
+          tarjetaSimulacro.onmouseover = () => {
+            tarjetaSimulacro.style.borderColor = "rgba(59, 130, 246, 0.5)";
+            tarjetaSimulacro.style.transform = "translateY(-2px)";
+          };
+          tarjetaSimulacro.onmouseout = () => {
+            tarjetaSimulacro.style.borderColor = "rgba(255,255,255,0.08)";
+            tarjetaSimulacro.style.transform = "translateY(0)";
+          };
+
+          tarjetaSimulacro.addEventListener("click", () => {
+            window.location.href = `simulacrosAlumno.html?siglas=${encodeURIComponent(siglasUni)}`;
+          });
+
+          contSimulacros.appendChild(tarjetaSimulacro);
+
+          // CLASES GRABADAS
+          const contClases = document.getElementById("contenedorClases");
+          const listaClases = uniData.clases || uniData.videos || [];
+
+          contClases.innerHTML = `
+            <div id="btnClasesUnico" style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; gap: 16px; box-sizing: border-box; cursor: pointer; transition: all 0.2s ease;">
+              <div style="font-size: 1.6rem; color: #3b82f6; flex-shrink: 0;"><i class="fa-solid fa-circle-play"></i></div>
+              <div style="text-align: left; flex-grow: 1;">
+                <h4 style="margin: 0 0 2px 0; color: #ffffff; font-size: 1rem; font-weight: 700;">Clases Grabadas</h4>
+                <p style="margin: 0; color: #94a3b8; font-size: 0.82rem;">
+                  ${listaClases.length > 0 ? `${listaClases.length} clase(s) disponible(s).` : 'Aún no hay clases grabadas disponibles por el momento.'}
+                </p>
+              </div>
+              <span style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; flex-shrink: 0;">
+                Ver <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+              </span>
+            </div>
+          `;
+
+          const btnClases = document.getElementById("btnClasesUnico");
+          btnClases.onmouseover = () => { btnClases.style.borderColor = "rgba(59, 130, 246, 0.5)"; btnClases.style.transform = "translateY(-2px)"; };
+          btnClases.onmouseout = () => { btnClases.style.borderColor = "rgba(255,255,255,0.08)"; btnClases.style.transform = "translateY(0)"; };
+          
+          btnClases.addEventListener("click", () => {
+            if (esSoloSimulacro) {
+              mostrarAlerta("No estás habilitado para acceder a esta sección.");
+              return;
+            }
+            window.location.href = `clasesGrabadasAlumno.html?siglas=${encodeURIComponent(siglasUni)}`;
+          });
+
+          // MATERIALES DE ESTUDIO
+          const contMateriales = document.getElementById("contenedorMateriales");
+          const listaMateriales = uniData.materiales || uniData.archivos || uniData.modulos || [];
+
+          contMateriales.innerHTML = `
+            <div id="btnMaterialesUnico" style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; gap: 16px; box-sizing: border-box; cursor: pointer; transition: all 0.2s ease;">
+              <div style="font-size: 1.6rem; color: #34d399; flex-shrink: 0;"><i class="fa-solid fa-file-pdf"></i></div>
+              <div style="text-align: left; flex-grow: 1;">
+                <h4 style="margin: 0 0 2px 0; color: #ffffff; font-size: 1rem; font-weight: 700;">Materiales de Estudio</h4>
+                <p style="margin: 0; color: #94a3b8; font-size: 0.82rem;">
+                  ${listaMateriales.length > 0 ? `${listaMateriales.length} documento(s) disponible(s).` : 'Aún no hay materiales o PDF subidos por la administración.'}
+                </p>
+              </div>
+              <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; flex-shrink: 0;">
+                Ver <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+              </span>
+            </div>
+          `;
+
+          const btnMateriales = document.getElementById("btnMaterialesUnico");
+          btnMateriales.onmouseover = () => { btnMateriales.style.borderColor = "rgba(52, 211, 153, 0.5)"; btnMateriales.style.transform = "translateY(-2px)"; };
+          btnMateriales.onmouseout = () => { btnMateriales.style.borderColor = "rgba(255,255,255,0.08)"; btnMateriales.style.transform = "translateY(0)"; };
+          
+          btnMateriales.addEventListener("click", () => {
+            if (esSoloSimulacro) {
+              mostrarAlerta("No estás habilitado para acceder a esta sección.");
+              return;
+            }
+            window.location.href = `materialesAlumno.html?siglas=${encodeURIComponent(siglasUni)}`;
+          });
+
+          // PROGRESO DEL ALUMNO
+          const contProgreso = document.getElementById("contenedorProgresoAlumno");
+          const simsRendidosActuales = obtenerSimulacrosRendidosAlumno(siglasUni);
+
+          contProgreso.innerHTML = `
+            <div id="btnProgresoAlumnoUnico" style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; gap: 16px; box-sizing: border-box; cursor: pointer; transition: all 0.2s ease;">
+              <div style="font-size: 1.6rem; color: #fbbf24; flex-shrink: 0;"><i class="fa-solid fa-chart-line"></i></div>
+              <div style="text-align: left; flex-grow: 1;">
+                <h4 style="margin: 0 0 2px 0; color: #ffffff; font-size: 1rem; font-weight: 700;">Progreso del Alumno</h4>
+                <p style="margin: 0; color: #94a3b8; font-size: 0.82rem;">
+                  ${simsRendidosActuales.length > 0 ? `${simsRendidosActuales.length} simulacro(s) evaluado(s) frente al rango de tu carrera.` : 'Compara tus simulacros con el rango referencial de ingreso.'}
+                </p>
+              </div>
+              <span style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; flex-shrink: 0;">
+                Ver <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+              </span>
+            </div>
+          `;
+
+          const btnProgreso = document.getElementById("btnProgresoAlumnoUnico");
+          btnProgreso.onmouseover = () => { btnProgreso.style.borderColor = "rgba(251, 191, 36, 0.55)"; btnProgreso.style.transform = "translateY(-2px)"; };
+          btnProgreso.onmouseout = () => { btnProgreso.style.borderColor = "rgba(255,255,255,0.08)"; btnProgreso.style.transform = "translateY(0)"; };
+          btnProgreso.addEventListener("click", () => {
+            abrirModalProgresoAlumno(siglasUni);
+          });
+        }
+
+        return true;
+      }
+
+      document.getElementById("btnVolver").addEventListener("click", () => {
+        window.location.href = "estudiante.html";
+      });
+
+      document.getElementById("btnCerrarSesionDetalle").addEventListener("click", () => {
+        sessionStorage.clear();
+        localStorage.removeItem("usuarioLogueado");
+        window.location.href = "index.html";
+      });
+
+      pintarDetalleUniversidad();
+      cargarCarruselDeUniversidad();
+
+      try {
+        const [resUnis, resSims] = await Promise.all([
+          supabase.from('universidades').select('*'),
+          supabase.from('simulacros').select('id, titulo, universidad_siglas, alumnos, creado_en')
+        ]);
+
+        if (!resUnis.error && Array.isArray(resUnis.data)) {
+          universidadesList = resUnis.data;
+          try { sessionStorage.setItem('tales_unis_cache', JSON.stringify(universidadesList)); } catch (e) {}
+        }
+        if (!resSims.error && Array.isArray(resSims.data)) {
+          simulacrosBD = resSims.data;
+          try { sessionStorage.setItem('tales_sims_cache', JSON.stringify(simulacrosBD)); } catch (e) {}
+        }
+
+        if (!pintarDetalleUniversidad()) {
+          window.location.href = "estudiante.html";
+        }
+      } catch (e) {
+        console.error("Error al consultar Supabase en detalleUniversidad:", e);
+        if (!pintarDetalleUniversidad()) {
+          window.location.href = "estudiante.html";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
