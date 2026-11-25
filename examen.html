@@ -335,7 +335,7 @@
       text-align: center;
     }
 
-    @media (max-width: 1024px) and (orientation: portrait) {
+    @media (max-width: 1366px) and (orientation: portrait) {
       .aviso-rotar-pantalla {
         display: flex;
         align-items: flex-start;
@@ -358,8 +358,8 @@
       }
     }
 
-    /* TABLET (769px a 1024px) */
-    @media (min-width: 769px) and (max-width: 1024px) {
+    /* TABLET (769px a 1366px en dispositivos táctiles o hasta 1200px) */
+    @media (min-width: 769px) and (max-width: 1200px), (min-width: 769px) and (pointer: coarse) {
       body {
         height: auto;
         min-height: 100vh;
@@ -378,22 +378,26 @@
       }
 
       .top-bar {
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: minmax(180px, 1fr) auto;
         align-items: center;
         padding: 14px 18px;
         gap: 12px;
       }
 
       .top-bar-marca {
-        flex: 1 1 220px;
+        grid-column: 1;
+        min-width: 0;
       }
 
       .top-bar-controles {
+        grid-column: 2;
         justify-content: flex-end;
       }
 
       .top-bar-postulante {
-        flex: 1 1 100%;
+        grid-column: 1 / -1;
+        width: 100%;
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
@@ -402,13 +406,20 @@
         padding: 10px 14px;
       }
 
+      .top-bar-postulante > div:first-child {
+        min-width: 0;
+        flex: 1 1 220px;
+      }
+
       #alumnoNombreTop {
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .top-bar-carrera-grupo {
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 12px;
       }
 
       .content-layout {
