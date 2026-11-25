@@ -608,15 +608,16 @@
 
       if (!alumnoEncontrado) return null;
 
-      const passLocal = localStorage.getItem(`passAlumno_${codLim}`) || '';
-      const passwordActual = alumnoEncontrado.password || alumnoEncontrado.contrasena || passLocal || '';
+      const passwordDb = String(alumnoEncontrado.password || alumnoEncontrado.contrasena || '').trim();
+      const passLocal = !passwordDb ? (localStorage.getItem(`passAlumno_${codLim}`) || '').trim() : '';
+      const passwordActual = passwordDb || passLocal;
 
       return {
         alumno: alumnoEncontrado,
         alumnoIndex,
         universidades: universidadesEncontradas,
-        tienePassword: Boolean(String(passwordActual).trim()),
-        passwordActual: String(passwordActual).trim()
+        tienePassword: Boolean(passwordActual),
+        passwordActual
       };
     }
 
@@ -661,6 +662,23 @@
         simulacros: simulacrosHabilitados,
         universidadPermitida: simulacrosHabilitados[0].universidad_siglas || ''
       };
+    }
+
+    async function obtenerPasswordAdminGlobal() {
+      try {
+        const { data, error } = await supabase
+          .from('configuracion')
+          .select('*')
+          .limit(1);
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const row = data[0];
+          const claveDb = String(row.admin_password || row.password_admin || row.password || row.clave || '').trim();
+          if (claveDb) return claveDb;
+        }
+      } catch (e) {}
+
+      return (localStorage.getItem('adminPasswordCustom') || 'clave').trim();
     }
 
     async function evaluarEstadoCampoPassword(codigoVal) {
@@ -747,14 +765,22 @@
       }
 
       if (codigo === '48177869') {
-        const adminPassActual = localStorage.getItem('adminPasswordCustom') || 'clave';
-        if (pass !== adminPassActual) {
-          return mostrarAlerta('Contraseña de administrador incorrecta.');
+        btnAccion.disabled = true;
+        const textoOriginalAdmin = btnAccion.textContent;
+        btnAccion.textContent = 'Verificando...';
+        try {
+          const adminPassActual = await obtenerPasswordAdminGlobal();
+          if (pass !== adminPassActual) {
+            return mostrarAlerta('Contraseña de administrador incorrecta.');
+          }
+          sessionStorage.setItem('adminSesion', 'true');
+          localStorage.setItem('adminSesion', 'true');
+          window.location.href = 'admin.html';
+          return;
+        } finally {
+          btnAccion.disabled = false;
+          btnAccion.textContent = textoOriginalAdmin === 'Verificando...' ? 'Ingresar' : textoOriginalAdmin;
         }
-        sessionStorage.setItem('adminSesion', 'true');
-        localStorage.setItem('adminSesion', 'true');
-        window.location.href = 'admin.html';
-        return;
       }
 
       btnAccion.disabled = true;
@@ -780,7 +806,6 @@
             }
 
             const codKey = codigo.toLowerCase();
-            localStorage.setItem(`passAlumno_${codKey}`, pass);
             casoUni.alumno.password = pass;
 
             for (const itemUni of casoUni.universidades) {
@@ -792,12 +817,16 @@
                   }
                   return a;
                 });
-                await supabase
+                const { error: errUpdate } = await supabase
                   .from('universidades')
                   .update({ alumnos: alumnosActualizados })
                   .eq('id', uniObj.id);
+                if (errUpdate) {
+                  throw errUpdate;
+                }
               }
             }
+            localStorage.setItem(`passAlumno_${codKey}`, pass);
           } else {
             if (!pass) {
               passContainer.style.display = 'flex';
