@@ -807,6 +807,7 @@
 
             const codKey = codigo.toLowerCase();
             casoUni.alumno.password = pass;
+            localStorage.setItem(`passAlumno_${codKey}`, pass);
 
             for (const itemUni of casoUni.universidades) {
               const uniObj = universidades.find(u => u.id === itemUni.uniId);
@@ -822,11 +823,12 @@
                   .update({ alumnos: alumnosActualizados })
                   .eq('id', uniObj.id);
                 if (errUpdate) {
-                  throw errUpdate;
+                  console.warn('No se pudo persistir contraseña en Supabase:', errUpdate);
+                } else {
+                  uniObj.alumnos = alumnosActualizados;
                 }
               }
             }
-            localStorage.setItem(`passAlumno_${codKey}`, pass);
           } else {
             if (!pass) {
               passContainer.style.display = 'flex';
