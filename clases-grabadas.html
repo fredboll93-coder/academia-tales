@@ -61,6 +61,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 14px;
       margin-bottom: 25px;
     }
 
@@ -75,6 +76,7 @@
       font-weight: 600;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
       transition: transform 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
     }
 
     .btn-primary:hover {
@@ -92,6 +94,7 @@
       font-size: 13px;
       font-weight: 600;
       transition: background 0.2s;
+      white-space: nowrap;
     }
 
     .btn-secondary:hover {
@@ -107,6 +110,7 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      padding: 16px;
     }
 
     .modal-card {
@@ -162,6 +166,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 14px;
       transition: opacity 0.3s ease;
     }
 
@@ -170,25 +175,86 @@
       align-items: center;
       gap: 14px;
       flex: 1;
+      min-width: 0;
+    }
+
+    .folder-info > div {
+      min-width: 0;
     }
 
     .folder-icon {
       font-size: 22px;
+      flex-shrink: 0;
     }
 
     .folder-name {
       font-size: 15px;
       font-weight: 600;
       color: #f8fafc;
+      word-break: break-word;
     }
 
     .folder-actions {
       display: flex;
       gap: 8px;
+      flex-shrink: 0;
     }
 
     .disabled-folder {
       opacity: 0.35;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 14px 12px;
+      }
+
+      .main-container {
+        gap: 14px;
+      }
+
+      .top-bar {
+        padding: 14px 16px;
+        border-radius: 18px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+
+      .main-card {
+        padding: 20px 16px;
+        border-radius: 18px;
+      }
+
+      .header-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .header-section .btn-primary {
+        width: 100%;
+        padding: 11px 16px;
+      }
+
+      .folder-item {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .folder-actions {
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 8px;
+      }
+
+      .folder-actions .btn-secondary {
+        flex: 1 1 85px;
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -425,3 +491,4 @@
   </script>
 </body>
 </html>
+```[cite: 17]
