@@ -44,6 +44,36 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
+    }
+
+    .top-bar-marca {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      min-width: 0;
+    }
+
+    .top-bar-logo {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      margin-top: -6px;
+      flex-shrink: 0;
+    }
+
+    .top-bar-acciones {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .top-bar-sesion {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-left: 5px;
     }
 
     .main-card {
@@ -75,8 +105,10 @@
       transition: background 0.2s;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
       text-decoration: none;
+      white-space: nowrap;
     }
 
     .btn-secondary:hover {
@@ -94,6 +126,11 @@
       font-weight: 600;
       transition: background 0.2s;
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
     }
 
     .btn-nav-top:hover {
@@ -116,6 +153,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 14px;
       cursor: pointer;
       transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
@@ -130,16 +168,103 @@
       display: flex;
       align-items: center;
       gap: 14px;
+      min-width: 0;
     }
 
     .folder-icon {
       font-size: 22px;
+      flex-shrink: 0;
     }
 
     .folder-name {
       font-size: 15px;
       font-weight: 600;
       color: #f8fafc;
+      word-break: break-word;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+        background-attachment: scroll;
+      }
+
+      .main-container {
+        gap: 14px;
+      }
+
+      .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px 16px;
+        border-radius: 18px;
+        gap: 12px;
+      }
+
+      .top-bar-marca {
+        gap: 12px;
+      }
+
+      .top-bar-logo {
+        width: 58px;
+        height: 58px;
+        margin-top: 0;
+      }
+
+      .top-bar-titulo {
+        margin-top: 0 !important;
+        min-width: 0;
+      }
+
+      .top-bar-titulo h2 {
+        font-size: 17px !important;
+        line-height: 1.25;
+      }
+
+      .top-bar-acciones {
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .top-bar-acciones > .btn-nav-top {
+        flex: 1 1 0;
+        padding: 8px 10px;
+      }
+
+      .top-bar-sesion {
+        flex-direction: row;
+        width: 100%;
+        margin-left: 0;
+        gap: 8px;
+      }
+
+      .top-bar-sesion > button {
+        flex: 1 1 0;
+        padding: 7px 10px !important;
+      }
+
+      .main-card {
+        padding: 20px 16px;
+        border-radius: 18px;
+      }
+
+      .header-section {
+        margin-bottom: 18px;
+      }
+
+      .header-section h1 {
+        font-size: 19px !important;
+      }
+
+      .folder-item {
+        padding: 14px 16px;
+        gap: 10px;
+      }
+
+      .folder-name {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -149,20 +274,20 @@
 
     <!-- Barra Superior -->
     <div class="top-bar">
-      <div style="display: flex; align-items: center; gap: 15px;">
-        <img src="logo.png" alt="Logo" style="width: 90px; height: 90px; object-fit: contain; margin-top: -6px;">
-        <div style="margin-top: 5px;">
+      <div class="top-bar-marca">
+        <img src="logo.png" alt="Logo" class="top-bar-logo">
+        <div class="top-bar-titulo" style="margin-top: 5px;">
           <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #f8fafc;">Materiales – <span id="uni-siglas-header"></span></h2>
           <p style="margin: 0; font-size: 13px; color: #94a3b8;">Academia Tales • Panel del Alumno</p>
         </div>
       </div>
 
       <!-- Botones de navegación rápida, cerrar sesión y volver -->
-      <div style="display: flex; align-items: center; gap: 10px;">
+      <div class="top-bar-acciones">
         <a href="#" id="linkSimulacros" class="btn-nav-top"><i class="fa-solid fa-file-signature"></i> Simulacros</a>
         <a href="#" id="linkClases" class="btn-nav-top"><i class="fa-solid fa-circle-play"></i> Clases</a>
         
-        <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 5px;">
+        <div class="top-bar-sesion">
           <button id="btn-cerrar-sesion" class="btn-secondary" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); padding: 5px 12px; font-size: 12px;">
             <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
           </button>
@@ -312,7 +437,7 @@
               <span class="folder-icon">📁</span>
               <span class="folder-name">${nombreCarpeta}</span>
             </div>
-            <span style="font-size: 13px; color: #34d399; font-weight: 600;">Ver materiales →</span>
+            <span style="font-size: 13px; color: #34d399; font-weight: 600; flex-shrink: 0;">Ver materiales →</span>
           </div>
         `;
       });
