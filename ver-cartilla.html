@@ -19,6 +19,9 @@
       padding: 16px;
       gap: 14px;
     }
+    .aviso-rotar-pantalla {
+      display: none;
+    }
     .header-bar {
       background: rgba(11, 18, 32, 0.94);
       border: 1px solid rgba(148, 163, 184, 0.22);
@@ -62,6 +65,11 @@
       justify-content: center;
       padding-bottom: 24px;
       overflow-x: auto;
+    }
+    .hoja-escala-wrapper {
+      display: flex;
+      justify-content: center;
+      width: fit-content;
     }
     .cartilla-hoja {
       width: 980px;
@@ -419,15 +427,66 @@
       color: #ffffff;
       border-color: #0f172a;
     }
+
+    @media (hover: none) and (pointer: coarse) {
+      .aviso-rotar-pantalla {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.24) 0%, rgba(14, 165, 233, 0.18) 100%);
+        border: 1px solid rgba(56, 189, 248, 0.45);
+        border-radius: 12px;
+        padding: 10px 12px;
+        color: #e0f2fe;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .aviso-rotar-pantalla i {
+        color: #38bdf8;
+        font-size: 15px;
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+    }
+
+    @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+      .aviso-rotar-pantalla {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+        overflow-x: hidden;
+      }
+      .hoja-contenedor {
+        width: 100%;
+        overflow-x: hidden;
+        justify-content: flex-start;
+      }
+      .hoja-escala-wrapper {
+        transform-origin: top left;
+      }
+    }
+
     @media print {
       body { background: #fff; padding: 0; }
-      .header-bar { display: none !important; }
+      .header-bar, .aviso-rotar-pantalla { display: none !important; }
       .hoja-contenedor { padding: 0; overflow: visible; }
+      .hoja-escala-wrapper { transform: none !important; width: auto !important; height: auto !important; }
       .cartilla-hoja { box-shadow: none; width: 100%; min-width: 0; }
     }
   </style>
 </head>
 <body>
+  <div class="aviso-rotar-pantalla" role="status">
+    <i class="fa-solid fa-mobile-screen-button"></i>
+    <div>
+      <b>Sugerencia para mayor comodidad:</b> gira tu tablet en posición horizontal para ver mejor la cartilla. Si no gira, revisa que el bloqueo de rotación vertical esté desactivado.
+    </div>
+  </div>
+
   <div class="header-bar">
     <div style="display: flex; align-items: center; gap: 12px;">
       <img id="logoBarraSuperior" src="/logo.png" alt="Logo" style="width: 40px; height: 40px; object-fit: contain;">
@@ -446,132 +505,134 @@
     </div>
   </div>
 
-  <div class="hoja-contenedor">
-    <div class="cartilla-hoja" id="cartillaHoja">
-      <div class="top-grid">
-        <div class="left-panel">
-          <div class="brand-header">
-            <div class="logo-box-cartilla" id="contenedorLogoCartilla">
-              <img id="logoCartillaOficial" src="/logo.png" alt="Logo Academia Tales">
-            </div>
-            <div>
-              <div class="academia">ACADEMIA</div>
-              <div class="nombre-academia">TALES</div>
-            </div>
-          </div>
-
-          <div class="box-title">HOJA DE IDENTIFICACIÓN</div>
-
-          <div class="campo-ident">
-            <label>Apellido Paterno</label>
-            <div class="valor-campo" id="campoApPaterno"></div>
-          </div>
-
-          <div class="campo-ident">
-            <label>Apellido Materno</label>
-            <div class="valor-campo" id="campoApMaterno"></div>
-          </div>
-
-          <div class="campo-ident">
-            <label>Nombres</label>
-            <div class="valor-campo" id="campoNombres"></div>
-          </div>
-
-          <div class="ejemplos-box">
-            <div class="ejemplos-title">EJEMPLOS DE MARCA</div>
-            <div class="ejemplos-cols">
-              <div>
-                <div>CORRECTA</div>
-                <div class="burbujas-ejemplo">
-                  <span class="mini-circ filled"></span>
-                </div>
+  <div class="hoja-contenedor" id="hojaContenedor">
+    <div class="hoja-escala-wrapper" id="hojaEscalaWrapper">
+      <div class="cartilla-hoja" id="cartillaHoja">
+        <div class="top-grid">
+          <div class="left-panel">
+            <div class="brand-header">
+              <div class="logo-box-cartilla" id="contenedorLogoCartilla">
+                <img id="logoCartillaOficial" src="/logo.png" alt="Logo Academia Tales">
               </div>
               <div>
-                <div>INCORRECTAS</div>
-                <div class="burbujas-ejemplo">
-                  <span class="mini-circ">✕</span>
-                  <span class="mini-circ">✓</span>
-                  <span class="mini-circ">◐</span>
-                  <span class="mini-circ">◑</span>
+                <div class="academia">ACADEMIA</div>
+                <div class="nombre-academia">TALES</div>
+              </div>
+            </div>
+
+            <div class="box-title">HOJA DE IDENTIFICACIÓN</div>
+
+            <div class="campo-ident">
+              <label>Apellido Paterno</label>
+              <div class="valor-campo" id="campoApPaterno"></div>
+            </div>
+
+            <div class="campo-ident">
+              <label>Apellido Materno</label>
+              <div class="valor-campo" id="campoApMaterno"></div>
+            </div>
+
+            <div class="campo-ident">
+              <label>Nombres</label>
+              <div class="valor-campo" id="campoNombres"></div>
+            </div>
+
+            <div class="ejemplos-box">
+              <div class="ejemplos-title">EJEMPLOS DE MARCA</div>
+              <div class="ejemplos-cols">
+                <div>
+                  <div>CORRECTA</div>
+                  <div class="burbujas-ejemplo">
+                    <span class="mini-circ filled"></span>
+                  </div>
+                </div>
+                <div>
+                  <div>INCORRECTAS</div>
+                  <div class="burbujas-ejemplo">
+                    <span class="mini-circ">✕</span>
+                    <span class="mini-circ">✓</span>
+                    <span class="mini-circ">◐</span>
+                    <span class="mini-circ">◑</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="right-panel">
-          <div class="firma-sede-huella">
-            <div class="recuadro-box">
-              <div class="recuadro-titulo">FIRMA DEL POSTULANTE <span style="font-weight:500;">(dentro del recuadro)</span></div>
-              <div id="firmaPostulante" style="text-align:center; font-style:italic; font-weight:700; color:#334155; font-size:13px;"></div>
-              <div style="height:12px;"></div>
-            </div>
+          <div class="right-panel">
+            <div class="firma-sede-huella">
+              <div class="recuadro-box">
+                <div class="recuadro-titulo">FIRMA DEL POSTULANTE <span style="font-weight:500;">(dentro del recuadro)</span></div>
+                <div id="firmaPostulante" style="text-align:center; font-style:italic; font-weight:700; color:#334155; font-size:13px;"></div>
+                <div style="height:12px;"></div>
+              </div>
 
-            <div class="recuadro-box">
-              <div class="recuadro-titulo">SEDE DONDE POSTULA</div>
-              <div class="sede-lista" id="listaSedes">
-                <div class="sede-item"><span>Iquitos</span><span class="sede-circ filled"></span></div>
-                <div class="sede-item"><span>Nauta</span><span class="sede-circ"></span></div>
-                <div class="sede-item"><span>Yurimaguas</span><span class="sede-circ"></span></div>
-                <div class="sede-item"><span>Requena</span><span class="sede-circ"></span></div>
-                <div class="sede-item"><span>Contamana</span><span class="sede-circ"></span></div>
-                <div class="sede-item"><span>Datem</span><span class="sede-circ"></span></div>
+              <div class="recuadro-box">
+                <div class="recuadro-titulo">SEDE DONDE POSTULA</div>
+                <div class="sede-lista" id="listaSedes">
+                  <div class="sede-item"><span>Iquitos</span><span class="sede-circ filled"></span></div>
+                  <div class="sede-item"><span>Nauta</span><span class="sede-circ"></span></div>
+                  <div class="sede-item"><span>Yurimaguas</span><span class="sede-circ"></span></div>
+                  <div class="sede-item"><span>Requena</span><span class="sede-circ"></span></div>
+                  <div class="sede-item"><span>Contamana</span><span class="sede-circ"></span></div>
+                  <div class="sede-item"><span>Datem</span><span class="sede-circ"></span></div>
+                </div>
+              </div>
+
+              <div class="recuadro-box">
+                <div class="recuadro-titulo">HUELLA DIGITAL</div>
+                <div class="recuadro-sub">Índice Derecho</div>
+                <div style="height:56px;"></div>
               </div>
             </div>
 
-            <div class="recuadro-box">
-              <div class="recuadro-titulo">HUELLA DIGITAL</div>
-              <div class="recuadro-sub">Índice Derecho</div>
-              <div style="height:56px;"></div>
-            </div>
-          </div>
+            <div class="grids-numericos">
+              <div class="grid-col-box">
+                <div class="grid-header">CÓDIGO DEL ALUMNO</div>
+                <div class="grid-valor-top" id="topCodigo"></div>
+                <div class="grid-matriz" id="matrizCodigo"></div>
+              </div>
 
-          <div class="grids-numericos">
-            <div class="grid-col-box">
-              <div class="grid-header">CÓDIGO DEL ALUMNO</div>
-              <div class="grid-valor-top" id="topCodigo"></div>
-              <div class="grid-matriz" id="matrizCodigo"></div>
-            </div>
+              <div class="grid-col-box">
+                <div class="grid-header">LOCAL</div>
+                <div class="grid-valor-top" id="topLocal"></div>
+                <div class="grid-matriz" id="matrizLocal"></div>
+              </div>
 
-            <div class="grid-col-box">
-              <div class="grid-header">LOCAL</div>
-              <div class="grid-valor-top" id="topLocal"></div>
-              <div class="grid-matriz" id="matrizLocal"></div>
-            </div>
+              <div class="grid-col-box">
+                <div class="grid-header">AULA</div>
+                <div class="grid-valor-top" id="topAula"></div>
+                <div class="grid-matriz" id="matrizAula"></div>
+              </div>
 
-            <div class="grid-col-box">
-              <div class="grid-header">AULA</div>
-              <div class="grid-valor-top" id="topAula"></div>
-              <div class="grid-matriz" id="matrizAula"></div>
-            </div>
-
-            <div class="grid-col-box">
-              <div class="grid-header">N° ASIENTO</div>
-              <div class="grid-valor-top" id="topAsiento"></div>
-              <div class="grid-matriz" id="matrizAsiento"></div>
+              <div class="grid-col-box">
+                <div class="grid-header">N° ASIENTO</div>
+                <div class="grid-valor-top" id="topAsiento"></div>
+                <div class="grid-matriz" id="matrizAsiento"></div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="facultad-bar">
-        <strong>Facultad que postula:</strong>
-        <span id="campoFacultad"></span>
-      </div>
-
-      <div class="grupo-strip">
-        <span class="grupo-label">GRUPO</span>
-        <div class="grupo-opciones" id="contenedorGrupos">
-          <span class="grupo-circ" data-grupo="A">A</span>
-          <span class="grupo-circ" data-grupo="B">B</span>
-          <span class="grupo-circ" data-grupo="C">C</span>
-          <span class="grupo-circ" data-grupo="D">D</span>
+        <div class="facultad-bar">
+          <strong>Facultad que postula:</strong>
+          <span id="campoFacultad"></span>
         </div>
+
+        <div class="grupo-strip">
+          <span class="grupo-label">GRUPO</span>
+          <div class="grupo-opciones" id="contenedorGrupos">
+            <span class="grupo-circ" data-grupo="A">A</span>
+            <span class="grupo-circ" data-grupo="B">B</span>
+            <span class="grupo-circ" data-grupo="C">C</span>
+            <span class="grupo-circ" data-grupo="D">D</span>
+          </div>
+        </div>
+
+        <div class="timing-bar" id="barraTiempo"></div>
+
+        <div class="preguntas-5cols" id="contenedor5Columnas"></div>
       </div>
-
-      <div class="timing-bar" id="barraTiempo"></div>
-
-      <div class="preguntas-5cols" id="contenedor5Columnas"></div>
     </div>
   </div>
 
@@ -587,8 +648,36 @@
         imgCartilla.src = "/logo.png";
       }
     }
-    window.addEventListener("DOMContentLoaded", asegurarLogoEnCartilla);
-    window.addEventListener("load", asegurarLogoEnCartilla);
+
+    function ajustarEscalaCelularCartilla() {
+      const contenedor = document.getElementById("hojaContenedor");
+      const wrapper = document.getElementById("hojaEscalaWrapper");
+      const hoja = document.getElementById("cartillaHoja");
+      if (!contenedor || !wrapper || !hoja) return;
+
+      if (window.innerWidth <= 768) {
+        const anchoDisponible = contenedor.clientWidth || (window.innerWidth - 20);
+        const anchoHoja = hoja.offsetWidth || 980;
+        const escala = Math.min(1, anchoDisponible / anchoHoja);
+        wrapper.style.transform = `scale(${escala})`;
+        wrapper.style.width = `${anchoHoja * escala}px`;
+        wrapper.style.height = `${hoja.offsetHeight * escala}px`;
+      } else {
+        wrapper.style.transform = "";
+        wrapper.style.width = "";
+        wrapper.style.height = "";
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      asegurarLogoEnCartilla();
+      ajustarEscalaCelularCartilla();
+    });
+    window.addEventListener("load", () => {
+      asegurarLogoEnCartilla();
+      ajustarEscalaCelularCartilla();
+    });
+    window.addEventListener("resize", ajustarEscalaCelularCartilla);
   </script>
 
   <script type="module">
@@ -772,6 +861,7 @@
       const totalPreg = parseInt(simData?.preguntas, 10) || 100;
       const alternativasSim = simData?.alternativas || "ABCD";
       construirPreguntas5Columnas(totalPreg, respuestas, alternativasSim);
+      ajustarEscalaCelularCartilla();
     });
   </script>
 </body>
