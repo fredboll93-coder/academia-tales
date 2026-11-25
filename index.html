@@ -608,7 +608,6 @@
 
       if (!alumnoEncontrado) return null;
 
-      // Prioridad 1: contraseña guardada en la base de datos (Supabase)
       const passwordDb = String(alumnoEncontrado.password || alumnoEncontrado.contrasena || '').trim();
       const passwordActual = passwordDb;
 
@@ -756,6 +755,33 @@
     inputPass.addEventListener('keydown', manejarEnterIngreso);
     inputCodigo.addEventListener('keydown', manejarEnterIngreso);
 
+    async function actualizarAlumnosUniversidadEnSupabase(uniObj, alumnosActualizados) {
+      if (uniObj && uniObj.id !== undefined && uniObj.id !== null) {
+        return await supabase
+          .from('universidades')
+          .update({ alumnos: alumnosActualizados })
+          .eq('id', uniObj.id);
+      }
+
+      const siglaUni = String(uniObj?.siglas || '').trim();
+      if (siglaUni) {
+        return await supabase
+          .from('universidades')
+          .update({ alumnos: alumnosActualizados })
+          .eq('siglas', siglaUni);
+      }
+
+      const nombreUni = String(uniObj?.nombre || '').trim();
+      if (nombreUni) {
+        return await supabase
+          .from('universidades')
+          .update({ alumnos: alumnosActualizados })
+          .eq('nombre', nombreUni);
+      }
+
+      return { error: new Error('No se pudo identificar la universidad para actualizar.') };
+    }
+
     window.procesarIngreso = async function() {
       const codigo = inputCodigo.value.trim();
       const pass = inputPass.value.trim();
@@ -809,7 +835,12 @@
             casoUni.alumno.password = pass;
 
             for (const itemUni of casoUni.universidades) {
-              const uniObj = universidades.find(u => u.id === itemUni.uniId);
+              const uniObj = universidades.find(u =>
+                (itemUni.uniId !== undefined && itemUni.uniId !== null && u.id === itemUni.uniId) ||
+                (itemUni.siglas && String(u.siglas || '').trim().toLowerCase() === String(itemUni.siglas).trim().toLowerCase()) ||
+                (itemUni.nombre && String(u.nombre || '').trim().toLowerCase() === String(itemUni.nombre).trim().toLowerCase())
+              );
+
               if (uniObj && Array.isArray(uniObj.alumnos)) {
                 const alumnosActualizados = uniObj.alumnos.map(a => {
                   if (extraerCodigoAlumno(a) === codKey && typeof a === 'object') {
@@ -817,10 +848,8 @@
                   }
                   return a;
                 });
-                const { error: errUpdate } = await supabase
-                  .from('universidades')
-                  .update({ alumnos: alumnosActualizados })
-                  .eq('id', uniObj.id);
+
+                const { error: errUpdate } = await actualizarAlumnosUniversidadEnSupabase(uniObj, alumnosActualizados);
 
                 if (errUpdate) {
                   console.error('Error al guardar contraseña en Supabase:', errUpdate);
