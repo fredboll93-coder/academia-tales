@@ -608,9 +608,9 @@
 
       if (!alumnoEncontrado) return null;
 
+      // Prioridad 1: contraseña guardada en la base de datos (Supabase)
       const passwordDb = String(alumnoEncontrado.password || alumnoEncontrado.contrasena || '').trim();
-      const passLocal = !passwordDb ? (localStorage.getItem(`passAlumno_${codLim}`) || '').trim() : '';
-      const passwordActual = passwordDb || passLocal;
+      const passwordActual = passwordDb;
 
       return {
         alumno: alumnoEncontrado,
@@ -807,7 +807,6 @@
 
             const codKey = codigo.toLowerCase();
             casoUni.alumno.password = pass;
-            localStorage.setItem(`passAlumno_${codKey}`, pass);
 
             for (const itemUni of casoUni.universidades) {
               const uniObj = universidades.find(u => u.id === itemUni.uniId);
@@ -822,11 +821,13 @@
                   .from('universidades')
                   .update({ alumnos: alumnosActualizados })
                   .eq('id', uniObj.id);
+
                 if (errUpdate) {
-                  console.warn('No se pudo persistir contraseña en Supabase:', errUpdate);
-                } else {
-                  uniObj.alumnos = alumnosActualizados;
+                  console.error('Error al guardar contraseña en Supabase:', errUpdate);
+                  return mostrarAlerta('No se pudo guardar su contraseña en la base de datos. Intente nuevamente o consulte con administración.');
                 }
+
+                uniObj.alumnos = alumnosActualizados;
               }
             }
           } else {
