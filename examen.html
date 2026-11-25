@@ -387,6 +387,23 @@
       return new Promise(resolve => requestAnimationFrame(() => resolve()));
     }
 
+    function obtenerFuentePdfSimulacro(sim, tipo = 'simulacro') {
+      if (!sim || typeof sim !== 'object') return "";
+      if (tipo === 'solucionario') {
+        return sim.solucionario_url || sim.solucionarioPdf || sim.solucionarioBase64 || sim.solucionario || "";
+      }
+      return (
+        sim.pdf_url ||
+        sim.pdfUrl ||
+        sim.pdfBase64 ||
+        sim.archivoSimulacroBase64 ||
+        sim.archivoSimulacro ||
+        sim.archivo_url ||
+        sim.archivoUrl ||
+        ""
+      );
+    }
+
     async function cargarDocumentoPdf(pdfSource) {
       if (pdfSource.startsWith('data:')) {
         const base64 = pdfSource.split(';base64,')[1];
@@ -395,16 +412,16 @@
         for (let i = 0; i < raw.length; i++) {
           uint8Array[i] = raw.charCodeAt(i);
         }
-        return pdfjsLib.getDocument({ data: uint8Array }).promise;
+        return pdfjsLib.getDocument({ data: uint8Array, withCredentials: false }).promise;
       }
 
       try {
-        const resp = await fetch(pdfSource);
+        const resp = await fetch(pdfSource, { mode: 'cors' });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const buffer = await resp.arrayBuffer();
-        return pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+        return pdfjsLib.getDocument({ data: new Uint8Array(buffer), withCredentials: false }).promise;
       } catch (fetchErr) {
-        return pdfjsLib.getDocument(pdfSource).promise;
+        return pdfjsLib.getDocument({ url: pdfSource, withCredentials: false }).promise;
       }
     }
 
@@ -436,7 +453,13 @@
         return true;
       } catch (error) {
         console.error("Error al renderizar PDF protegido:", error);
-        container.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #f87171; text-align: center; padding: 20px;">No se pudo cargar el documento PDF del examen.</div>`;
+        container.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; color: #cbd5e1; text-align: center; padding: 20px; gap: 12px;">
+            <div style="color: #f87171; font-size: 14px; font-weight: 600;">No se pudo cargar el documento PDF del examen en el visor canvas.</div>
+            <iframe src="${pdfSource}" style="width: 100%; flex: 1; min-height: 360px; border: 1px solid rgba(148,163,184,0.25); border-radius: 10px; background: #0f172a;"></iframe>
+            <a href="${pdfSource}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-size: 12px; font-weight: 700; text-decoration: underline;">Abrir PDF en nueva pestaña</a>
+          </div>
+        `;
         return false;
       }
     }
@@ -527,12 +550,7 @@
       const pdfViewerBox = document.getElementById("pdfViewerBox");
       document.getElementById("modalFlotante").style.display = 'none';
 
-      let fuentePdf = "";
-      if (tipo === 'solucionario') {
-        fuentePdf = sim.solucionario_url || sim.solucionarioPdf || sim.solucionarioBase64 || sim.solucionario || "";
-      } else {
-        fuentePdf = sim.pdf_url || sim.pdfBase64 || sim.archivoSimulacroBase64 || sim.archivoSimulacro || "";
-      }
+      let fuentePdf = obtenerFuentePdfSimulacro(sim, tipo);
 
       if (fuentePdf) {
         pdfViewerBox.innerHTML = `<div style="color: #94a3b8; font-size: 14px; margin: auto;">Cargando ${tipo === 'solucionario' ? 'solucionario' : 'simulacro'}...</div>`;
@@ -641,7 +659,7 @@
             const parsed = JSON.parse(rawCache);
             if (Array.isArray(parsed)) {
               const found = parsed.find(s => String(s.id) === String(simIdParam));
-              if (found && (found.pdf_url !== undefined || found.claves !== undefined)) {
+              if (found && obtenerFuentePdfSimulacro(found, 'simulacro')) {
                 simulacroActivo = found;
                 break;
               }
@@ -650,7 +668,7 @@
         }
       } catch (e) {}
 
-      if (!simulacroActivo || !uniData?.carreras) {
+      if (!simulacroActivo || !obtenerFuentePdfSimulacro(simulacroActivo, 'simulacro') || !uniData?.carreras) {
         try {
           const promesaUni = supabase
             .from('universidades')
@@ -992,7 +1010,7 @@
       });
 
       const pdfViewerBox = document.getElementById("pdfViewerBox");
-      const rawPdf = simulacroActivo.pdf_url || simulacroActivo.pdfBase64 || simulacroActivo.archivoSimulacroBase64 || simulacroActivo.archivoSimulacro;
+      const rawPdf = obtenerFuentePdfSimulacro(simulacroActivo, 'simulacro');
 
       if (rawPdf) {
         await renderizarPdfSinDescarga(rawPdf, pdfViewerBox);
