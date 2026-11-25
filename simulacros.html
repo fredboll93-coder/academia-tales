@@ -111,6 +111,127 @@
     .simulacro-item:hover {
       border-color: rgba(59, 130, 246, 0.4);
     }
+
+    .lista-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .lista-modal-card {
+      background: #ffffff;
+      color: #000000;
+      width: 100%;
+      max-width: 1120px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 14px;
+      padding: 24px 28px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+      font-family: Calibri, Arial, Helvetica, sans-serif;
+    }
+
+    .lista-modal-top {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .lista-btn-pdf {
+      background: #1d4ed8;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lista-btn-pdf:hover { background: #1e40af; }
+
+    .lista-btn-cerrar {
+      background: #e2e8f0;
+      color: #0f172a;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lista-btn-cerrar:hover { background: #cbd5e1; }
+
+    .lista-doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .lista-doc-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 0.2px;
+    }
+
+    .lista-doc-date {
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .lista-tabla {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .lista-tabla th,
+    .lista-tabla td {
+      border: 1px solid #000000;
+      padding: 4px 6px;
+      line-height: 1.25;
+    }
+
+    .lista-tabla .grp-header { font-weight: 700; text-align: left; background: #ffffff; }
+    .lista-tabla .area-group-header { font-weight: 700; text-align: center; background: #ffffff; }
+    .lista-tabla .sub-header th { font-weight: 700; text-align: center; background: #ffffff; }
+    .lista-tabla .sub-header th.left-head { text-align: left; }
+    .lista-tabla .dni-cell { text-align: left; white-space: nowrap; }
+    .lista-tabla .nom-cell { text-align: left; white-space: nowrap; }
+    .lista-tabla .fac-cell { text-align: center; }
+    .lista-tabla .num-cell { text-align: center; white-space: nowrap; }
+    .lista-tabla .pts-cell { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    @media print {
+      body * { visibility: hidden !important; }
+      #modal-lista-simulacro,
+      #modal-lista-simulacro * { visibility: visible !important; }
+      #modal-lista-simulacro {
+        position: static !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+      .lista-modal-card {
+        max-height: none !important;
+        box-shadow: none !important;
+        padding: 10px 14px !important;
+      }
+      .no-print { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -149,6 +270,17 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Modal Lista de Alumnos -->
+  <div id="modal-lista-simulacro" class="lista-modal-overlay">
+    <div class="lista-modal-card">
+      <div class="lista-modal-top no-print">
+        <button type="button" class="lista-btn-pdf" onclick="window.print()">Descargar PDF</button>
+        <button type="button" class="lista-btn-cerrar" onclick="cerrarModalListaSimulacro()">Cerrar ✕</button>
+      </div>
+      <div id="contenido-lista-simulacro"></div>
+    </div>
   </div>
 
   <script type="module">
@@ -292,6 +424,11 @@
       return (0).toFixed(7);
     }
 
+    window.cerrarModalListaSimulacro = function() {
+      const modal = document.getElementById('modal-lista-simulacro');
+      if (modal) modal.style.display = 'none';
+    };
+
     window.verListaSimulacro = function(id) {
       const sim = simulacrosCargados.find(s => String(s.id) === String(id));
       if (!sim) {
@@ -351,132 +488,24 @@
           }).join('')
         : `<tr><td colspan="${5 + areasColumnas.length}" style="text-align:center;padding:18px;color:#475569;">Ningún alumno ha rendido este simulacro aún.</td></tr>`;
 
-      const ventana = window.open('', '_blank', 'width=1200,height=760');
-      if (!ventana) {
-        alert('Permite las ventanas emergentes en tu navegador para ver y descargar la lista en PDF.');
-        return;
-      }
-
       const tituloSim = escapeHtml((sim.titulo || 'SIMULACRO').toUpperCase());
       const siglasSim = escapeHtml(String(siglas).toUpperCase());
       const fechaHoy = new Date().toLocaleDateString('es-PE', {
         weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
       }).toUpperCase();
 
-      ventana.document.write(`
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-          <meta charset="UTF-8" />
-          <title>Resultados - ${tituloSim} (${siglasSim})</title>
-          <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body {
-              font-family: Calibri, Arial, Helvetica, sans-serif;
-              color: #000000;
-              background: #ffffff;
-              padding: 24px 28px;
-            }
-            .top-actions {
-              display: flex;
-              justify-content: flex-end;
-              margin-bottom: 10px;
-            }
-            .btn-pdf {
-              background: #1d4ed8;
-              color: #ffffff;
-              border: none;
-              padding: 8px 16px;
-              border-radius: 6px;
-              font-size: 13px;
-              font-weight: 700;
-              cursor: pointer;
-            }
-            .btn-pdf:hover { background: #1e40af; }
-            .doc-header {
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-end;
-              gap: 16px;
-              margin-bottom: 12px;
-            }
-            .doc-title-main {
-              font-size: 13.5px;
-              font-weight: 700;
-              line-height: 1.35;
-              letter-spacing: 0.2px;
-            }
-            .doc-date {
-              font-size: 11.5px;
-              font-weight: 700;
-              white-space: nowrap;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              font-size: 11px;
-            }
-            th, td {
-              border: 1px solid #000000;
-              padding: 4px 6px;
-              line-height: 1.25;
-            }
-            .grp-header {
-              font-weight: 700;
-              text-align: left;
-              background: #ffffff;
-            }
-            .area-group-header {
-              font-weight: 700;
-              text-align: center;
-              background: #ffffff;
-            }
-            .sub-header th {
-              font-weight: 700;
-              text-align: center;
-              background: #ffffff;
-            }
-            .sub-header th.left-head {
-              text-align: left;
-            }
-            .dni-cell {
-              text-align: left;
-              white-space: nowrap;
-            }
-            .nom-cell {
-              text-align: left;
-              white-space: nowrap;
-            }
-            .fac-cell {
-              text-align: center;
-            }
-            .num-cell {
-              text-align: center;
-              white-space: nowrap;
-            }
-            .pts-cell {
-              text-align: right;
-              font-variant-numeric: tabular-nums;
-              white-space: nowrap;
-            }
-            @media print {
-              .no-print { display: none !important; }
-              body { padding: 10px 14px; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="top-actions no-print">
-            <button type="button" class="btn-pdf" onclick="window.print()">Descargar PDF</button>
-          </div>
-          <div class="doc-header">
-            <div class="doc-title-main">
+      const contenido = document.getElementById('contenido-lista-simulacro');
+      const modal = document.getElementById('modal-lista-simulacro');
+      if (contenido && modal) {
+        contenido.innerHTML = `
+          <div class="lista-doc-header">
+            <div class="lista-doc-title">
               <div>ACADEMIA PRE UNIVERSITARIA TALES</div>
               <div>RESULTADOS DE ${tituloSim} — ${siglasSim}</div>
             </div>
-            <div class="doc-date">${escapeHtml(fechaHoy)}</div>
+            <div class="lista-doc-date">${escapeHtml(fechaHoy)}</div>
           </div>
-          <table>
+          <table class="lista-tabla">
             <thead>
               <tr>
                 <th colspan="3" class="grp-header">${escapeHtml(etiquetaGrupos)}</th>
@@ -497,10 +526,9 @@
               ${filasHtml}
             </tbody>
           </table>
-        </body>
-        </html>
-      `);
-      ventana.document.close();
+        `;
+        modal.style.display = 'flex';
+      }
     };
 
     function pintarSimulacros(simulacros) {
