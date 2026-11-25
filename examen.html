@@ -1263,14 +1263,8 @@
         }, 1000);
       }
 
-      history.pushState(null, null, window.location.href);
-      window.addEventListener('popstate', function () {
-        history.pushState(null, null, window.location.href);
-        if (yaEnviadoEnSesion) return;
-        clearInterval(window.timerIntervalRef);
-        localStorage.removeItem(storageTimerKey);
-        procesarCalificacionYFin(respuestasAlumno, simulacroActivo, siglaUni, alumnoLogueado, true);
-      });
+      history.pushState({ trap: 1 }, "", window.location.href);
+      history.pushState({ trap: 2 }, "", window.location.href);
 
       const pdfViewerBox = document.getElementById("pdfViewerBox");
       const rawPdf = obtenerFuentePdfSimulacro(simulacroActivo, 'simulacro');
@@ -1657,11 +1651,12 @@
     }
 
     // 2. Flecha de retroceder: advierte antes de salir, sin bloquear por preguntas sin marcar
-    history.pushState(null, "", window.location.href);
+    history.pushState({ trap: 1 }, "", window.location.href);
+    history.pushState({ trap: 2 }, "", window.location.href);
     window.addEventListener(
       "popstate",
       (e) => {
-        history.pushState(null, "", window.location.href);
+        history.pushState({ trap: 2 }, "", window.location.href);
 
         if (window.__tiempoAgotadoAutomatico) {
           return;
@@ -1703,3 +1698,4 @@
 </script>
 </body>
 </html>
+```[cite: 18]
