@@ -786,15 +786,42 @@
       }
     }
 
+    function normalizarTextoCarrera(texto) {
+      return String(texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/\beduc\b\.?/g, "educacion")
+        .replace(/\bing\b\.?/g, "ingenieria")
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function extraerLetraGrupo(valorGrupo) {
+      const txt = String(valorGrupo || "").trim().toUpperCase();
+      const match = txt.match(/\b([A-D])\b/) || txt.match(/GRUPO\s*[:\-]?\s*([A-D])/);
+      return match ? match[1] : "";
+    }
+
     function obtenerGrupoPorCarrera(carrerasLista, nombreCarrera) {
-      const lim = String(nombreCarrera || "").trim().toUpperCase();
-      if (!lim || !Array.isArray(carrerasLista)) return "";
-      const encontrada = carrerasLista.find((c) => {
+      const target = normalizarTextoCarrera(nombreCarrera);
+      if (!target || !Array.isArray(carrerasLista)) return "";
+
+      let encontrada = carrerasLista.find((c) => {
         const nom = typeof c === "string" ? c : (c?.nombre || c?.carrera || "");
-        return String(nom).trim().toUpperCase() === lim;
+        return normalizarTextoCarrera(nom) === target;
       });
+
+      if (!encontrada) {
+        encontrada = carrerasLista.find((c) => {
+          const nom = normalizarTextoCarrera(typeof c === "string" ? c : (c?.nombre || c?.carrera || ""));
+          return nom && (nom.includes(target) || target.includes(nom));
+        });
+      }
+
       if (encontrada && typeof encontrada === "object") {
-        return String(encontrada.grupo || encontrada.area || "").trim().toUpperCase();
+        return extraerLetraGrupo(encontrada.grupo || encontrada.area || "");
       }
       return "";
     }
@@ -869,7 +896,7 @@
       }
 
       const grupoCarrera = obtenerGrupoPorCarrera(carrerasCache, carrera);
-      const grupo = grupoCarrera || String(datosGuardados.grupo || alumno.grupo || "A").trim().toUpperCase();
+      const grupo = grupoCarrera || extraerLetraGrupo(datosGuardados.grupo || alumno.grupo) || "A";
       const nombreAlumno = alumno.nombres || alumno.nombre || "Postulante";
 
       document.getElementById("subtituloCartilla").textContent = `${nombreAlumno} • ${siglaUni.toUpperCase()} • Grupo ${grupo}`;
