@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contenido de Carpeta - Academia Tales</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -134,6 +135,21 @@
       border: none;
       background: #0f172a;
       margin-top: 12px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .pdf-frame canvas {
+      max-width: 100%;
+      height: auto !important;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      background: #fff;
     }
 
     /* Lista de Videos / Materiales */
@@ -335,7 +351,7 @@
           <h3 id="pdf-viewer-titulo" style="font-size: 16px; color: #fff;">Documento PDF</h3>
           <button type="button" class="btn-secondary" style="padding: 5px 12px; font-size: 12px;" onclick="cerrarVisorPdf()">Cerrar PDF ✕</button>
         </div>
-        <iframe id="pdf-viewer-frame" class="pdf-frame" title="Visor de PDF"></iframe>
+        <div id="pdf-viewer-frame" class="pdf-frame" title="Visor de PDF"></div>
       </div>
 
       <!-- Reproductor Integrado -->
@@ -378,6 +394,10 @@
   <script type="module">
     import { supabase } from './supabaseClient.js';
 
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const siglas = urlParams.get('siglas') || urlParams.get('uni') || 'UNAP';
     const rawFolderId = urlParams.get('folderId');
@@ -410,6 +430,7 @@
     let uniCarpetasArray = null;
     let uniCarpetaIndex = -1;
     let pdfBlobUrlActual = null;
+    let tokenVisorPdf = 0;
 
     document.getElementById('btn-simulacros').onclick = () => {
       window.location.href = esModoAlumno
@@ -533,15 +554,110 @@
     }
 
     window.cerrarVisorPdf = function() {
+      tokenVisorPdf++;
       const wrapper = document.getElementById('pdf-viewer-wrapper');
       const frame = document.getElementById('pdf-viewer-frame');
       if (wrapper) wrapper.style.display = 'none';
-      if (frame) frame.src = '';
+      if (frame) frame.innerHTML = '';
       if (pdfBlobUrlActual) {
         URL.revokeObjectURL(pdfBlobUrlActual);
         pdfBlobUrlActual = null;
       }
     };
+
+    async function cargarPdfBytes(fuente) {
+      const str = String(fuente || '').trim();
+      if (str.startsWith('data:')) {
+        const base64Data = str.includes(',') ? str.split(',')[1] : str;
+        const byteCharacters = atob(base64Data.replace(/\s+/g, ''));
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        return new Uint8Array(byteNumbers);
+      }
+
+      if (str.startsWith('blob:')) {
+        const resp = await fetch(str);
+        const buf = await resp.arrayBuffer();
+        return new Uint8Array(buf);
+      }
+
+      const resp = await fetch(str, { mode: 'cors' });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const buf = await resp.arrayBuffer();
+      return new Uint8Array(buf);
+    }
+
+    async function renderizarPdfEnContenedor(fuente, container, tokenActual) {
+      container.innerHTML = `<div style="color: #94a3b8; font-size: 13px; margin: auto; padding: 20px;">Cargando documento PDF...</div>`;
+
+      try {
+        if (!window.pdfjsLib) {
+          throw new Error('PDF.js no disponible');
+        }
+
+        const bytes = await cargarPdfBytes(fuente);
+        if (tokenActual !== tokenVisorPdf) return;
+
+        const doc = await pdfjsLib.getDocument({ data: bytes, withCredentials: false }).promise;
+        if (tokenActual !== tokenVisorPdf) return;
+
+        container.innerHTML = '';
+        const anchoContenedor = Math.max(280, (container.clientWidth || 760) - 28);
+
+        for (let pageNum = 1; pageNum <= doc.numPages; pageNum++) {
+          if (tokenActual !== tokenVisorPdf) return;
+
+          const page = await doc.getPage(pageNum);
+          if (tokenActual !== tokenVisorPdf) return;
+
+          const baseViewport = page.getViewport({ scale: 1 });
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const scale = (anchoContenedor / baseViewport.width) * dpr;
+          const viewport = page.getViewport({ scale });
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+          canvas.style.width = `${Math.floor(viewport.width / dpr)}px`;
+          canvas.style.height = `${Math.floor(viewport.height / dpr)}px`;
+
+          container.appendChild(canvas);
+
+          await page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise;
+        }
+      } catch (err) {
+        if (tokenActual !== tokenVisorPdf) return;
+        console.error('Error renderizando PDF con PDF.js:', err);
+
+        let srcFallback = fuente;
+        if (String(fuente).startsWith('data:')) {
+          try {
+            const base64Data = fuente.includes(',') ? fuente.split(',')[1] : fuente;
+            const byteCharacters = atob(base64Data.replace(/\s+/g, ''));
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+              byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+            pdfBlobUrlActual = URL.createObjectURL(blob);
+            srcFallback = pdfBlobUrlActual;
+          } catch (_) {}
+        }
+
+        container.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 12px; padding: 16px; text-align: center;">
+            <iframe src="${srcFallback}" style="width: 100%; flex: 1; min-height: 360px; border: none; border-radius: 8px; background: #fff;" title="Documento PDF"></iframe>
+            <a href="${srcFallback}" target="_blank" rel="noopener noreferrer" class="btn-secondary">Abrir documento en pestaña nueva ↗</a>
+          </div>
+        `;
+      }
+    }
 
     window.abrirPdfAlumno = function(index) {
       const item = listaMateriales[index];
@@ -556,32 +672,14 @@
         pdfBlobUrlActual = null;
       }
 
-      let srcVisor = fuente;
-      if (String(fuente).startsWith("data:")) {
-        try {
-          const base64Data = fuente.includes(",") ? fuente.split(",")[1] : fuente;
-          const byteCharacters = atob(base64Data);
-          const byteNumbers = new Array(byteCharacters.length);
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          const blob = new Blob([byteArray], { type: "application/pdf" });
-          pdfBlobUrlActual = URL.createObjectURL(blob);
-          srcVisor = pdfBlobUrlActual;
-        } catch (e) {
-          console.error("Error al abrir PDF:", e);
-          alert("No se pudo abrir el archivo PDF.");
-          return;
-        }
-      }
-
+      const tokenActual = ++tokenVisorPdf;
       const wrapper = document.getElementById('pdf-viewer-wrapper');
       const frame = document.getElementById('pdf-viewer-frame');
       document.getElementById('pdf-viewer-titulo').textContent = item.titulo || item.nombre || item.name || 'Documento PDF';
-      frame.src = srcVisor;
       wrapper.style.display = 'block';
       wrapper.scrollIntoView({ behavior: 'smooth' });
+
+      renderizarPdfEnContenedor(fuente, frame, tokenActual);
     };
 
     async function cargarDatosCarpeta() {
@@ -606,7 +704,6 @@
         let carpetasArrResuelto = null;
         let carpetaIdxResuelto = -1;
 
-        // 1. Buscar en tabla materiales
         if (rawFolderId !== null && rawFolderId !== '') {
           const numericId = Number(rawFolderId);
           if (!Number.isNaN(numericId)) {
@@ -638,7 +735,6 @@
           }
         }
 
-        // 2. Buscar en tabla clases_grabadas
         if (!encontrada && rawFolderId !== null && rawFolderId !== '') {
           const numericId = Number(rawFolderId);
           if (!Number.isNaN(numericId)) {
@@ -670,7 +766,6 @@
           }
         }
 
-        // 3. Buscar dentro de universidades
         if (!encontrada) {
           const { data: uniMatch } = await supabase
             .from('universidades')
