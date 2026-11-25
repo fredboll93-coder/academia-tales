@@ -499,8 +499,8 @@
       <button type="button" class="btn-imprimir" onclick="window.print()">
         <i class="fa-solid fa-print"></i> Imprimir
       </button>
-      <button type="button" class="btn-volver" id="btnVolverExamen">
-        <i class="fa-solid fa-arrow-left"></i> Volver al Examen
+      <button type="button" class="btn-volver" id="btnVolverSimulacros">
+        <i class="fa-solid fa-arrow-left"></i> Volver a Simulacros
       </button>
     </div>
   </div>
@@ -791,8 +791,9 @@
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase()
-        .replace(/\beduc\b\.?/g, "educacion")
-        .replace(/\bing\b\.?/g, "ingenieria")
+        .replace(/\beduc\.?\b/g, "educacion")
+        .replace(/\bsec\.?\b/g, "secundaria")
+        .replace(/\bing\.?\b/g, "ingenieria")
         .replace(/[^a-z0-9\s]/g, " ")
         .replace(/\s+/g, " ")
         .trim();
@@ -800,7 +801,7 @@
 
     function extraerLetraGrupo(valorGrupo) {
       const txt = String(valorGrupo || "").trim().toUpperCase();
-      const match = txt.match(/\b([A-D])\b/) || txt.match(/GRUPO\s*[:\-]?\s*([A-D])/);
+      const match = txt.match(/(?:GRUPO\s*[:\-]?\s*)?\b([A-D])\b/);
       return match ? match[1] : "";
     }
 
@@ -809,14 +810,17 @@
       if (!target || !Array.isArray(carrerasLista)) return "";
 
       let encontrada = carrerasLista.find((c) => {
-        const nom = typeof c === "string" ? c : (c?.nombre || c?.carrera || "");
-        return normalizarTextoCarrera(nom) === target;
+        const nom = normalizarTextoCarrera(typeof c === "string" ? c : (c?.nombre || c?.carrera || ""));
+        return nom && nom === target;
       });
 
       if (!encontrada) {
+        const targetTokens = target.split(" ").filter((t) => t.length > 2);
         encontrada = carrerasLista.find((c) => {
           const nom = normalizarTextoCarrera(typeof c === "string" ? c : (c?.nombre || c?.carrera || ""));
-          return nom && (nom.includes(target) || target.includes(nom));
+          if (!nom) return false;
+          if (nom.includes(target) || target.includes(nom)) return true;
+          return targetTokens.length >= 2 && targetTokens.every((tok) => nom.includes(tok));
         });
       }
 
@@ -826,19 +830,50 @@
       return "";
     }
 
+    function buscarAlumnoEnLista(lista, codigoFiltro, nombreFiltro) {
+      if (!Array.isArray(lista)) return null;
+      const codLim = String(codigoFiltro || "").trim().toLowerCase();
+      const nomLim = String(nombreFiltro || "").trim().toLowerCase();
+
+      if (codLim) {
+        const porCod = lista.find((a) => {
+          if (!a || typeof a !== "object") return false;
+          const idA = String(a.codigo || a.dni || a.id || "").trim().toLowerCase();
+          return idA && idA === codLim;
+        });
+        if (porCod) return porCod;
+      }
+
+      if (nomLim) {
+        const porNom = lista.find((a) => {
+          if (!a || typeof a !== "object") return false;
+          const nomA = String(a.nombres || a.nombre || a.apellidosYnombres || "").trim().toLowerCase();
+          return nomA && nomA === nomLim;
+        });
+        if (porNom) return porNom;
+      }
+
+      return null;
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
       asegurarLogoEnCartilla();
 
       const params = new URLSearchParams(window.location.search);
-      const siglaUni = params.get("uni") || localStorage.getItem("universidadSeleccionada") || "UNAP";
+      const siglaUni = params.get("uni") || params.get("siglas") || localStorage.getItem("universidadSeleccionada") || "UNAP";
       const simId = params.get("id") || sessionStorage.getItem("simulacroActivoId") || "";
 
-      document.getElementById("btnVolverExamen").onclick = () => {
-        const idx = params.get("idx") || "";
-        window.location.href = `examen.html?uni=${encodeURIComponent(siglaUni)}&id=${encodeURIComponent(simId)}${idx ? `&idx=${encodeURIComponent(idx)}` : ""}`;
+      document.getElementById("btnVolverSimulacros").onclick = () => {
+        window.location.href = `simulacrosAlumno.html?siglas=${encodeURIComponent(siglaUni)}`;
       };
 
       construirBarraTiempo();
+
+      const codigoSesion = String(sessionStorage.getItem("alumnoCodigo") || localStorage.getItem("alumnoCodigo") || "").trim();
+      let sesionObj = {};
+      try {
+        sesionObj = JSON.parse(sessionStorage.getItem("alumnoSesion") || localStorage.getItem("usuarioLogueado") || "{}");
+      } catch (e) {}
 
       let simData = {};
       let uniData = {};
@@ -858,32 +893,6 @@
         console.error("Error obteniendo datos:", e);
       }
 
-      let datosGuardados = {};
-      try {
-        const rawTemp = sessionStorage.getItem("cartilla_datos_actuales");
-        if (rawTemp) datosGuardados = JSON.parse(rawTemp);
-      } catch (e) {}
-
-      if (!datosGuardados.respuestas && simId) {
-        const cod = String(sessionStorage.getItem("alumnoCodigo") || localStorage.getItem("alumnoCodigo") || "").trim().toLowerCase();
-        const keysLocal = Object.keys(localStorage).filter((k) => k.startsWith(`resultado_${simId}_`));
-        for (const k of keysLocal) {
-          if (!cod || k.endsWith(`_${cod}`)) {
-            try {
-              const parsed = JSON.parse(localStorage.getItem(k));
-              if (parsed?.respuestas) {
-                datosGuardados = { ...datosGuardados, ...parsed };
-                break;
-              }
-            } catch (e) {}
-          }
-        }
-      }
-
-      const alumno = datosGuardados.alumno || {};
-      const respuestas = datosGuardados.respuestas || {};
-      const carrera = datosGuardados.carrera || alumno.carrera || "";
-
       let carrerasCache = uniData?.carreras;
       if (!Array.isArray(carrerasCache)) {
         try {
@@ -895,8 +904,50 @@
         } catch (e) {}
       }
 
+      let datosGuardados = {};
+      try {
+        const rawTemp = sessionStorage.getItem("cartilla_datos_actuales");
+        if (rawTemp) {
+          const parsedTemp = JSON.parse(rawTemp);
+          const codTemp = String(parsedTemp?.alumno?.codigo || parsedTemp?.alumno?.dni || parsedTemp?.alumno?.id || "").trim().toLowerCase();
+          if (!codigoSesion || !codTemp || codTemp === codigoSesion.toLowerCase()) {
+            datosGuardados = parsedTemp;
+          }
+        }
+      } catch (e) {}
+
+      const codLookup = String(codigoSesion || sesionObj?.codigo || sesionObj?.dni || "").trim().toLowerCase();
+      if (!datosGuardados.respuestas && simId) {
+        const keysLocal = Object.keys(localStorage).filter((k) => k.startsWith(`resultado_${simId}_`));
+        for (const k of keysLocal) {
+          if (!codLookup || k.endsWith(`_${codLookup}`)) {
+            try {
+              const parsed = JSON.parse(localStorage.getItem(k));
+              if (parsed?.respuestas) {
+                datosGuardados = { ...datosGuardados, ...parsed };
+                break;
+              }
+            } catch (e) {}
+          }
+        }
+      }
+
+      const alumSim = buscarAlumnoEnLista(simData?.alumnos, codLookup, sesionObj?.nombre || sesionObj?.nombres);
+      const alumUni = buscarAlumnoEnLista(uniData?.alumnos || uniData?.alumnosMatriculados || uniData?.matriculados, codLookup, sesionObj?.nombre || sesionObj?.nombres);
+
+      const alumno = {
+        ...(alumUni || {}),
+        ...(alumSim || {}),
+        ...(datosGuardados.alumno || {}),
+        codigo: datosGuardados.alumno?.codigo || alumSim?.codigo || alumUni?.codigo || codigoSesion || sesionObj?.codigo || "",
+        nombres: datosGuardados.alumno?.nombres || datosGuardados.alumno?.nombre || alumSim?.nombres || alumSim?.nombre || alumUni?.nombres || alumUni?.nombre || sesionObj?.nombre || sesionObj?.nombres || "Postulante"
+      };
+
+      const respuestas = datosGuardados.respuestas || alumSim?.respuestas || {};
+      const carrera = datosGuardados.carrera || alumno.carrera || alumSim?.carrera || alumUni?.carrera || sesionObj?.carrera || "";
+
       const grupoCarrera = obtenerGrupoPorCarrera(carrerasCache, carrera);
-      const grupo = grupoCarrera || extraerLetraGrupo(datosGuardados.grupo || alumno.grupo) || "A";
+      const grupo = grupoCarrera || extraerLetraGrupo(datosGuardados.grupo || alumno.grupo || alumSim?.grupo) || "A";
       const nombreAlumno = alumno.nombres || alumno.nombre || "Postulante";
 
       document.getElementById("subtituloCartilla").textContent = `${nombreAlumno} • ${siglaUni.toUpperCase()} • Grupo ${grupo}`;
