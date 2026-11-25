@@ -154,6 +154,143 @@
     .adm-btn-danger:hover {
       background: rgba(239, 68, 68, 0.28);
     }
+
+    .uni-top-bar {
+      background: rgba(11, 18, 32, 0.85);
+      border: 3px solid rgba(148, 163, 184, 0.15);
+      border-top: 3px solid rgba(148, 163, 184, 0.4);
+      border-radius: 20px;
+      padding: 8px 30px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .uni-top-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .uni-top-brand > div {
+      min-width: 0;
+    }
+
+    .uni-top-logo {
+      width: 75px;
+      height: 75px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .uni-top-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .uni-top-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .uni-back-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        align-items: flex-start;
+        padding: 14px 12px;
+      }
+
+      .uni-top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px 16px;
+        gap: 12px;
+      }
+
+      .uni-top-logo {
+        width: 50px;
+        height: 50px;
+      }
+
+      .uni-top-actions {
+        align-items: stretch;
+        width: 100%;
+        gap: 8px;
+      }
+
+      .uni-top-btns {
+        flex-wrap: wrap;
+        width: 100%;
+      }
+
+      .uni-top-btns button {
+        flex: 1 1 120px;
+        text-align: center;
+      }
+
+      .uni-back-btn {
+        justify-content: center;
+        padding-top: 2px;
+      }
+
+      .main-card {
+        padding: 20px 16px;
+      }
+
+      #uni-header {
+        gap: 12px;
+      }
+
+      #uni-logo {
+        width: 46px !important;
+        height: 46px !important;
+        flex-shrink: 0;
+      }
+
+      #uni-siglas {
+        font-size: 18px !important;
+      }
+
+      #uni-nombre {
+        font-size: 12px !important;
+      }
+
+      .options-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .option-card {
+        padding: 16px;
+      }
+
+      .adm-modal-box {
+        padding: 18px 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -162,20 +299,20 @@
   <div style="width: 100%; max-width: 900px; margin: 0 auto; padding: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
 
     <!-- Barra Superior compacta y alineada -->
-    <div style="background: rgba(11, 18, 32, 0.85); border: 3px solid rgba(148, 163, 184, 0.15); border-top: 3px solid rgba(148, 163, 184, 0.4); border-radius: 20px; padding: 8px 30px; backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box;">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <img src="logo.png" alt="Logo" style="width: 75px; height: 75px; object-fit: contain;">
+    <div class="uni-top-bar">
+      <div class="uni-top-brand">
+        <img src="logo.png" alt="Logo" class="uni-top-logo">
         <div>
           <h2 style="margin: 0 0 2px 0; font-size: 18px; font-weight: 700; color: #f8fafc;">Panel de Universidad</h2>
           <p style="margin: 0; font-size: 12px; color: #94a3b8;">Academia Tales • Gestión Académica</p>
         </div>
       </div>
-      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
+      <div class="uni-top-actions">
+        <div class="uni-top-btns">
           <button type="button" onclick="abrirModalCarruselUniversidad()" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s;">🖼️ Carrusel</button>
           <button onclick="cerrarSesionPanel()" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 6px 14px; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s;">Cerrar Sesión</button>
         </div>
-        <button onclick="window.location.href='admin.html'" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;">← Volver a Universidades</button>
+        <button onclick="window.location.href='admin.html'" class="uni-back-btn">← Volver a Universidades</button>
       </div>
     </div>
 
@@ -915,7 +1052,7 @@
         cancelarEdicionResultado();
 
         statusMsg.style.color = '#34d399';
-        statusEl.textContent = `✓ Guardado en la nube (${totalCarreras} carreras analizadas). Rangos actualizados.`;
+        statusMsg.textContent = `✓ Guardado en la nube (${totalCarreras} carreras analizadas). Rangos actualizados.`;
         renderizarModal();
       } catch (error) {
         console.error(error);
