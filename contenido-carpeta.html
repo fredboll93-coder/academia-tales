@@ -450,10 +450,25 @@
         return;
       }
 
-      if (fuente.startsWith("data:application/pdf") || fuente.startsWith("data:")) {
-        const win = window.open();
-        if (win) {
-          win.document.write(`<iframe src="${fuente}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+      if (String(fuente).startsWith("data:")) {
+        try {
+          const base64Data = fuente.includes(",") ? fuente.split(",")[1] : fuente;
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: "application/pdf" });
+          const blobUrl = URL.createObjectURL(blob);
+          const win = window.open(blobUrl, "_blank", "noopener,noreferrer");
+          if (!win) {
+            alert("El navegador bloqueó la ventana emergente. Permite ventanas emergentes para ver el PDF.");
+          }
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+        } catch (e) {
+          console.error("Error al abrir PDF:", e);
+          alert("No se pudo abrir el archivo PDF.");
         }
       } else {
         window.open(fuente, "_blank", "noopener,noreferrer");
