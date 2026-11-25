@@ -259,112 +259,114 @@
         icono.innerText = "👁️";
       }
     }
+  </script>
 
-    document.addEventListener("DOMContentLoaded", () => {
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+
     // Configuración de contraseña
-      const btnAbrir = document.getElementById("btn-abrir-config-admin");
-      const modal = document.getElementById("modal-config-admin");
-      const btnCancelar = document.getElementById("btn-cancelar-pass");
-      const btnGuardar = document.getElementById("btn-guardar-pass");
+    const btnAbrir = document.getElementById("btn-abrir-config-admin");
+    const modal = document.getElementById("modal-config-admin");
+    const btnCancelar = document.getElementById("btn-cancelar-pass");
+    const btnGuardar = document.getElementById("btn-guardar-pass");
 
-      async function obtenerPassAdminRemota() {
+    async function obtenerPassAdminRemota() {
+      try {
+        const { data, error } = await supabase
+          .from("configuracion")
+          .select("*")
+          .limit(1);
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const fila = data[0];
+          const claveRemota = String(
+            fila.admin_password || fila.password_admin || fila.password || fila.clave || ""
+          ).trim();
+          if (claveRemota) {
+            return { clave: claveRemota, filaId: fila.id };
+          }
+          return { clave: "clave", filaId: fila.id };
+        }
+      } catch (e) {}
+
+      return {
+        clave: localStorage.getItem("adminPasswordCustom") || "clave",
+        filaId: null
+      };
+    }
+
+    if (btnAbrir && modal) {
+      btnAbrir.addEventListener("click", () => {
+        document.getElementById("input-pass-antigua").value = "";
+        document.getElementById("input-pass-nueva").value = "";
+        modal.style.display = "flex";
+      });
+    }
+
+    if (btnCancelar && modal) {
+      btnCancelar.addEventListener("click", () => {
+        modal.style.display = "none";
+      });
+    }
+
+    if (btnGuardar) {
+      btnGuardar.addEventListener("click", async () => {
+        const antigua = document.getElementById("input-pass-antigua").value.trim();
+        const nueva = document.getElementById("input-pass-nueva").value.trim();
+
+        if (!antigua || !nueva) {
+          alert("Por favor complete ambos campos.");
+          return;
+        }
+
+        const { clave: passActual, filaId } = await obtenerPassAdminRemota();
+
+        if (antigua !== passActual) {
+          alert("La contraseña actual es incorrecta.");
+          return;
+        }
+
         try {
-          const { data, error } = await supabase
-            .from("configuracion")
-            .select("*")
-            .limit(1);
-
-          if (!error && Array.isArray(data) && data.length > 0) {
-            const fila = data[0];
-            const claveRemota = String(
-              fila.admin_password || fila.password_admin || fila.password || fila.clave || ""
-            ).trim();
-            if (claveRemota) {
-              return { clave: claveRemota, filaId: fila.id };
-            }
-            return { clave: "clave", filaId: fila.id };
+          let guardadoOk = false;
+          if (filaId !== undefined && filaId !== null) {
+            const { error } = await supabase
+              .from("configuracion")
+              .update({ admin_password: nueva })
+              .eq("id", filaId);
+            if (!error) guardadoOk = true;
+          } else {
+            const { error } = await supabase
+              .from("configuracion")
+              .insert([{ admin_password: nueva }]);
+            if (!error) guardadoOk = true;
           }
-        } catch (e) {}
 
-        return {
-          clave: localStorage.getItem("adminPasswordCustom") || "clave",
-          filaId: null
-        };
-      }
+          localStorage.setItem("adminPasswordCustom", nueva);
 
-      if (btnAbrir && modal) {
-        btnAbrir.addEventListener("click", () => {
-          document.getElementById("input-pass-antigua").value = "";
-          document.getElementById("input-pass-nueva").value = "";
-          modal.style.display = "flex";
-        });
-      }
+          if (!guardadoOk) {
+            alert("Se guardó localmente, pero revisa en Supabase que exista la tabla 'configuracion' con la columna 'admin_password' para sincronizar en otros dispositivos.");
+            return;
+          }
 
-      if (btnCancelar && modal) {
-        btnCancelar.addEventListener("click", () => {
+          alert("¡Contraseña de administrador cambiada con éxito!");
           modal.style.display = "none";
-        });
-      }
+        } catch (e) {
+          localStorage.setItem("adminPasswordCustom", nueva);
+          alert("Hubo un problema al guardar en la base de datos.");
+        }
+      });
+    }
 
-      if (btnGuardar) {
-        btnGuardar.addEventListener("click", async () => {
-          const antigua = document.getElementById("input-pass-antigua").value.trim();
-          const nueva = document.getElementById("input-pass-nueva").value.trim();
-
-          if (!antigua || !nueva) {
-            alert("Por favor complete ambos campos.");
-            return;
-          }
-
-          const { clave: passActual, filaId } = await obtenerPassAdminRemota();
-
-          if (antigua !== passActual) {
-            alert("La contraseña actual es incorrecta.");
-            return;
-          }
-
-          try {
-            let guardadoOk = false;
-            if (filaId !== undefined && filaId !== null) {
-              const { error } = await supabase
-                .from("configuracion")
-                .update({ admin_password: nueva })
-                .eq("id", filaId);
-              if (!error) guardadoOk = true;
-            } else {
-              const { error } = await supabase
-                .from("configuracion")
-                .insert([{ admin_password: nueva }]);
-              if (!error) guardadoOk = true;
-            }
-
-            localStorage.setItem("adminPasswordCustom", nueva);
-
-            if (!guardadoOk) {
-              alert("Se guardó localmente, pero revisa en Supabase que exista la tabla 'configuracion' con la columna 'admin_password' para sincronizar en otros dispositivos.");
-              return;
-            }
-
-            alert("¡Contraseña de administrador cambiada con éxito!");
-            modal.style.display = "none";
-          } catch (e) {
-            localStorage.setItem("adminPasswordCustom", nueva);
-            alert("Hubo un problema al guardar en la base de datos.");
-          }
-        });
-      }
-
-      // Cerrar Sesión directo y seguro
-      const btnCerrar = document.getElementById("btn-cerrar-sesion");
-      if (btnCerrar) {
-        btnCerrar.addEventListener("click", () => {
-          localStorage.removeItem("adminSesion");
-          sessionStorage.removeItem("adminSesion");
-          localStorage.removeItem("usuarioLogueado");
-          window.location.href = "index.html";
-        });
-      }
-    });
+    // Cerrar Sesión directo y seguro
+    const btnCerrar = document.getElementById("btn-cerrar-sesion");
+    if (btnCerrar) {
+      btnCerrar.addEventListener("click", () => {
+        localStorage.removeItem("adminSesion");
+        sessionStorage.removeItem("adminSesion");
+        localStorage.removeItem("usuarioLogueado");
+        window.location.href = "index.html";
+      });
+    }
   </script>
 
   <!-- Lógica de Supabase para el Carrusel de Inicio -->
@@ -883,6 +885,7 @@
             const h = parseInt(rangoMatch[2], 10);
             if (!Number.isNaN(d) && !Number.isNaN(h) && h >= d && h <= 200) {
               resultado[normalizarTextoClave(areaMatch.nombre)] = h - d + 1;
+              return;
             }
           }
         });
