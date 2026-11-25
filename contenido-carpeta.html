@@ -77,6 +77,7 @@
       font-weight: 600;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
       transition: transform 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
     }
 
     .btn-primary:hover {
@@ -97,7 +98,9 @@
       text-decoration: none;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
+      white-space: nowrap;
     }
 
     .btn-secondary:hover {
@@ -157,23 +160,35 @@
       gap: 14px;
       cursor: pointer;
       flex: 1;
+      min-width: 0;
+    }
+
+    .video-info > span {
+      flex-shrink: 0;
+    }
+
+    .video-info > div {
+      min-width: 0;
     }
 
     .video-title {
       font-size: 15px;
       font-weight: 600;
       color: #f8fafc;
+      word-break: break-word;
     }
 
     .video-desc {
       font-size: 12px;
       color: #94a3b8;
       margin-top: 3px;
+      word-break: break-word;
     }
 
     .video-actions {
       display: flex;
       gap: 8px;
+      flex-shrink: 0;
     }
 
     /* Modal */
@@ -186,6 +201,7 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      padding: 16px;
     }
 
     .modal-card {
@@ -227,6 +243,60 @@
       justify-content: flex-end;
       gap: 10px;
       margin-top: 5px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 14px 12px;
+      }
+
+      .main-container {
+        gap: 14px;
+      }
+
+      .top-bar {
+        padding: 14px 16px;
+        border-radius: 18px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+
+      .main-card {
+        padding: 20px 16px;
+        border-radius: 18px;
+      }
+
+      .header-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .header-section .btn-primary {
+        width: 100%;
+        padding: 11px 16px;
+      }
+
+      .video-item {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .video-actions {
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 8px;
+      }
+
+      .video-actions .btn-primary,
+      .video-actions .btn-secondary {
+        flex: 1 1 85px;
+        text-align: center;
+      }
     }
   </style>
 </head>
