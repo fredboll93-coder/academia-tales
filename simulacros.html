@@ -389,6 +389,62 @@
       }[m]));
     }
 
+    function normalizarTextoArea(txt) {
+      return String(txt || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\bciencias\b/gi, 'c.')
+        .replace(/\by\b/gi, 'y')
+        .replace(/[^a-zA-Z0-9]+/g, ' ')
+        .trim()
+        .toLowerCase();
+    }
+
+    function normalizarRespuestasAlumno(resp) {
+      if (!resp) return [];
+      if (Array.isArray(resp)) {
+        return resp.map((r) => {
+          if (r === null || r === undefined) return '';
+          if (typeof r === 'object') {
+            return String(r.respuesta ?? r.marcada ?? r.opcion ?? r.valor ?? '').trim().toUpperCase();
+          }
+          return String(r).trim().toUpperCase();
+        });
+      }
+      if (typeof resp === 'object') {
+        const clavesNum = Object.keys(resp)
+          .filter(k => /^\d+$/.test(String(k).trim()))
+          .sort((a, b) => Number(a) - Number(b));
+        if (clavesNum.length > 0) {
+          const maxIdx = Math.max(...clavesNum.map(Number));
+          const arr = new Array(maxIdx).fill('');
+          clavesNum.forEach((k) => {
+            const idx = Number(k) - 1;
+            if (idx >= 0) {
+              const v = resp[k];
+              arr[idx] = typeof v === 'object' && v !== null
+                ? String(v.respuesta ?? v.marcada ?? v.opcion ?? v.valor ?? '').trim().toUpperCase()
+                : String(v ?? '').trim().toUpperCase();
+            }
+          });
+          return arr;
+        }
+      }
+      if (typeof resp === 'string') {
+        const limp = resp.trim().toUpperCase();
+        if (limp.startsWith('[') || limp.startsWith('{')) {
+          try {
+            return normalizarRespuestasAlumno(JSON.parse(limp));
+          } catch (_) {}
+        }
+        if (limp.includes(',')) {
+          return limp.split(',').map(s => s.trim());
+        }
+        return limp.split('');
+      }
+      return [];
+    }
+
     function obtenerListaAreas(sim, alumnos) {
       const areasSet = [];
       const vistos = new Set();
@@ -396,7 +452,7 @@
       const agregarArea = (nombre) => {
         const limp = String(nombre || '').trim();
         if (!limp) return;
-        const clave = limp.toLowerCase();
+        const clave = normalizarTextoArea(limp);
         if (!vistos.has(clave)) {
           vistos.add(clave);
           areasSet.push(limp);
@@ -408,7 +464,7 @@
       }
 
       (Array.isArray(alumnos) ? alumnos : []).forEach((alu) => {
-        const mapa = alu?.correctasPorArea || alu?.areasCorrectas;
+        const mapa = alu?.correctasPorArea || alu?.areasCorrectas || alu?.aciertosPorArea || alu?.areas_correctas;
         if (mapa && typeof mapa === 'object') {
           Object.keys(mapa).forEach(agregarArea);
         }
@@ -421,31 +477,48 @@
     }
 
     function obtenerCorrectaEnArea(alumno, sim, nombreArea, listaResp, claves) {
+      const targetNorm = normalizarTextoArea(nombreArea);
+
       const buscarEnMapa = (mapa) => {
         if (!mapa || typeof mapa !== 'object') return undefined;
         if (mapa[nombreArea] !== undefined) return mapa[nombreArea];
-        const target = String(nombreArea).trim().toLowerCase();
         for (const [k, v] of Object.entries(mapa)) {
-          if (String(k).trim().toLowerCase() === target) return v;
+          if (normalizarTextoArea(k) === targetNorm) return v;
+          if (targetNorm && normalizarTextoArea(k).includes(targetNorm)) return v;
+          if (normalizarTextoArea(k) && targetNorm.includes(normalizarTextoArea(k))) return v;
         }
         return undefined;
       };
 
-      const desdeMapa = buscarEnMapa(alumno?.correctasPorArea) ?? buscarEnMapa(alumno?.areasCorrectas);
+      const desdeMapa =
+        buscarEnMapa(alumno?.correctasPorArea) ??
+        buscarEnMapa(alumno?.areasCorrectas) ??
+        buscarEnMapa(alumno?.aciertosPorArea) ??
+        buscarEnMapa(alumno?.areas_correctas);
+
       if (desdeMapa !== undefined && desdeMapa !== null && desdeMapa !== '') {
-        return desdeMapa;
+        if (typeof desdeMapa === 'object') {
+          const val = desdeMapa.correctas ?? desdeMapa.aciertos ?? desdeMapa.cantidad ?? desdeMapa.total;
+          if (val !== undefined && val !== null && val !== '') return Number(val) || 0;
+        } else {
+          return Number(desdeMapa) || 0;
+        }
       }
 
       const areasArr = Array.isArray(sim?.areas) ? sim.areas : [];
-      const areaObj = areasArr.find(a => String(a?.nombre || '').trim().toLowerCase() === String(nombreArea).trim().toLowerCase());
-      if (areaObj && claves && listaResp) {
+      const areaObj = areasArr.find((a) => {
+        const aNorm = normalizarTextoArea(a?.nombre || '');
+        return aNorm === targetNorm || (aNorm && targetNorm && (aNorm.includes(targetNorm) || targetNorm.includes(aNorm)));
+      });
+
+      if (areaObj && claves && Array.isArray(listaResp) && listaResp.length > 0) {
         const desde = Math.max(1, parseInt(areaObj.desde ?? areaObj.inicio ?? 1, 10) || 1);
         const hasta = Math.max(desde, parseInt(areaObj.hasta ?? areaObj.fin ?? desde, 10) || desde);
         let correctas = 0;
         for (let p = desde; p <= hasta; p++) {
-          const marca = listaResp[p - 1] || '';
-          const clave = claves[p - 1] || '';
-          if (marca && clave && marca === clave) {
+          const marca = String(listaResp[p - 1] || '').trim().toUpperCase();
+          const clave = String(claves[p - 1] || '').trim().toUpperCase();
+          if (marca && marca !== '-' && marca !== 'NONE' && clave && marca === clave) {
             correctas++;
           }
         }
@@ -460,17 +533,29 @@
       if (typeof alumno?.totalResueltas === 'number') return alumno.totalResueltas;
       if (typeof alumno?.resueltas === 'number') return alumno.resueltas;
 
-      const resp = alumno?.respuestas;
-      if (Array.isArray(resp)) {
-        return resp.filter(r => r !== null && r !== undefined && String(r).trim() !== '').length;
-      }
-      if (typeof resp === 'string' && resp.trim() !== '') {
-        return resp.trim().split('').filter(r => r.trim() !== '' && r.trim() !== '-').length;
+      const listaResp = normalizarRespuestasAlumno(alumno?.respuestas);
+      const contestadas = listaResp.filter(r => r !== '' && r !== '-' && r !== 'NONE' && r !== 'NULL' && r !== 'UNDEFINED');
+      if (contestadas.length > 0) {
+        return contestadas.length;
       }
 
       const correctas = Number(alumno?.correctas ?? alumno?.aciertos ?? 0) || 0;
       const incorrectas = Number(alumno?.incorrectas ?? alumno?.errores ?? 0) || 0;
-      if (correctas > 0 || incorrectas > 0) return correctas + incorrectas;
+      const enBlanco = Number(alumno?.enBlanco ?? alumno?.blanco ?? alumno?.omitidas ?? 0) || 0;
+      if (correctas > 0 || incorrectas > 0 || enBlanco > 0) {
+        return correctas + incorrectas;
+      }
+
+      const mapa = alumno?.correctasPorArea || alumno?.areasCorrectas || alumno?.aciertosPorArea || alumno?.areas_correctas;
+      if (mapa && typeof mapa === 'object') {
+        const sumaArea = Object.values(mapa).reduce((acc, v) => {
+          if (typeof v === 'object' && v !== null) {
+            return acc + (Number(v.correctas ?? v.aciertos ?? v.cantidad ?? 0) || 0);
+          }
+          return acc + (Number(v) || 0);
+        }, 0);
+        if (sumaArea > 0) return sumaArea;
+      }
 
       return sim?.preguntas ? '—' : 0;
     }
@@ -501,14 +586,13 @@
       const alumnosQueDieron = alumnosRaw.filter(a => {
         if (!a || typeof a !== 'object') return false;
         const tienePuntaje = a.puntaje !== undefined && a.puntaje !== null && a.puntaje !== '';
-        const tieneRespuestas = Array.isArray(a.respuestas)
-          ? a.respuestas.some(r => r !== null && r !== undefined && String(r).trim() !== '')
-          : (typeof a.respuestas === 'string' && a.respuestas.trim() !== '');
+        const respNorm = normalizarRespuestasAlumno(a.respuestas);
+        const tieneRespuestas = respNorm.some(r => r !== '' && r !== '-' && r !== 'NONE');
         return Boolean(a.rindio === true || a.finalizado === true || a.fecha_envio || tienePuntaje || tieneRespuestas);
       });
 
       const areasColumnas = obtenerListaAreas(sim, alumnosQueDieron);
-      const claves = String(sim?.claves || '').trim().toUpperCase();
+      const claves = String(sim?.claves || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
 
       const gruposKeys = sim?.grupos && typeof sim.grupos === 'object' ? Object.keys(sim.grupos) : [];
       const etiquetaGrupos = gruposKeys.length > 0
@@ -524,9 +608,7 @@
             const dni = escapeHtml(alu.codigo || alu.dni || alu.id || '—');
             const nombres = escapeHtml(alu.nombres || alu.nombre || alu.apellidosYnombres || alu.nombreAlumno || '—');
             const facultad = escapeHtml(alu.carrera || alu.especialidad || '—');
-            const listaResp = Array.isArray(alu?.respuestas)
-              ? alu.respuestas.map(r => String(r ?? '').trim().toUpperCase())
-              : (typeof alu?.respuestas === 'string' ? alu.respuestas.trim().toUpperCase().split('') : null);
+            const listaResp = normalizarRespuestasAlumno(alu?.respuestas);
 
             const celdasAreas = areasColumnas.map((area) => {
               const cant = obtenerCorrectaEnArea(alu, sim, area, listaResp, claves);
