@@ -1163,7 +1163,11 @@
         });
       }
 
+      window.__areasExamenActual = areasList;
+      window.__numPreguntasExamenActual = numPreguntas;
+
       let respuestasAlumno = {};
+      window.__respuestasExamenActual = respuestasAlumno;
 
       const tabsContainer = document.getElementById("contenedorAreasTabs");
       const preguntasContainer = document.getElementById("contenedorPreguntasArea");
@@ -1222,6 +1226,7 @@
       window.seleccionarRespuesta = function(preguntaNum, opcionLetra) {
         if (yaEnviadoEnSesion) return;
         respuestasAlumno[preguntaNum] = opcionLetra;
+        window.__respuestasExamenActual = respuestasAlumno;
         const grupo = document.getElementById(`grupo-preg-${preguntaNum}`);
         if (grupo) {
           grupo.querySelectorAll('.opcion-btn').forEach(btn => {
@@ -1601,14 +1606,59 @@
 
     let envioAutorizadoPorConfirmacion = false;
 
-    function obtenerPreguntasSinMarcar() {
-      const numsPreguntas = new Set();
+    function estaMarcada(preguntaNum, respuestasActuales) {
+      if (respuestasActuales && typeof respuestasActuales === "object") {
+        const val = respuestasActuales[preguntaNum];
+        if (val !== undefined && val !== null && String(val).trim() !== "") {
+          return true;
+        }
+      }
+      const grupo = document.getElementById(`grupo-preg-${preguntaNum}`);
+      if (grupo) {
+        return Boolean(grupo.querySelector(".opcion-btn.selected"));
+      }
+      return Boolean(document.querySelector(`.opcion-btn[data-pregunta="${preguntaNum}"].selected`));
+    }
 
+    function obtenerFaltantesPorArea() {
+      const respuestasActuales = window.__respuestasExamenActual || {};
+      const areas = Array.isArray(window.__areasExamenActual) ? window.__areasExamenActual : [];
+      const totalPreguntas = parseInt(window.__numPreguntasExamenActual, 10) || 0;
+
+      const porArea = [];
+      let totalFaltantes = 0;
+
+      if (areas.length > 0) {
+        areas.forEach((area, idx) => {
+          const desde = Math.max(1, parseInt(area?.desde, 10) || 1);
+          const hasta = Math.max(desde, parseInt(area?.hasta, 10) || totalPreguntas || desde);
+          const faltantesArea = [];
+
+          for (let p = desde; p <= hasta; p++) {
+            if (!estaMarcada(p, respuestasActuales)) {
+              faltantesArea.push(p);
+            }
+          }
+
+          if (faltantesArea.length > 0) {
+            totalFaltantes += faltantesArea.length;
+            porArea.push({
+              nombre: String(area?.nombre || `Área ${idx + 1}`).trim(),
+              faltantes: faltantesArea
+            });
+          }
+        });
+        return { porArea, totalFaltantes };
+      }
+
+      const numsPreguntas = new Set();
+      for (let p = 1; p <= totalPreguntas; p++) {
+        numsPreguntas.add(p);
+      }
       document.querySelectorAll("[data-pregunta]").forEach((el) => {
         const n = parseInt(el.getAttribute("data-pregunta"), 10);
         if (!Number.isNaN(n) && n > 0) numsPreguntas.add(n);
       });
-
       document.querySelectorAll(".pregunta-num").forEach((el) => {
         const match = (el.textContent || "").match(/\d+/);
         if (match) {
@@ -1618,23 +1668,25 @@
       });
 
       const ordenadas = Array.from(numsPreguntas).sort((a, b) => a - b);
-      const faltantes = [];
-
+      const faltantesGenerales = [];
       for (const p of ordenadas) {
-        const grupo = document.getElementById(`grupo-preg-${p}`);
-        const haySeleccion = grupo
-          ? Boolean(grupo.querySelector(".opcion-btn.selected"))
-          : Boolean(document.querySelector(`.opcion-btn[data-pregunta="${p}"].selected`));
-
-        if (!haySeleccion) {
-          faltantes.push(p);
+        if (!estaMarcada(p, respuestasActuales)) {
+          faltantesGenerales.push(p);
         }
       }
 
-      return faltantes;
+      if (faltantesGenerales.length > 0) {
+        totalFaltantes = faltantesGenerales.length;
+        porArea.push({
+          nombre: "Preguntas del examen",
+          faltantes: faltantesGenerales
+        });
+      }
+
+      return { porArea, totalFaltantes };
     }
 
-    // 1. Botón "Terminar y Enviar": exige que todas las preguntas estén marcadas
+    // 1. Botón "Terminar y Enviar": exige que todas las preguntas de todas las áreas estén marcadas
     if (btnTerminar) {
       btnTerminar.addEventListener(
         "click",
@@ -1648,17 +1700,28 @@
             return;
           }
 
-          const faltantes = obtenerPreguntasSinMarcar();
-          if (faltantes.length > 0) {
+          const { porArea, totalFaltantes } = obtenerFaltantesPorArea();
+          if (totalFaltantes > 0) {
             e.preventDefault();
             e.stopImmediatePropagation();
 
+            const detalleAreasHtml = porArea
+              .map(
+                (item) => `
+                  <div style="margin-bottom: 8px;">
+                    <div style="color: #93c5fd; font-weight: 700; font-size: 12px; margin-bottom: 3px;">${item.nombre}:</div>
+                    <div style="color: #fbbf24; font-weight: 700; word-break: break-word;">${item.faltantes.join(", ")}</div>
+                  </div>
+                `
+              )
+              .join("");
+
             titulo.textContent = "⚠️ Te faltan marcar preguntas";
             mensaje.innerHTML = `
-              Aún tienes preguntas sin marcar en tu cartilla. Debes marcar todas las preguntas antes de enviar tu examen.<br><br>
-              <b>${faltantes.length === 1 ? "Pregunta pendiente:" : "Preguntas pendientes:"}</b><br>
-              <div style="margin-top: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 10px; padding: 10px 12px; color: #fbbf24; font-weight: 700; word-break: break-word;">
-                ${faltantes.join(", ")}
+              Aún tienes preguntas sin marcar en tu examen. Debes marcar todas las preguntas de todas las áreas antes de enviar.<br><br>
+              <b>${totalFaltantes === 1 ? "Pregunta pendiente por área:" : "Preguntas pendientes por área:"}</b>
+              <div style="margin-top: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 10px; padding: 10px 12px;">
+                ${detalleAreasHtml}
               </div>
             `;
 
