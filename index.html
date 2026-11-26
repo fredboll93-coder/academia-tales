@@ -232,6 +232,40 @@
       line-height: 1.4;
     }
 
+    /* BOTÓN FLOTANTE WHATSAPP */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 150;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #ffffff;
+      text-decoration: none;
+      padding: 11px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 12px 24px -6px rgba(22, 163, 74, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .whatsapp-float:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 28px -6px rgba(22, 163, 74, 0.7);
+      background: linear-gradient(135deg, #16a34a, #15803d);
+    }
+
+    .whatsapp-float svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
     @media (max-width: 768px) {
       body {
         height: auto;
@@ -278,7 +312,7 @@
         margin-top: 0;
         height: auto;
         min-height: calc(100dvh - 135px);
-        padding: 12px 14px 20px;
+        padding: 12px 14px 76px;
       }
 
       .carousel-container {
@@ -303,6 +337,19 @@
         right: 14px;
         left: 14px;
         max-width: none;
+      }
+
+      .whatsapp-float {
+        bottom: 14px;
+        left: 14px;
+        padding: 9px 13px;
+        font-size: 12px;
+        gap: 7px;
+      }
+
+      .whatsapp-float svg {
+        width: 18px;
+        height: 18px;
       }
     }
 
@@ -352,7 +399,7 @@
         margin-top: 0;
         height: auto;
         min-height: auto;
-        padding: 10px 16px 16px;
+        padding: 10px 16px 64px;
       }
 
       .carousel-container {
@@ -370,6 +417,13 @@
 
       .slide-desc {
         font-size: 11px;
+      }
+
+      .whatsapp-float {
+        bottom: 10px;
+        left: 14px;
+        padding: 7px 12px;
+        font-size: 11.5px;
       }
     }
   </style>
@@ -400,6 +454,19 @@
       <!-- Carga dinámica -->
     </div>
   </main>
+
+  <a
+    href="https://wa.me/51990259827?text=Hola%20Academia%20TALES%2C%20quisiera%20comunicarme%20con%20ustedes."
+    target="_blank"
+    rel="noopener noreferrer"
+    class="whatsapp-float"
+    aria-label="Comunícate con nosotros por WhatsApp"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12.031 2c-5.516 0-9.969 4.374-9.969 9.769 0 1.724.456 3.405 1.322 4.889L2 22l5.502-1.416a10.056 10.056 0 0 0 4.529 1.077h.004c5.515 0 9.965-4.375 9.965-9.77 0-2.611-1.037-5.066-2.92-6.913C17.196 3.131 14.696 2 12.031 2Zm5.829 13.84c-.244.677-1.416 1.294-1.953 1.374-.526.078-1.19.111-1.922-.12-.443-.14-1.012-.326-1.741-.636-3.063-1.298-5.064-4.324-5.218-4.524-.154-.2-1.246-1.627-1.246-3.103 0-1.477.786-2.203 1.066-2.503.279-.3.611-.375.815-.375.204 0 .408.002.587.011.188.01.44-.07.688.515.254.6.867 2.078.943 2.228.076.15.127.326.025.526-.102.2-.153.326-.306.501-.153.175-.321.391-.459.526-.153.15-.312.313-.134.613.178.3.792 1.283 1.7 2.077 1.168 1.023 2.154 1.341 2.46 1.491.306.15.484.125.662-.075.178-.2.765-.876.969-1.176.204-.3.408-.25.688-.15.28.1 1.774.825 2.079.975.306.15.51.225.586.35.076.125.076.726-.168 1.403Z"/>
+    </svg>
+    <span>Comunícate con nosotros</span>
+  </a>
 
   <script type="module">
     import { supabase } from './supabaseClient.js';
