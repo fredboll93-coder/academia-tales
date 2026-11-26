@@ -14,139 +14,26 @@
       height: 100vh;
       background: #020617;
       color: #f8fafc;
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
-    }
-
-    /* BARRA SUPERIOR (HEADER) */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 40px;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(15px);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      height: 100px;
-    }
-
-    .brand-logo {
-      display: flex;
-      align-items: center;
-    }
-
-    .brand-logo img {
-      height: 120px;
-      width: auto;
-      object-fit: contain;
-    }
-
-    .login-top-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(30, 41, 59, 0.6);
-      padding: 8px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-    }
-
-    .input-compact {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: #fff;
-      font-size: 12px;
-      width: 130px;
-      outline: none;
-      transition: all 0.2s;
-    }
-
-    .input-compact:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
-    }
-
-    #pass-container {
-      display: none;
       position: relative;
-      align-items: center;
     }
 
-    #pass-container input {
-      padding-right: 32px;
-      width: 155px;
-    }
-
-    .btn-eye {
-      position: absolute;
-      right: 8px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #94a3b8;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s;
-    }
-
-    .btn-eye:hover { color: #38bdf8; }
-
-    .btn-compact {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .btn-compact:hover {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      transform: translateY(-1px);
-    }
-
-    .btn-compact:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
-
-    main {
-      margin-top: 100px;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      height: calc(100vh - 100px);
-    }
-
+    /* CARRUSEL A PANTALLA COMPLETA DE FONDO */
     .carousel-container {
+      position: fixed;
+      inset: 0;
       width: 100%;
-      max-width: 1050px;
-      height: 480px;
-      position: relative;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.15);
+      height: 100%;
+      z-index: 0;
       background: #0f172a;
+      overflow: hidden;
     }
 
     .slide {
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       opacity: 0;
       transition: opacity 0.8s ease-in-out;
       display: flex;
@@ -161,7 +48,7 @@
 
     .slide-img {
       position: absolute;
-      top: 0; left: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -173,40 +60,52 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      padding: 30px 40px;
-      background: linear-gradient(to top, rgba(2, 6, 23, 0.95) 0%, rgba(2, 6, 23, 0.4) 60%, transparent 100%);
+      padding: 44px 48px;
+      padding-right: 480px;
+      background: linear-gradient(to top, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.45) 55%, transparent 100%);
+    }
+
+    .slide-badge {
+      display: inline-block;
+      border-left: 4px solid #38bdf8;
+      padding-left: 14px;
     }
 
     .slide-title {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 800;
-      color: #38bdf8;
-      margin-bottom: 6px;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 10px rgba(2, 6, 23, 0.8);
     }
 
     .slide-desc {
-      font-size: 13px;
-      color: #cbd5e1;
-      max-width: 600px;
-      line-height: 1.4;
+      font-size: 14px;
+      color: #e2e8f0;
+      max-width: 560px;
+      line-height: 1.45;
+      text-shadow: 0 1px 6px rgba(2, 6, 23, 0.8);
     }
 
     .dots-container {
-      position: absolute;
-      bottom: 20px;
-      right: 30px;
+      position: fixed;
+      bottom: 24px;
+      left: 48px;
       display: flex;
       gap: 8px;
-      z-index: 10;
+      z-index: 20;
     }
 
     .dot {
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.45);
       cursor: pointer;
       transition: all 0.3s;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
     }
 
     .dot.active {
@@ -215,132 +114,291 @@
       border-radius: 10px;
     }
 
-    #alerta-top {
+    /* PANEL LATERAL DE LOGIN (ESTILO VIDRIO TRANSLÚCIDO COMO PAMER) */
+    .login-glass-panel {
       position: fixed;
-      top: 115px;
-      right: 40px;
-      background: rgba(239, 68, 68, 0.95);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 600;
-      display: none;
-      z-index: 200;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-      max-width: 400px;
-      line-height: 1.4;
+      top: 0;
+      right: 7%;
+      width: 390px;
+      height: 100vh;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.62);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-left: 1px solid rgba(255, 255, 255, 0.16);
+      border-right: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 36px 34px;
     }
 
-    /* BOTÓN FLOTANTE WHATSAPP */
-    .whatsapp-float {
-      position: fixed;
-      bottom: 18px;
-      left: 20px;
-      z-index: 150;
+    .brand-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .brand-logo img {
+      height: 115px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 16px rgba(2, 6, 23, 0.5));
+    }
+
+    .login-subtitle {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: #cbd5e1;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .login-title {
+      font-size: 27px;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .login-form-box {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .input-group {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      color: #94a3b8;
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .input-modern {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      padding: 13px 18px 13px 44px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-modern::placeholder {
+      color: #cbd5e1;
+    }
+
+    .input-modern:focus {
+      background: rgba(15, 23, 42, 0.72);
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+    }
+
+    #pass-container {
+      display: none;
+      position: relative;
+      width: 100%;
+      align-items: center;
+    }
+
+    #pass-container input {
+      padding-right: 44px;
+    }
+
+    .btn-eye {
+      position: absolute;
+      right: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #cbd5e1;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .btn-eye:hover { color: #38bdf8; }
+
+    .btn-modern {
+      margin-top: 6px;
+      width: 100%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #ffffff;
+      border: none;
+      padding: 13px 20px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 10px 24px -6px rgba(37, 99, 235, 0.65);
+    }
+
+    .btn-modern:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px -6px rgba(37, 99, 235, 0.8);
+    }
+
+    .btn-modern:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* WHATSAPP DENTRO DEL PANEL DE LOGIN */
+    .whatsapp-login-link {
+      margin-top: 26px;
       display: inline-flex;
       flex-direction: column;
       align-items: center;
       gap: 5px;
-      background: transparent;
       text-decoration: none;
       transition: transform 0.2s ease;
     }
 
-    .whatsapp-float:hover {
+    .whatsapp-login-link:hover {
       transform: translateY(-2px);
     }
 
-    .whatsapp-float svg {
-      width: 48px;
-      height: 48px;
+    .whatsapp-login-link svg {
+      width: 44px;
+      height: 44px;
       color: #0f172a;
       stroke: #ffffff;
       stroke-width: 1.5px;
       paint-order: stroke fill;
-      filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px rgba(255, 255, 255, 0.75)) drop-shadow(0 4px 10px rgba(2, 6, 23, 0.95));
+      filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px rgba(255, 255, 255, 0.7)) drop-shadow(0 4px 10px rgba(2, 6, 23, 0.9));
       transition: color 0.2s ease, filter 0.2s ease;
     }
 
-    .whatsapp-float:hover svg {
+    .whatsapp-login-link:hover svg {
       color: #1e3a8a;
       filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 11px rgba(255, 255, 255, 0.9)) drop-shadow(0 6px 12px rgba(2, 6, 23, 0.95));
     }
 
-    .whatsapp-float span {
+    .whatsapp-login-link span {
       color: #ffffff;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 800;
       letter-spacing: 0.2px;
       text-align: center;
       line-height: 1.25;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.55), 0 2px 6px rgba(2, 6, 23, 0.98);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(2, 6, 23, 0.95);
     }
 
+    #alerta-top {
+      position: fixed;
+      top: 22px;
+      left: 24px;
+      background: rgba(239, 68, 68, 0.95);
+      color: white;
+      padding: 13px 20px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: none;
+      z-index: 200;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+      max-width: 420px;
+      line-height: 1.4;
+    }
+
+    /* TABLET */
+    @media (max-width: 1024px) {
+      .login-glass-panel {
+        right: 3%;
+        width: 350px;
+        padding: 28px 26px;
+      }
+
+      .slide-overlay {
+        padding: 36px 32px;
+        padding-right: 400px;
+      }
+    }
+
+    /* CELULAR */
     @media (max-width: 768px) {
       body {
         height: auto;
         min-height: 100dvh;
         overflow-y: auto;
         overflow-x: hidden;
-      }
-
-      header {
-        position: relative;
-        height: auto;
-        padding: 10px 14px;
+        display: flex;
         flex-direction: column;
-        gap: 8px;
-      }
-
-      .brand-logo img {
-        height: 54px;
-      }
-
-      .login-top-right {
-        width: 100%;
-        flex-wrap: wrap;
         justify-content: center;
-        padding: 8px;
-        gap: 8px;
-      }
-
-      .input-compact,
-      #pass-container,
-      #pass-container input {
-        flex: 1 1 130px;
-        width: 100%;
-        min-width: 0;
-        font-size: 13px;
-      }
-
-      .btn-compact {
-        padding: 9px 14px;
-        font-size: 13px;
-      }
-
-      main {
-        margin-top: 0;
-        height: auto;
-        min-height: calc(100dvh - 135px);
-        padding: 12px 14px 76px;
-      }
-
-      .carousel-container {
-        height: 300px;
-        border-radius: 18px;
+        align-items: center;
+        padding: 20px 14px;
       }
 
       .slide-overlay {
-        padding: 18px;
+        padding: 20px 18px;
+        padding-right: 18px;
       }
 
       .slide-title {
-        font-size: 18px;
+        font-size: 17px;
       }
 
       .slide-desc {
         font-size: 12px;
+      }
+
+      .dots-container {
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .login-glass-panel {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100%;
+        max-width: 390px;
+        height: auto;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 28px 22px;
+        margin: auto 0;
+      }
+
+      .brand-logo img {
+        height: 86px;
+      }
+
+      .login-title {
+        font-size: 22px;
+        margin-bottom: 20px;
       }
 
       #alerta-top {
@@ -349,145 +407,117 @@
         left: 14px;
         max-width: none;
       }
-
-      .whatsapp-float {
-        bottom: 14px;
-        left: 14px;
-        gap: 4px;
-      }
-
-      .whatsapp-float svg {
-        width: 42px;
-        height: 42px;
-      }
-
-      .whatsapp-float span {
-        font-size: 12px;
-      }
     }
 
-    @media (max-height: 520px) and (orientation: landscape) {
+    /* HORIZONTAL EN PANTALLAS BAJAS */
+    @media (max-height: 540px) and (orientation: landscape) {
       body {
         height: auto;
         min-height: 100dvh;
         overflow-y: auto;
+        padding: 14px;
       }
 
-      header {
+      .login-glass-panel {
         position: relative;
+        top: auto;
+        right: auto;
+        margin-left: auto;
         height: auto;
-        padding: 6px 16px;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 8px;
+        width: 340px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 18px 20px;
+      }
+
+      .brand-logo {
+        margin-bottom: 8px;
       }
 
       .brand-logo img {
-        height: 40px;
+        height: 62px;
       }
 
-      .login-top-right {
-        width: auto;
-        flex: 1;
-        justify-content: flex-end;
-        padding: 6px 10px;
-        gap: 6px;
+      .login-title {
+        font-size: 19px;
+        margin-bottom: 12px;
       }
 
-      .input-compact {
-        width: 125px;
-        padding: 6px 10px;
+      .input-modern {
+        padding: 10px 16px 10px 40px;
       }
 
-      #pass-container input {
-        width: 140px;
-        padding: 6px 28px 6px 10px;
+      .btn-modern {
+        padding: 10px 16px;
       }
 
-      .btn-compact {
-        padding: 6px 12px;
+      .whatsapp-login-link {
+        margin-top: 12px;
       }
 
-      main {
-        margin-top: 0;
-        height: auto;
-        min-height: auto;
-        padding: 10px 16px 64px;
-      }
-
-      .carousel-container {
-        height: 220px;
-        border-radius: 16px;
-      }
-
-      .slide-overlay {
-        padding: 14px 20px;
-      }
-
-      .slide-title {
-        font-size: 16px;
-      }
-
-      .slide-desc {
-        font-size: 11px;
-      }
-
-      .whatsapp-float {
-        bottom: 10px;
-        left: 14px;
-        gap: 3px;
-      }
-
-      .whatsapp-float svg {
-        width: 36px;
-        height: 36px;
-      }
-
-      .whatsapp-float span {
-        font-size: 11px;
+      .whatsapp-login-link svg {
+        width: 34px;
+        height: 34px;
       }
     }
   </style>
 </head>
 <body>
 
-  <header>
+  <!-- CARRUSEL DE FONDO -->
+  <div class="carousel-container" id="carousel-wrapper">
+    <!-- Carga dinámica -->
+  </div>
+
+  <!-- PANEL TRANSLÚCIDO DE ACCESO -->
+  <aside class="login-glass-panel">
     <div class="brand-logo">
       <img src="./logo.png" alt="Logo Academia Tales" fetchpriority="high" />
     </div>
 
-    <div class="login-top-right">
-      <input type="text" id="input-codigo" class="input-compact" placeholder="Código / DNI" autocomplete="off" />
-      
+    <div class="login-subtitle">Tu espacio para aprender</div>
+    <h1 class="login-title">Bienvenido</h1>
+
+    <div class="login-form-box">
+      <div class="input-group">
+        <span class="input-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c1.8-3.6 5-5.5 8-5.5s6.2 1.9 8 5.5" stroke-linecap="round" />
+          </svg>
+        </span>
+        <input type="text" id="input-codigo" class="input-modern" placeholder="Código / DNI" autocomplete="off" />
+      </div>
+
       <div id="pass-container">
-        <input type="password" id="input-pass" class="input-compact" placeholder="Ingrese su contraseña" />
+        <span class="input-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <rect x="5" y="11" width="14" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke-linecap="round" />
+          </svg>
+        </span>
+        <input type="password" id="input-pass" class="input-modern" placeholder="Ingrese su contraseña" />
         <button type="button" class="btn-eye" id="btn-toggle-pass" onclick="togglePassword()">👁️</button>
       </div>
 
-      <button type="button" class="btn-compact" id="btn-accion" onclick="procesarIngreso()">Ingresar</button>
+      <button type="button" class="btn-modern" id="btn-accion" onclick="procesarIngreso()">Ingresar</button>
     </div>
-  </header>
+
+    <a
+      href="https://wa.me/51990259827?text=Hola%20Academia%20TALES%2C%20quisiera%20comunicarme%20con%20ustedes."
+      target="_blank"
+      rel="noopener noreferrer"
+      class="whatsapp-login-link"
+      aria-label="Comunícate con nosotros por WhatsApp"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12.031 2c-5.516 0-9.969 4.374-9.969 9.769 0 1.724.456 3.405 1.322 4.889L2 22l5.502-1.416a10.056 10.056 0 0 0 4.529 1.077h.004c5.515 0 9.965-4.375 9.965-9.77 0-2.611-1.037-5.066-2.92-6.913C17.196 3.131 14.696 2 12.031 2Zm5.829 13.84c-.244.677-1.416 1.294-1.953 1.374-.526.078-1.19.111-1.922-.12-.443-.14-1.012-.326-1.741-.636-3.063-1.298-5.064-4.324-5.218-4.524-.154-.2-1.246-1.627-1.246-3.103 0-1.477.786-2.203 1.066-2.503.279-.3.611-.375.815-.375.204 0 .408.002.587.011.188.01.44-.07.688.515.254.6.867 2.078.943 2.228.076.15.127.326.025.526-.102.2-.153.326-.306.501-.153.175-.321.391-.459.526-.153.15-.312.313-.134.613.178.3.792 1.283 1.7 2.077 1.168 1.023 2.154 1.341 2.46 1.491.306.15.484.125.662-.075.178-.2.765-.876.969-1.176.204-.3.408-.25.688-.15.28.1 1.774.825 2.079.975.306.15.51.225.586.35.076.125.076.726-.168 1.403Z"/>
+      </svg>
+      <span>Comunícate con nosotros</span>
+    </a>
+  </aside>
 
   <div id="alerta-top"></div>
-
-  <main>
-    <div class="carousel-container" id="carousel-wrapper">
-      <!-- Carga dinámica -->
-    </div>
-  </main>
-
-  <a
-    href="https://wa.me/51990259827?text=Hola%20Academia%20TALES%2C%20quisiera%20comunicarme%20con%20ustedes."
-    target="_blank"
-    rel="noopener noreferrer"
-    class="whatsapp-float"
-    aria-label="Comunícate con nosotros por WhatsApp"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12.031 2c-5.516 0-9.969 4.374-9.969 9.769 0 1.724.456 3.405 1.322 4.889L2 22l5.502-1.416a10.056 10.056 0 0 0 4.529 1.077h.004c5.515 0 9.965-4.375 9.965-9.77 0-2.611-1.037-5.066-2.92-6.913C17.196 3.131 14.696 2 12.031 2Zm5.829 13.84c-.244.677-1.416 1.294-1.953 1.374-.526.078-1.19.111-1.922-.12-.443-.14-1.012-.326-1.741-.636-3.063-1.298-5.064-4.324-5.218-4.524-.154-.2-1.246-1.627-1.246-3.103 0-1.477.786-2.203 1.066-2.503.279-.3.611-.375.815-.375.204 0 .408.002.587.011.188.01.44-.07.688.515.254.6.867 2.078.943 2.228.076.15.127.326.025.526-.102.2-.153.326-.306.501-.153.175-.321.391-.459.526-.153.15-.312.313-.134.613.178.3.792 1.283 1.7 2.077 1.168 1.023 2.154 1.341 2.46 1.491.306.15.484.125.662-.075.178-.2.765-.876.969-1.176.204-.3.408-.25.688-.15.28.1 1.774.825 2.079.975.306.15.51.225.586.35.076.125.076.726-.168 1.403Z"/>
-    </svg>
-    <span>Comunícate con nosotros</span>
-  </a>
 
   <script type="module">
     import { supabase } from './supabaseClient.js';
@@ -565,8 +595,10 @@
             <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} />
             ${tieneTexto ? `
               <div class="slide-overlay">
-                ${s.titulo ? `<div class="slide-title">${s.titulo}</div>` : ''}
-                ${s.descripcion ? `<div class="slide-desc">${s.descripcion}</div>` : ''}
+                <div class="slide-badge">
+                  ${s.titulo ? `<div class="slide-title">${s.titulo}</div>` : ''}
+                  ${s.descripcion ? `<div class="slide-desc">${s.descripcion}</div>` : ''}
+                </div>
               </div>
             ` : ''}
           </div>
