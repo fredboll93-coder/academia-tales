@@ -451,9 +451,9 @@
 
       const agregarArea = (nombre) => {
         const limp = String(nombre || '').trim();
-        if (!limp) return;
+        if (!limp || /^\d+$/.test(limp)) return;
         const clave = normalizarTextoArea(limp);
-        if (!vistos.has(clave)) {
+        if (!clave || !vistos.has(clave)) {
           vistos.add(clave);
           areasSet.push(limp);
         }
@@ -463,12 +463,14 @@
         sim.areas.forEach((a, idx) => agregarArea(a?.nombre || `ÁREA ${idx + 1}`));
       }
 
-      (Array.isArray(alumnos) ? alumnos : []).forEach((alu) => {
-        const mapa = alu?.correctasPorArea || alu?.areasCorrectas || alu?.aciertosPorArea || alu?.areas_correctas;
-        if (mapa && typeof mapa === 'object') {
-          Object.keys(mapa).forEach(agregarArea);
-        }
-      });
+      if (areasSet.length === 0) {
+        (Array.isArray(alumnos) ? alumnos : []).forEach((alu) => {
+          const mapa = alu?.correctasPorArea || alu?.areasCorrectas || alu?.aciertosPorArea || alu?.areas_correctas;
+          if (mapa && typeof mapa === 'object') {
+            Object.keys(mapa).forEach(agregarArea);
+          }
+        });
+      }
 
       if (areasSet.length === 0) {
         return ['MATEMÁTICAS', 'C. SOCIALES', 'C. Y TECNOLOGÍA', 'COMUNICACIÓN', 'INGLÉS'];
@@ -483,6 +485,7 @@
         if (!mapa || typeof mapa !== 'object') return undefined;
         if (mapa[nombreArea] !== undefined) return mapa[nombreArea];
         for (const [k, v] of Object.entries(mapa)) {
+          if (/^\d+$/.test(String(k).trim())) continue;
           if (normalizarTextoArea(k) === targetNorm) return v;
           if (targetNorm && normalizarTextoArea(k).includes(targetNorm)) return v;
           if (normalizarTextoArea(k) && targetNorm.includes(normalizarTextoArea(k))) return v;
@@ -526,38 +529,6 @@
       }
 
       return 0;
-    }
-
-    function obtenerTotalResueltas(alumno, sim) {
-      if (typeof alumno?.preguntasResueltas === 'number') return alumno.preguntasResueltas;
-      if (typeof alumno?.totalResueltas === 'number') return alumno.totalResueltas;
-      if (typeof alumno?.resueltas === 'number') return alumno.resueltas;
-
-      const listaResp = normalizarRespuestasAlumno(alumno?.respuestas);
-      const contestadas = listaResp.filter(r => r !== '' && r !== '-' && r !== 'NONE' && r !== 'NULL' && r !== 'UNDEFINED');
-      if (contestadas.length > 0) {
-        return contestadas.length;
-      }
-
-      const correctas = Number(alumno?.correctas ?? alumno?.aciertos ?? 0) || 0;
-      const incorrectas = Number(alumno?.incorrectas ?? alumno?.errores ?? 0) || 0;
-      const enBlanco = Number(alumno?.enBlanco ?? alumno?.blanco ?? alumno?.omitidas ?? 0) || 0;
-      if (correctas > 0 || incorrectas > 0 || enBlanco > 0) {
-        return correctas + incorrectas;
-      }
-
-      const mapa = alumno?.correctasPorArea || alumno?.areasCorrectas || alumno?.aciertosPorArea || alumno?.areas_correctas;
-      if (mapa && typeof mapa === 'object') {
-        const sumaArea = Object.values(mapa).reduce((acc, v) => {
-          if (typeof v === 'object' && v !== null) {
-            return acc + (Number(v.correctas ?? v.aciertos ?? v.cantidad ?? 0) || 0);
-          }
-          return acc + (Number(v) || 0);
-        }, 0);
-        if (sumaArea > 0) return sumaArea;
-      }
-
-      return sim?.preguntas ? '—' : 0;
     }
 
     function obtenerPuntajeFinal(alumno) {
@@ -610,12 +581,14 @@
             const facultad = escapeHtml(alu.carrera || alu.especialidad || '—');
             const listaResp = normalizarRespuestasAlumno(alu?.respuestas);
 
+            let sumaCorrectasAreas = 0;
             const celdasAreas = areasColumnas.map((area) => {
-              const cant = obtenerCorrectaEnArea(alu, sim, area, listaResp, claves);
+              const cant = Number(obtenerCorrectaEnArea(alu, sim, area, listaResp, claves)) || 0;
+              sumaCorrectasAreas += cant;
               return `<td class="num-cell">${escapeHtml(cant)}</td>`;
             }).join('');
 
-            const resueltas = escapeHtml(obtenerTotalResueltas(alu, sim));
+            const resueltas = escapeHtml(sumaCorrectasAreas);
             const puntajeFinal = escapeHtml(obtenerPuntajeFinal(alu));
 
             return `
