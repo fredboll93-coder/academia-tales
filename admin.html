@@ -471,17 +471,67 @@
 
     let imagenBase64Temp = "";
 
-    inputFile.addEventListener("change", (e) => {
+    function optimizarImagenCarrusel(file, maxAncho = 1600, calidad = 0.82) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("No se pudo leer el archivo."));
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onerror = () => reject(new Error("Archivo de imagen no válido."));
+          img.onload = () => {
+            let ancho = img.width;
+            let alto = img.height;
+            if (ancho > maxAncho) {
+              alto = Math.round((alto * maxAncho) / ancho);
+              ancho = maxAncho;
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = ancho;
+            canvas.height = alto;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, ancho, alto);
+
+            const tipoSalida = file.type === "image/png" ? "image/png" : "image/jpeg";
+            const resultado = tipoSalida === "image/jpeg"
+              ? canvas.toDataURL("image/jpeg", calidad)
+              : canvas.toDataURL("image/png");
+
+            resolve(resultado);
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function guardarCacheCarruselSeguro(items) {
+      try {
+        localStorage.setItem("carruselTalesLocal", JSON.stringify(items));
+        return true;
+      } catch (e) {
+        try {
+          const versionLiviana = items.map(it => ({
+            ...it,
+            imagen_url: it.imagen_url && it.imagen_url.startsWith("data:") ? "" : it.imagen_url
+          }));
+          localStorage.setItem("carruselTalesLocal", JSON.stringify(versionLiviana));
+        } catch (err2) {}
+        return false;
+      }
+    }
+
+    inputFile.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) {
         imagenBase64Temp = "";
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        imagenBase64Temp = ev.target.result;
-      };
-      reader.readAsDataURL(file);
+      try {
+        imagenBase64Temp = await optimizarImagenCarrusel(file);
+      } catch (err) {
+        imagenBase64Temp = "";
+        alert("No se pudo procesar la imagen seleccionada.");
+      }
     });
 
     btnAbrirCarrusel.addEventListener("click", () => {
@@ -507,9 +557,11 @@
           .select('*')
           .order('id', { ascending: true });
 
-        if (!error && data) {
+        if (!error && Array.isArray(data)) {
           listaItems = data;
-          localStorage.setItem('carruselTalesLocal', JSON.stringify(data));
+          guardarCacheCarruselSeguro(data);
+        } else {
+          listaItems = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
         }
       } catch (e) {
         try {
@@ -537,7 +589,7 @@
     }
 
     btnSubirCarrusel.addEventListener("click", async () => {
-      if (!imagenBase64Temp) {
+      if (!imagenBase64Temp && !inputFile.files?.[0]) {
         alert("Por favor selecciona una imagen desde tu computadora.");
         return;
       }
@@ -548,19 +600,36 @@
       btnSubirCarrusel.disabled = true;
       btnSubirCarrusel.textContent = "Guardando...";
 
-      const nuevoItem = {
-        id: Date.now(),
-        imagen_url: imagenBase64Temp,
-        titulo: titulo,
-        descripcion: descripcion
-      };
-
       try {
-        let local = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
-        local.push(nuevoItem);
-        localStorage.setItem('carruselTalesLocal', JSON.stringify(local));
+        if (!imagenBase64Temp && inputFile.files?.[0]) {
+          imagenBase64Temp = await optimizarImagenCarrusel(inputFile.files[0]);
+        }
 
-        await supabase.from('carrusel_login').insert([nuevoItem]);
+        const nuevoItem = {
+          id: Date.now(),
+          imagen_url: imagenBase64Temp,
+          titulo: titulo,
+          descripcion: descripcion
+        };
+
+        const { error: errorInsert } = await supabase
+          .from('carrusel_login')
+          .insert([nuevoItem]);
+
+        if (errorInsert) {
+          console.error("Error al guardar en Supabase:", errorInsert);
+          alert("No se pudo guardar la imagen en la base de datos: " + (errorInsert.message || "Error desconocido"));
+          return;
+        }
+
+        let local = [];
+        try {
+          local = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
+        } catch (e) {
+          local = [];
+        }
+        local.push(nuevoItem);
+        guardarCacheCarruselSeguro(local);
 
         inputFile.value = "";
         document.getElementById("input-carrusel-titulo").value = "";
@@ -569,6 +638,7 @@
         await cargarImagenesCarrusel();
       } catch (err) {
         console.error("Error al guardar:", err);
+        alert("Ocurrió un error al guardar la imagen del carrusel.");
       } finally {
         btnSubirCarrusel.disabled = false;
         btnSubirCarrusel.textContent = "Guardar Imagen en Carrusel";
@@ -578,11 +648,26 @@
     window.eliminarSlideCarrusel = async function(id) {
       if (confirm("¿Eliminar esta imagen del carrusel?")) {
         try {
-          let local = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
-          local = local.filter(item => item.id !== id);
-          localStorage.setItem('carruselTalesLocal', JSON.stringify(local));
+          const { error: errorDelete } = await supabase
+            .from('carrusel_login')
+            .delete()
+            .eq('id', id);
 
-          await supabase.from('carrusel_login').delete().eq('id', id);
+          if (errorDelete) {
+            console.error("Error al eliminar en Supabase:", errorDelete);
+            alert("No se pudo eliminar la imagen de la base de datos.");
+            return;
+          }
+
+          let local = [];
+          try {
+            local = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
+          } catch (e) {
+            local = [];
+          }
+          local = local.filter(item => String(item.id) !== String(id));
+          guardarCacheCarruselSeguro(local);
+
           await cargarImagenesCarrusel();
         } catch (err) {
           console.error("Error al eliminar:", err);
