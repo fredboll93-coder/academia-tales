@@ -522,7 +522,9 @@
 
   <!-- CARRUSEL DE FONDO -->
   <div class="carousel-container" id="carousel-wrapper">
-    <!-- Carga dinámica -->
+    <div class="slide active" style="transition: none;">
+      <img src="./banner-1.jpg" alt="Banner Academia Tales" class="slide-img" fetchpriority="high" loading="eager" decoding="sync" onerror="this.style.display='none'" />
+    </div>
   </div>
 
   <!-- PANEL TRANSLÚCIDO DE ACCESO -->
@@ -588,13 +590,14 @@
       if (!slidesCache.length) return;
 
       const wrapper = document.getElementById('carousel-wrapper');
-      if (!wrapper || wrapper.children.length > 0) return;
+      if (!wrapper) return;
 
       const htmlSlides = slidesCache.map((s, idx) => {
         const tieneTexto = (s.titulo && s.titulo.trim() !== '') || (s.descripcion && s.descripcion.trim() !== '');
         const prioridad = idx === 0 ? 'fetchpriority="high" loading="eager" decoding="sync"' : 'loading="eager" decoding="async"';
+        const estiloSlide = idx === 0 ? ' style="transition: none;"' : '';
         return `
-          <div class="slide ${idx === 0 ? 'active' : ''}">
+          <div class="slide ${idx === 0 ? 'active' : ''}"${estiloSlide}>
             <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} />
             ${tieneTexto ? `
               <div class="slide-overlay">
@@ -625,7 +628,7 @@
           document.body.prepend(fondoEl);
         }
         fondoEl.innerHTML = slidesCache.map((s, i) =>
-          `<img src="${s.imagen_url}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:${i === 0 ? '0.52' : '0'};transition:opacity 0.8s ease-in-out;" />`
+          `<img src="${s.imagen_url}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:${i === 0 ? '0.52' : '0'};transition:${i === 0 ? 'none' : 'opacity 0.8s ease-in-out'};" />`
         ).join('');
       }
     })();
@@ -725,6 +728,15 @@
       if (validosLocal.length > 0) {
         currentSlide = 0;
         renderizarCarruselUI(validosLocal);
+      } else {
+        const slidesInicialesDom = Array.from(document.querySelectorAll('#carousel-wrapper .slide-img'))
+          .map(img => ({ imagen_url: img.getAttribute('src') || '', titulo: '', descripcion: '' }))
+          .filter(s => s.imagen_url.trim() !== '');
+        if (slidesInicialesDom.length > 0) {
+          totalSlides = slidesInicialesDom.length;
+          adaptarCuadroCarruselAImagen(0);
+          sincronizarFondoCarruselMovil();
+        }
       }
 
       try {
@@ -740,7 +752,7 @@
           const firmaActual = JSON.stringify(validosLocal.map(x => [x.id, x.imagen_url, x.titulo, x.descripcion]));
           const firmaNueva = JSON.stringify(slidesBD.map(x => [x.id, x.imagen_url, x.titulo, x.descripcion]));
 
-          if (firmaActual !== firmaNueva || document.getElementById('carousel-wrapper').children.length === 0) {
+          if (slidesBD.length > 0 && (firmaActual !== firmaNueva || validosLocal.length === 0)) {
             currentSlide = 0;
             renderizarCarruselUI(slidesBD);
           } else {
@@ -769,8 +781,9 @@
       let htmlSlides = lista.map((s, idx) => {
         const tieneTexto = (s.titulo && s.titulo.trim() !== '') || (s.descripcion && s.descripcion.trim() !== '');
         const prioridad = idx === 0 ? 'fetchpriority="high" loading="eager" decoding="sync"' : 'loading="eager" decoding="async"';
+        const estiloSlide = idx === 0 ? ' style="transition: none;"' : '';
         return `
-          <div class="slide ${idx === 0 ? 'active' : ''}">
+          <div class="slide ${idx === 0 ? 'active' : ''}"${estiloSlide}>
             <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} />
             ${tieneTexto ? `
               <div class="slide-overlay">
@@ -1215,3 +1228,4 @@
   </script>
 </body>
 </html>
+```[cite: 14]
