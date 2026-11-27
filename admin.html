@@ -1412,7 +1412,200 @@
     })();
   </script>
 
+  <!-- Botones masivos (Habilitar/Deshabilitar todos y Eliminar todos) junto al buscador en 5. ALUMNOS MATRICULADOS -->
+  <script>
+    (() => {
+      let estadoMasivoHabilitado = true;
+
+      function obtenerContenedorSeccion5() {
+        const candidatos = Array.from(document.querySelectorAll("h1, h2, h3, h4, p, div, span"));
+        const tituloSec5 = candidatos.find(
+          (el) => el.children.length === 0 && /5\.\s*ALUMNOS\s+MATRICULADOS/i.test((el.textContent || "").trim())
+        );
+        if (!tituloSec5) return null;
+
+        let cont = tituloSec5.parentElement;
+        while (cont && cont !== document.body) {
+          const buscador = cont.querySelector('input[placeholder*="Buscar alumno" i]');
+          if (buscador) return cont;
+          cont = cont.parentElement;
+        }
+        return tituloSec5.parentElement;
+      }
+
+      function obtenerFilasAlumnosEnSec5(sec5) {
+        if (!sec5) return [];
+        const buscador = sec5.querySelector('input[placeholder*="Buscar alumno" i]');
+        const todosDivs = Array.from(sec5.querySelectorAll("div"));
+
+        return todosDivs.filter((div) => {
+          if (div.contains(buscador)) return false;
+          const texto = (div.textContent || "").trim();
+          if (!texto) return false;
+          const tieneBotonEliminar = Array.from(div.querySelectorAll("button")).some((b) =>
+            /^eliminar$/i.test((b.textContent || "").trim())
+          );
+          if (!tieneBotonEliminar) return false;
+          // Evitar contenedores padres que engloben múltiples filas de alumnos
+          const subFilasConEliminar = Array.from(div.querySelectorAll("div")).filter((sub) =>
+            Array.from(sub.querySelectorAll("button")).some((b) => /^eliminar$/i.test((b.textContent || "").trim()))
+          );
+          return subFilasConEliminar.length === 0;
+        });
+      }
+
+      function alternarEstadoTodosLosAlumnos(sec5, btnToggle) {
+        const filas = obtenerFilasAlumnosEnSec5(sec5);
+        if (!filas.length) {
+          alert("No hay alumnos guardados en esta universidad.");
+          return;
+        }
+
+        const habilitarDestino = !estadoMasivoHabilitado;
+
+        filas.forEach((fila) => {
+          const elementosEstado = Array.from(fila.querySelectorAll("button, span, label, input[type='checkbox']"));
+          const controlEstado = elementosEstado.find((el) => {
+            if (el.type === "checkbox") return true;
+            const txt = (el.textContent || "").trim().toLowerCase();
+            return (txt === "habilitado" || txt === "deshabilitado" || txt === "habilitar" || txt === "deshabilitar") &&
+              !el.id?.startsWith("btn-masivo-");
+          });
+
+          if (!controlEstado) return;
+
+          if (controlEstado.type === "checkbox") {
+            if (controlEstado.checked !== habilitarDestino) {
+              controlEstado.checked = habilitarDestino;
+              controlEstado.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            return;
+          }
+
+          const txtActual = (controlEstado.textContent || "").trim().toLowerCase();
+          const estaHabilitadoAhora = txtActual === "habilitado" || txtActual === "deshabilitar";
+          if (estaHabilitadoAhora !== habilitarDestino) {
+            controlEstado.click();
+          }
+        });
+
+        estadoMasivoHabilitado = habilitarDestino;
+        if (btnToggle) {
+          btnToggle.textContent = habilitarDestino ? "Deshabilitar Todos" : "Habilitar Todos";
+        }
+      }
+
+      function eliminarTodosLosAlumnos(sec5) {
+        const filas = obtenerFilasAlumnosEnSec5(sec5);
+        if (!filas.length) {
+          alert("No hay alumnos guardados en esta universidad.");
+          return;
+        }
+
+        if (!confirm(`¿Estás seguro de eliminar a los ${filas.length} alumno(s) guardados en esta universidad?`)) {
+          return;
+        }
+
+        filas.forEach((fila) => {
+          const btnEliminar = Array.from(fila.querySelectorAll("button")).find(
+            (b) => !b.id?.startsWith("btn-masivo-") && /^eliminar$/i.test((b.textContent || "").trim())
+          );
+          if (btnEliminar) {
+            btnEliminar.click();
+          } else {
+            fila.remove();
+          }
+        });
+      }
+
+      function insertarBotonesJuntoAlBuscador() {
+        const sec5 = obtenerContenedorSeccion5();
+        if (!sec5) return;
+
+        const buscador = sec5.querySelector('input[placeholder*="Buscar alumno" i]');
+        if (!buscador) return;
+        if (document.getElementById("acciones-masivas-alumnos-sec5")) return;
+
+        const wrapperFila = document.createElement("div");
+        wrapperFila.id = "acciones-masivas-alumnos-sec5";
+        wrapperFila.style.cssText = [
+          "display: flex",
+          "align-items: center",
+          "gap: 8px",
+          "flex-wrap: wrap",
+          "width: 100%"
+        ].join(";");
+
+        const padreBuscador = buscador.parentElement;
+        if (padreBuscador && padreBuscador !== sec5) {
+          padreBuscador.style.flex = "1 1 240px";
+          padreBuscador.style.minWidth = "200px";
+          padreBuscador.insertAdjacentElement("beforebegin", wrapperFila);
+          wrapperFila.appendChild(padreBuscador);
+        } else {
+          buscador.style.flex = "1 1 240px";
+          buscador.style.minWidth = "200px";
+          buscador.insertAdjacentElement("beforebegin", wrapperFila);
+          wrapperFila.appendChild(buscador);
+        }
+
+        const btnToggle = document.createElement("button");
+        btnToggle.type = "button";
+        btnToggle.id = "btn-masivo-toggle-alumnos";
+        btnToggle.textContent = "Deshabilitar Todos";
+        btnToggle.style.cssText = [
+          "background: rgba(56, 189, 248, 0.16)",
+          "border: 1px solid rgba(56, 189, 248, 0.4)",
+          "color: #38bdf8",
+          "padding: 9px 14px",
+          "border-radius: 10px",
+          "font-size: 12px",
+          "font-weight: 700",
+          "cursor: pointer",
+          "white-space: nowrap"
+        ].join(";");
+
+        const btnEliminarTodos = document.createElement("button");
+        btnEliminarTodos.type = "button";
+        btnEliminarTodos.id = "btn-masivo-eliminar-alumnos";
+        btnEliminarTodos.textContent = "Eliminar Todos";
+        btnEliminarTodos.style.cssText = [
+          "background: rgba(239, 68, 68, 0.16)",
+          "border: 1px solid rgba(239, 68, 68, 0.4)",
+          "color: #f87171",
+          "padding: 9px 14px",
+          "border-radius: 10px",
+          "font-size: 12px",
+          "font-weight: 700",
+          "cursor: pointer",
+          "white-space: nowrap"
+        ].join(";");
+
+        btnToggle.addEventListener("click", () => {
+          alternarEstadoTodosLosAlumnos(sec5, btnToggle);
+        });
+
+        btnEliminarTodos.addEventListener("click", () => {
+          eliminarTodosLosAlumnos(sec5);
+        });
+
+        wrapperFila.appendChild(btnToggle);
+        wrapperFila.appendChild(btnEliminarTodos);
+      }
+
+      const observerSec5 = new MutationObserver(() => {
+        insertarBotonesJuntoAlBuscador();
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        insertarBotonesJuntoAlBuscador();
+        observerSec5.observe(document.body, { childList: true, subtree: true });
+      });
+    })();
+  </script>
+
   <!-- Módulo principal de administración -->
   <script type="module" src="src/admin.js"></script>
 </body>
 </html>
+```[cite: 13]
