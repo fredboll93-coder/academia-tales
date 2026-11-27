@@ -359,12 +359,27 @@
         align-items: center;
         padding: 14px 12px 24px;
         gap: 16px;
-        background: radial-gradient(circle at top, #0f172a 0%, #020617 75%);
+        background: #020617;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background: linear-gradient(
+          to bottom,
+          rgba(2, 6, 23, 0.42) 0%,
+          rgba(2, 6, 23, 0.72) 45%,
+          rgba(2, 6, 23, 0.82) 100%
+        );
       }
 
       .carousel-container {
         position: relative;
         inset: auto;
+        z-index: 10;
         width: 100%;
         max-width: 560px;
         aspect-ratio: 16 / 9;
@@ -372,8 +387,8 @@
         min-height: 195px;
         max-height: 290px;
         border-radius: 18px;
-        border: 1px solid rgba(148, 163, 184, 0.22);
-        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.65);
         flex-shrink: 0;
       }
 
@@ -415,11 +430,15 @@
         position: relative;
         top: auto;
         right: auto;
+        z-index: 50;
         width: 100%;
         max-width: 420px;
         height: auto;
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
         border-radius: 24px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         padding: 24px 20px;
       }
 
@@ -571,6 +590,43 @@
       } catch (e) {}
     }
 
+    function esPantallaVerticalMovilOTablet() {
+      return window.matchMedia('(max-width: 900px) and (orientation: portrait), (max-width: 768px)').matches;
+    }
+
+    function sincronizarFondoCarruselMovil() {
+      const esMovil = esPantallaVerticalMovilOTablet();
+      let fondoEl = document.getElementById('carousel-mobile-bg');
+
+      if (!esMovil) {
+        if (fondoEl) fondoEl.remove();
+        return;
+      }
+
+      if (!fondoEl) {
+        fondoEl = document.createElement('div');
+        fondoEl.id = 'carousel-mobile-bg';
+        fondoEl.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden;background:#020617;';
+        document.body.prepend(fondoEl);
+      }
+
+      const slides = Array.from(document.querySelectorAll('#carousel-wrapper .slide'));
+      if (!slides.length) {
+        fondoEl.innerHTML = '';
+        return;
+      }
+
+      fondoEl.innerHTML = slides.map((sl, i) => {
+        const img = sl.querySelector('.slide-img');
+        const src = img ? img.getAttribute('src') : '';
+        const esActiva = sl.classList.contains('active') || i === currentSlide;
+        if (!src) return '';
+        return `<img src="${src}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:${esActiva ? '0.52' : '0'};transition:opacity 0.8s ease-in-out;" />`;
+      }).join('');
+    }
+
+    window.addEventListener('resize', sincronizarFondoCarruselMovil);
+
     async function inicializarCarrusel() {
       let slidesBD = null;
 
@@ -614,6 +670,7 @@
 
       if (totalSlides === 0) {
         wrapper.innerHTML = '';
+        sincronizarFondoCarruselMovil();
         return;
       }
 
@@ -643,6 +700,7 @@
       }
 
       wrapper.innerHTML = htmlSlides + htmlDots;
+      sincronizarFondoCarruselMovil();
 
       if (totalSlides > 1) {
         intervaloCarrusel = setInterval(() => {
@@ -663,6 +721,7 @@
       currentSlide = index;
       slides[currentSlide].classList.add('active');
       if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+      sincronizarFondoCarruselMovil();
     };
 
     inicializarCarrusel();
@@ -1057,4 +1116,3 @@
   </script>
 </body>
 </html>
-
