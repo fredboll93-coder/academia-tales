@@ -598,7 +598,7 @@
         const prioridad = idx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="eager"';
         return `
           <div class="slide ${idx === 0 ? 'active' : ''}">
-            <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} onerror="this.closest('.slide').style.display='none';" />
+            <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} />
             ${tieneTexto ? `
               <div class="slide-overlay">
                 <div class="slide-badge">
