@@ -332,8 +332,8 @@
       line-height: 1.4;
     }
 
-    /* TABLET */
-    @media (max-width: 1024px) {
+    /* TABLET HORIZONTAL / ESCRITORIO MEDIANO */
+    @media (max-width: 1024px) and (orientation: landscape) {
       .login-glass-panel {
         right: 3%;
         width: 350px;
@@ -346,8 +346,8 @@
       }
     }
 
-    /* CELULAR */
-    @media (max-width: 768px) {
+    /* TABLET VERTICAL Y CELULAR */
+    @media (max-width: 900px) and (orientation: portrait), (max-width: 768px) {
       body {
         height: auto;
         min-height: 100dvh;
@@ -355,28 +355,60 @@
         overflow-x: hidden;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
-        padding: 20px 14px;
+        padding: 14px 12px 24px;
+        gap: 16px;
+        background: radial-gradient(circle at top, #0f172a 0%, #020617 75%);
+      }
+
+      .carousel-container {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        max-width: 560px;
+        aspect-ratio: 16 / 9;
+        height: auto;
+        min-height: 195px;
+        max-height: 290px;
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
+        flex-shrink: 0;
+      }
+
+      .slide-img {
+        object-fit: contain;
+        background: #020617;
       }
 
       .slide-overlay {
-        padding: 20px 18px;
-        padding-right: 18px;
+        padding: 12px 14px 24px;
+        padding-right: 14px;
       }
 
       .slide-title {
-        font-size: 17px;
+        font-size: 14px;
       }
 
       .slide-desc {
-        font-size: 12px;
+        font-size: 11px;
       }
 
       .dots-container {
-        bottom: 12px;
+        position: absolute;
+        bottom: 8px;
         left: 50%;
         transform: translateX(-50%);
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+      }
+
+      .dot.active {
+        width: 22px;
       }
 
       .login-glass-panel {
@@ -384,21 +416,28 @@
         top: auto;
         right: auto;
         width: 100%;
-        max-width: 390px;
+        max-width: 420px;
         height: auto;
         border-radius: 24px;
         border: 1px solid rgba(255, 255, 255, 0.18);
-        padding: 28px 22px;
-        margin: auto 0;
+        padding: 24px 20px;
+      }
+
+      .brand-logo {
+        margin-bottom: 12px;
       }
 
       .brand-logo img {
-        height: 86px;
+        height: 82px;
       }
 
       .login-title {
         font-size: 22px;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
+      }
+
+      .whatsapp-login-link {
+        margin-top: 20px;
       }
 
       #alerta-top {
@@ -1018,4 +1057,6 @@
   </script>
 </body>
 </html>
-```[cite: 8]
+```[cite: 7]
+
+Con esto en celular y tablet vertical el carrusel se muestra en su propio bloque superior en formato panorámico (`16:9`) con `object-fit: contain` para que el diseño del banner no se recorte, y el panel de login queda justo debajo ordenadito. ¿Cómo se ve en tu celular y en tu tablet?
