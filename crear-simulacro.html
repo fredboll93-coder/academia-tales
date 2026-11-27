@@ -454,7 +454,6 @@
 
       <div class="section-title">
         <span>Gestión de Alumnos Habilitados</span>
-        <button type="button" id="btn-toggle-todos-alumnos" class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleTodosAlumnos()">Deshabilitar a todos</button>
       </div>
       
       <!-- Bloque de Registro Estilo Configuración de Universidades -->
@@ -484,9 +483,11 @@
         <button type="button" class="btn-primary" onclick="agregarAlumnoManual()" style="padding: 8px 20px; font-size: 12px; font-weight: 700;">+ Agregar Alumno(s)</button>
       </div>
 
-      <!-- Buscador de Alumnos -->
-      <div style="margin-bottom: 12px;">
-        <input type="text" id="buscar-alumno" placeholder="🔍 Buscar alumno por código, nombre o carrera..." oninput="renderizarAlumnos()" style="width: 100%; padding: 8px 12px; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 13px; outline: none;">
+      <!-- Buscador de Alumnos y Acciones Masivas -->
+      <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <input type="text" id="buscar-alumno" placeholder="🔍 Buscar alumno por código, nombre o carrera..." oninput="renderizarAlumnos()" style="flex: 1 1 240px; min-width: 200px; padding: 8px 12px; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; color: #fff; font-size: 13px; outline: none;">
+        <button type="button" id="btn-toggle-todos-alumnos" class="btn-secondary" style="padding: 8px 12px; font-size: 12px;" onclick="toggleTodosAlumnos()">Deshabilitar a todos</button>
+        <button type="button" id="btn-eliminar-todos-alumnos" class="btn-danger-sm" style="padding: 8px 12px; font-size: 12px;" onclick="eliminarTodosAlumnos()">Eliminar a todos</button>
       </div>
 
       <div class="table-container">
@@ -888,6 +889,7 @@
 
     function actualizarBotonTodosAlumnos() {
       const btn = document.getElementById('btn-toggle-todos-alumnos');
+      const btnEliminarTodos = document.getElementById('btn-eliminar-todos-alumnos');
       if (!btn) return;
 
       if (alumnosSimulacro.length === 0) {
@@ -896,10 +898,12 @@
         btn.style.color = '#94a3b8';
         btn.style.borderColor = 'rgba(148, 163, 184, 0.2)';
         btn.style.background = 'rgba(148, 163, 184, 0.1)';
+        if (btnEliminarTodos) btnEliminarTodos.disabled = true;
         return;
       }
 
       btn.disabled = false;
+      if (btnEliminarTodos) btnEliminarTodos.disabled = false;
       const todosHabilitados = alumnosSimulacro.every(alu =>
         alu.activo !== false && alu.habilitado !== false && String(alu.estado || '').toLowerCase() !== 'deshabilitado'
       );
@@ -935,6 +939,15 @@
         }
       });
 
+      renderizarAlumnos();
+    }
+
+    window.eliminarTodosAlumnos = function() {
+      if (alumnosSimulacro.length === 0) return;
+      if (!confirm(`¿Seguro que deseas eliminar a los ${alumnosSimulacro.length} alumno(s) de este simulacro?`)) {
+        return;
+      }
+      alumnosSimulacro = [];
       renderizarAlumnos();
     }
 
@@ -1240,3 +1253,4 @@
   </script>
 </body>
 </html>
+```[cite: 13]
