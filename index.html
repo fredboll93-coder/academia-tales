@@ -575,6 +575,62 @@
 
   <div id="alerta-top"></div>
 
+  <script>
+    (function pintarCarruselInstante() {
+      let slidesCache = [];
+      try {
+        const raw = JSON.parse(localStorage.getItem('carruselTalesLocal') || '[]');
+        if (Array.isArray(raw)) {
+          slidesCache = raw.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
+        }
+      } catch (e) {}
+
+      if (!slidesCache.length) return;
+
+      const wrapper = document.getElementById('carousel-wrapper');
+      if (!wrapper || wrapper.children.length > 0) return;
+
+      const htmlSlides = slidesCache.map((s, idx) => {
+        const tieneTexto = (s.titulo && s.titulo.trim() !== '') || (s.descripcion && s.descripcion.trim() !== '');
+        const prioridad = idx === 0 ? 'fetchpriority="high" loading="eager" decoding="sync"' : 'loading="eager" decoding="async"';
+        return `
+          <div class="slide ${idx === 0 ? 'active' : ''}">
+            <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} />
+            ${tieneTexto ? `
+              <div class="slide-overlay">
+                <div class="slide-badge">
+                  ${s.titulo ? `<div class="slide-title">${s.titulo}</div>` : ''}
+                  ${s.descripcion ? `<div class="slide-desc">${s.descripcion}</div>` : ''}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      const htmlDots = slidesCache.length > 1
+        ? `<div class="dots-container">` +
+            slidesCache.map((_, idx) => `<div class="dot ${idx === 0 ? 'active' : ''}" onclick="irASlide(${idx})"></div>`).join('') +
+          `</div>`
+        : '';
+
+      wrapper.innerHTML = htmlSlides + htmlDots;
+
+      if (window.matchMedia('(max-width: 900px) and (orientation: portrait), (max-width: 768px)').matches) {
+        let fondoEl = document.getElementById('carousel-mobile-bg');
+        if (!fondoEl) {
+          fondoEl = document.createElement('div');
+          fondoEl.id = 'carousel-mobile-bg';
+          fondoEl.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden;background:#020617;';
+          document.body.prepend(fondoEl);
+        }
+        fondoEl.innerHTML = slidesCache.map((s, i) =>
+          `<img src="${s.imagen_url}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:${i === 0 ? '0.52' : '0'};transition:opacity 0.8s ease-in-out;" />`
+        ).join('');
+      }
+    })();
+  </script>
+
   <script type="module">
     import { supabase } from './supabaseClient.js';
 
@@ -646,8 +702,30 @@
       adaptarCuadroCarruselAImagen(currentSlide);
     });
 
+    function iniciarRotacionCarruselSiCorresponde() {
+      if (intervaloCarrusel) {
+        clearInterval(intervaloCarrusel);
+        intervaloCarrusel = null;
+      }
+      if (totalSlides > 1) {
+        intervaloCarrusel = setInterval(() => {
+          let next = (currentSlide + 1) % totalSlides;
+          window.irASlide(next);
+        }, 4000);
+      }
+    }
+
     async function inicializarCarrusel() {
-      let slidesBD = null;
+      let validosLocal = [];
+      try {
+        const localSlides = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
+        validosLocal = localSlides.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
+      } catch (e) {}
+
+      if (validosLocal.length > 0) {
+        currentSlide = 0;
+        renderizarCarruselUI(validosLocal);
+      }
 
       try {
         const { data, error } = await supabase
@@ -656,25 +734,20 @@
           .order('id', { ascending: true });
 
         if (!error && Array.isArray(data)) {
-          slidesBD = data.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
+          const slidesBD = data.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
           guardarLocalCarruselSeguro(slidesBD);
+
+          const firmaActual = JSON.stringify(validosLocal.map(x => [x.id, x.imagen_url, x.titulo, x.descripcion]));
+          const firmaNueva = JSON.stringify(slidesBD.map(x => [x.id, x.imagen_url, x.titulo, x.descripcion]));
+
+          if (firmaActual !== firmaNueva || document.getElementById('carousel-wrapper').children.length === 0) {
+            currentSlide = 0;
+            renderizarCarruselUI(slidesBD);
+          } else {
+            iniciarRotacionCarruselSiCorresponde();
+          }
         }
       } catch (e) {}
-
-      if (slidesBD !== null) {
-        currentSlide = 0;
-        renderizarCarruselUI(slidesBD);
-        return;
-      }
-
-      try {
-        const localSlides = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
-        const validosLocal = localSlides.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
-        currentSlide = 0;
-        renderizarCarruselUI(validosLocal);
-      } catch (e) {
-        renderizarCarruselUI([]);
-      }
     }
 
     function renderizarCarruselUI(slidesAUsar) {
@@ -695,7 +768,7 @@
 
       let htmlSlides = lista.map((s, idx) => {
         const tieneTexto = (s.titulo && s.titulo.trim() !== '') || (s.descripcion && s.descripcion.trim() !== '');
-        const prioridad = idx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="eager"';
+        const prioridad = idx === 0 ? 'fetchpriority="high" loading="eager" decoding="sync"' : 'loading="eager" decoding="async"';
         return `
           <div class="slide ${idx === 0 ? 'active' : ''}">
             <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} />
@@ -732,13 +805,7 @@
 
       adaptarCuadroCarruselAImagen(0);
       sincronizarFondoCarruselMovil();
-
-      if (totalSlides > 1) {
-        intervaloCarrusel = setInterval(() => {
-          let next = (currentSlide + 1) % totalSlides;
-          window.irASlide(next);
-        }, 4000);
-      }
+      iniciarRotacionCarruselSiCorresponde();
     }
 
     window.irASlide = function(index) {
