@@ -549,6 +549,12 @@
     let totalSlides = 0;
     let intervaloCarrusel = null;
 
+    function guardarLocalCarruselSeguro(data) {
+      try {
+        localStorage.setItem('carruselTalesLocal', JSON.stringify(data));
+      } catch (e) {}
+    }
+
     async function inicializarCarrusel() {
       let slidesIniciales = [];
 
@@ -571,28 +577,28 @@
           .select('*')
           .order('id', { ascending: true });
 
-        if (!error && data && data.length > 0) {
-          const nuevoJson = JSON.stringify(data);
-          const actualJson = localStorage.getItem('carruselTalesLocal');
-          if (nuevoJson !== actualJson) {
-            localStorage.setItem('carruselTalesLocal', nuevoJson);
-            currentSlide = 0;
-            renderizarCarruselUI(data);
-          }
+        if (!error && Array.isArray(data)) {
+          const validos = data.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
+          guardarLocalCarruselSeguro(validos);
+          const listaFinal = validos.length > 0 ? validos : slidesPorDefecto;
+          currentSlide = 0;
+          renderizarCarruselUI(listaFinal);
         }
       } catch (e) {}
     }
 
     function renderizarCarruselUI(slidesAUsar) {
       const wrapper = document.getElementById('carousel-wrapper');
-      totalSlides = slidesAUsar.length;
+      const slidesFiltrados = (slidesAUsar || []).filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
+      const lista = slidesFiltrados.length > 0 ? slidesFiltrados : slidesPorDefecto;
+      totalSlides = lista.length;
 
-      let htmlSlides = slidesAUsar.map((s, idx) => {
+      let htmlSlides = lista.map((s, idx) => {
         const tieneTexto = (s.titulo && s.titulo.trim() !== '') || (s.descripcion && s.descripcion.trim() !== '');
         const prioridad = idx === 0 ? 'fetchpriority="high" loading="eager"' : 'loading="eager"';
         return `
           <div class="slide ${idx === 0 ? 'active' : ''}">
-            <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} />
+            <img src="${s.imagen_url}" alt="${s.titulo || 'Banner Academia Tales'}" class="slide-img" ${prioridad} onerror="this.closest('.slide').style.display='none';" />
             ${tieneTexto ? `
               <div class="slide-overlay">
                 <div class="slide-badge">
@@ -608,7 +614,7 @@
       let htmlDots = '';
       if (totalSlides > 1) {
         htmlDots = `<div class="dots-container">` + 
-          slidesAUsar.map((_, idx) => `<div class="dot ${idx === 0 ? 'active' : ''}" onclick="irASlide(${idx})"></div>`).join('') +
+          lista.map((_, idx) => `<div class="dot ${idx === 0 ? 'active' : ''}" onclick="irASlide(${idx})"></div>`).join('') +
         `</div>`;
       }
 
