@@ -522,9 +522,7 @@
 
   <!-- CARRUSEL DE FONDO -->
   <div class="carousel-container" id="carousel-wrapper">
-    <div class="slide active" style="transition: none;">
-      <img src="./banner-1.jpg" alt="Banner Academia Tales" class="slide-img" fetchpriority="high" loading="eager" decoding="sync" onerror="this.style.display='none'" />
-    </div>
+    <!-- Carga dinámica -->
   </div>
 
   <!-- PANEL TRANSLÚCIDO DE ACCESO -->
@@ -590,7 +588,7 @@
       if (!slidesCache.length) return;
 
       const wrapper = document.getElementById('carousel-wrapper');
-      if (!wrapper) return;
+      if (!wrapper || wrapper.children.length > 0) return;
 
       const htmlSlides = slidesCache.map((s, idx) => {
         const tieneTexto = (s.titulo && s.titulo.trim() !== '') || (s.descripcion && s.descripcion.trim() !== '');
@@ -640,6 +638,7 @@
     let currentSlide = 0;
     let totalSlides = 0;
     let intervaloCarrusel = null;
+    let ultimaFirmaImagenes = '';
 
     function guardarLocalCarruselSeguro(data) {
       try {
@@ -691,6 +690,21 @@
         return;
       }
 
+      const imgsActuales = Array.from(fondoEl.querySelectorAll('img'));
+      const srcsActuales = imgsActuales.map(im => im.getAttribute('src') || '');
+      const srcsNuevos = slides.map(sl => {
+        const img = sl.querySelector('.slide-img');
+        return img ? (img.getAttribute('src') || '') : '';
+      }).filter(Boolean);
+
+      if (imgsActuales.length === srcsNuevos.length && srcsActuales.every((s, idx) => s === srcsNuevos[idx])) {
+        imgsActuales.forEach((im, i) => {
+          const esActiva = slides[i]?.classList.contains('active') || i === currentSlide;
+          im.style.opacity = esActiva ? '0.52' : '0';
+        });
+        return;
+      }
+
       fondoEl.innerHTML = slides.map((sl, i) => {
         const img = sl.querySelector('.slide-img');
         const src = img ? img.getAttribute('src') : '';
@@ -725,18 +739,15 @@
         validosLocal = localSlides.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
       } catch (e) {}
 
-      if (validosLocal.length > 0) {
+      if (validosLocal.length > 0 && document.getElementById('carousel-wrapper').children.length === 0) {
         currentSlide = 0;
         renderizarCarruselUI(validosLocal);
-      } else {
-        const slidesInicialesDom = Array.from(document.querySelectorAll('#carousel-wrapper .slide-img'))
-          .map(img => ({ imagen_url: img.getAttribute('src') || '', titulo: '', descripcion: '' }))
-          .filter(s => s.imagen_url.trim() !== '');
-        if (slidesInicialesDom.length > 0) {
-          totalSlides = slidesInicialesDom.length;
-          adaptarCuadroCarruselAImagen(0);
-          sincronizarFondoCarruselMovil();
-        }
+      } else if (document.getElementById('carousel-wrapper').children.length > 0) {
+        totalSlides = document.querySelectorAll('#carousel-wrapper .slide').length;
+        ultimaFirmaImagenes = validosLocal.map(x => x.imagen_url).join('|');
+        adaptarCuadroCarruselAImagen(0);
+        sincronizarFondoCarruselMovil();
+        iniciarRotacionCarruselSiCorresponde();
       }
 
       try {
@@ -749,10 +760,12 @@
           const slidesBD = data.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
           guardarLocalCarruselSeguro(slidesBD);
 
-          const firmaActual = JSON.stringify(validosLocal.map(x => [x.id, x.imagen_url, x.titulo, x.descripcion]));
-          const firmaNueva = JSON.stringify(slidesBD.map(x => [x.id, x.imagen_url, x.titulo, x.descripcion]));
+          const firmaImagenesBD = slidesBD.map(x => x.imagen_url).join('|');
+          const yaRenderizadoConMismasImgs =
+            document.getElementById('carousel-wrapper').children.length > 0 &&
+            ultimaFirmaImagenes === firmaImagenesBD;
 
-          if (slidesBD.length > 0 && (firmaActual !== firmaNueva || validosLocal.length === 0)) {
+          if (!yaRenderizadoConMismasImgs) {
             currentSlide = 0;
             renderizarCarruselUI(slidesBD);
           } else {
@@ -766,6 +779,7 @@
       const wrapper = document.getElementById('carousel-wrapper');
       const lista = (slidesAUsar || []).filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
       totalSlides = lista.length;
+      ultimaFirmaImagenes = lista.map(x => x.imagen_url).join('|');
 
       if (intervaloCarrusel) {
         clearInterval(intervaloCarrusel);
@@ -807,11 +821,22 @@
       wrapper.innerHTML = htmlSlides + htmlDots;
 
       wrapper.querySelectorAll('.slide-img').forEach((img, idx) => {
-        if (img.complete && img.naturalWidth > 0) {
+        const alListo = () => {
           if (idx === currentSlide) adaptarCuadroCarruselAImagen(idx);
+        };
+        if (img.complete && img.naturalWidth > 0) {
+          if (typeof img.decode === 'function') {
+            img.decode().then(alListo).catch(alListo);
+          } else {
+            alListo();
+          }
         } else {
           img.addEventListener('load', () => {
-            if (idx === currentSlide) adaptarCuadroCarruselAImagen(idx);
+            if (typeof img.decode === 'function') {
+              img.decode().then(alListo).catch(alListo);
+            } else {
+              alListo();
+            }
           }, { once: true });
         }
       });
