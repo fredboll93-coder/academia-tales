@@ -384,8 +384,6 @@
         max-width: 560px;
         aspect-ratio: 16 / 9;
         height: auto;
-        min-height: 195px;
-        max-height: 290px;
         border-radius: 18px;
         border: 1px solid rgba(148, 163, 184, 0.25);
         box-shadow: 0 16px 34px rgba(0, 0, 0, 0.65);
@@ -393,8 +391,8 @@
       }
 
       .slide-img {
-        object-fit: contain;
-        background: #020617;
+        object-fit: cover;
+        object-position: center;
       }
 
       .slide-overlay {
@@ -594,6 +592,24 @@
       return window.matchMedia('(max-width: 900px) and (orientation: portrait), (max-width: 768px)').matches;
     }
 
+    function adaptarCuadroCarruselAImagen(indice = currentSlide) {
+      const wrapper = document.getElementById('carousel-wrapper');
+      if (!wrapper) return;
+
+      if (!esPantallaVerticalMovilOTablet()) {
+        wrapper.style.aspectRatio = '';
+        return;
+      }
+
+      const slides = wrapper.querySelectorAll('.slide');
+      const slideActiva = slides[indice] || slides[0];
+      const img = slideActiva ? slideActiva.querySelector('.slide-img') : null;
+
+      if (img && img.naturalWidth > 0 && img.naturalHeight > 0) {
+        wrapper.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+      }
+    }
+
     function sincronizarFondoCarruselMovil() {
       const esMovil = esPantallaVerticalMovilOTablet();
       let fondoEl = document.getElementById('carousel-mobile-bg');
@@ -625,7 +641,10 @@
       }).join('');
     }
 
-    window.addEventListener('resize', sincronizarFondoCarruselMovil);
+    window.addEventListener('resize', () => {
+      sincronizarFondoCarruselMovil();
+      adaptarCuadroCarruselAImagen(currentSlide);
+    });
 
     async function inicializarCarrusel() {
       let slidesBD = null;
@@ -700,6 +719,18 @@
       }
 
       wrapper.innerHTML = htmlSlides + htmlDots;
+
+      wrapper.querySelectorAll('.slide-img').forEach((img, idx) => {
+        if (img.complete && img.naturalWidth > 0) {
+          if (idx === currentSlide) adaptarCuadroCarruselAImagen(idx);
+        } else {
+          img.addEventListener('load', () => {
+            if (idx === currentSlide) adaptarCuadroCarruselAImagen(idx);
+          }, { once: true });
+        }
+      });
+
+      adaptarCuadroCarruselAImagen(0);
       sincronizarFondoCarruselMovil();
 
       if (totalSlides > 1) {
@@ -721,6 +752,7 @@
       currentSlide = index;
       slides[currentSlide].classList.add('active');
       if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+      adaptarCuadroCarruselAImagen(currentSlide);
       sincronizarFondoCarruselMovil();
     };
 
