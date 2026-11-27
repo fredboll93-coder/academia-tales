@@ -522,29 +522,6 @@
   <script type="module">
     import { supabase } from './supabaseClient.js';
 
-    const slidesPorDefecto = [
-      {
-        imagen_url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop',
-        titulo: 'Preparación de Alto Nivel',
-        descripcion: 'Asegura tu ingreso a la universidad con nuestro sistema de preparación exclusiva y simulacros tipo examen de admisión.'
-      },
-      {
-        imagen_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop',
-        titulo: 'Plataforma Digital e Interactiva',
-        descripcion: 'Accede a tus carpetas organizadas por ciclos, grabaciones y recursos educativos en cualquier momento.'
-      },
-      {
-        imagen_url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1600&auto=format&fit=crop',
-        titulo: 'Simulacros y Evaluación Continua',
-        descripcion: 'Mide tu rendimiento en tiempo real con nuestras evaluaciones periódicas diseñadas por especialistas.'
-      },
-      {
-        imagen_url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1600&auto=format&fit=crop',
-        titulo: 'Comunidad Académica Tales',
-        descripcion: 'Aprende junto a los mejores docentes e intégrate a una comunidad enfocada en el éxito profesional.'
-      }
-    ];
-
     let currentSlide = 0;
     let totalSlides = 0;
     let intervaloCarrusel = null;
@@ -555,53 +532,51 @@
       } catch (e) {}
     }
 
-    function consultarCarruselConTimeout(ms = 3500) {
-      const consulta = supabase
-        .from('carrusel_login')
-        .select('*')
-        .order('id', { ascending: true });
-
-      return Promise.race([
-        consulta,
-        new Promise((resolve) => setTimeout(() => resolve({ data: null, error: new Error('timeout') }), ms))
-      ]);
-    }
-
     async function inicializarCarrusel() {
-      let slidesFinales = null;
+      let slidesBD = null;
 
       try {
-        const { data, error } = await consultarCarruselConTimeout(3500);
+        const { data, error } = await supabase
+          .from('carrusel_login')
+          .select('*')
+          .order('id', { ascending: true });
+
         if (!error && Array.isArray(data)) {
-          const validos = data.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
-          guardarLocalCarruselSeguro(validos);
-          slidesFinales = validos.length > 0 ? validos : slidesPorDefecto;
+          slidesBD = data.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
+          guardarLocalCarruselSeguro(slidesBD);
         }
       } catch (e) {}
 
-      if (!slidesFinales) {
-        try {
-          const localSlides = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
-          const validosLocal = localSlides.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
-          if (validosLocal.length > 0) {
-            slidesFinales = validosLocal;
-          }
-        } catch (e) {}
+      if (slidesBD !== null) {
+        currentSlide = 0;
+        renderizarCarruselUI(slidesBD);
+        return;
       }
 
-      if (!slidesFinales) {
-        slidesFinales = slidesPorDefecto;
+      try {
+        const localSlides = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
+        const validosLocal = localSlides.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
+        currentSlide = 0;
+        renderizarCarruselUI(validosLocal);
+      } catch (e) {
+        renderizarCarruselUI([]);
       }
-
-      currentSlide = 0;
-      renderizarCarruselUI(slidesFinales);
     }
 
     function renderizarCarruselUI(slidesAUsar) {
       const wrapper = document.getElementById('carousel-wrapper');
-      const slidesFiltrados = (slidesAUsar || []).filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
-      const lista = slidesFiltrados.length > 0 ? slidesFiltrados : slidesPorDefecto;
+      const lista = (slidesAUsar || []).filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
       totalSlides = lista.length;
+
+      if (intervaloCarrusel) {
+        clearInterval(intervaloCarrusel);
+        intervaloCarrusel = null;
+      }
+
+      if (totalSlides === 0) {
+        wrapper.innerHTML = '';
+        return;
+      }
 
       let htmlSlides = lista.map((s, idx) => {
         const tieneTexto = (s.titulo && s.titulo.trim() !== '') || (s.descripcion && s.descripcion.trim() !== '');
@@ -630,7 +605,6 @@
 
       wrapper.innerHTML = htmlSlides + htmlDots;
 
-      if (intervaloCarrusel) clearInterval(intervaloCarrusel);
       if (totalSlides > 1) {
         intervaloCarrusel = setInterval(() => {
           let next = (currentSlide + 1) % totalSlides;
@@ -1044,3 +1018,4 @@
   </script>
 </body>
 </html>
+```[cite: 8]
