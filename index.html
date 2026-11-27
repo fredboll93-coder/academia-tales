@@ -555,36 +555,46 @@
       } catch (e) {}
     }
 
+    function consultarCarruselConTimeout(ms = 3500) {
+      const consulta = supabase
+        .from('carrusel_login')
+        .select('*')
+        .order('id', { ascending: true });
+
+      return Promise.race([
+        consulta,
+        new Promise((resolve) => setTimeout(() => resolve({ data: null, error: new Error('timeout') }), ms))
+      ]);
+    }
+
     async function inicializarCarrusel() {
-      let slidesIniciales = [];
+      let slidesFinales = null;
 
       try {
-        const localSlides = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
-        if (localSlides.length > 0) {
-          slidesIniciales = localSlides;
-        }
-      } catch (e) {}
-
-      if (slidesIniciales.length === 0) {
-        slidesIniciales = slidesPorDefecto;
-      }
-
-      renderizarCarruselUI(slidesIniciales);
-
-      try {
-        const { data, error } = await supabase
-          .from('carrusel_login')
-          .select('*')
-          .order('id', { ascending: true });
-
+        const { data, error } = await consultarCarruselConTimeout(3500);
         if (!error && Array.isArray(data)) {
           const validos = data.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
           guardarLocalCarruselSeguro(validos);
-          const listaFinal = validos.length > 0 ? validos : slidesPorDefecto;
-          currentSlide = 0;
-          renderizarCarruselUI(listaFinal);
+          slidesFinales = validos.length > 0 ? validos : slidesPorDefecto;
         }
       } catch (e) {}
+
+      if (!slidesFinales) {
+        try {
+          const localSlides = JSON.parse(localStorage.getItem('carruselTalesLocal')) || [];
+          const validosLocal = localSlides.filter(s => s && typeof s.imagen_url === 'string' && s.imagen_url.trim() !== '');
+          if (validosLocal.length > 0) {
+            slidesFinales = validosLocal;
+          }
+        } catch (e) {}
+      }
+
+      if (!slidesFinales) {
+        slidesFinales = slidesPorDefecto;
+      }
+
+      currentSlide = 0;
+      renderizarCarruselUI(slidesFinales);
     }
 
     function renderizarCarruselUI(slidesAUsar) {
