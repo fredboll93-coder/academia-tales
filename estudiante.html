@@ -576,8 +576,8 @@
                 if (typeof aluSim === 'object') {
                   const codSim = String(aluSim.codigo || aluSim.dni || aluSim.id || "").trim().toLowerCase();
                   const nomSim = String(aluSim.nombre || aluSim.nombres || "").trim().toLowerCase();
-                  const habilitadoEstado = aluSim.habilitado !== false && aluSim.activo !== false;
-                  return ((codB && codSim === codB) || (nomB && nomSim === nomB)) && habilitadoEstado;
+                  const permitidoEstado = aluSim.permitido !== false && aluSim.accesoPermitido !== false && String(aluSim.permiso || "").trim().toLowerCase() !== "nopermitido" && String(aluSim.permiso || "").trim().toLowerCase() !== "no permitido";
+                  return ((codB && codSim === codB) || (nomB && nomSim === nomB)) && permitidoEstado;
                 }
                 return codB && String(aluSim).trim().toLowerCase() === codB;
               });
