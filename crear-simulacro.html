@@ -951,6 +951,21 @@
       renderizarAlumnos();
     }
 
+    function estaAlumnoPermitido(alu) {
+      if (!alu) return true;
+      if (alu.permitido === false || alu.accesoPermitido === false) return false;
+      if (String(alu.permiso || '').toLowerCase() === 'nopermitido' || String(alu.permiso || '').toLowerCase() === 'no permitido') return false;
+      return true;
+    }
+
+    window.togglePermitirAlumno = function(index) {
+      const alu = alumnosSimulacro[index];
+      if (!alu) return;
+      const nuevoPermitido = !estaAlumnoPermitido(alu);
+      alu.permitido = nuevoPermitido;
+      renderizarAlumnos();
+    }
+
     window.renderizarAlumnos = function() {
       actualizarBotonTodosAlumnos();
       const tbody = document.getElementById('tabla-alumnos-body');
@@ -975,6 +990,7 @@
 
         mostrados++;
         const estaHabilitado = alu.activo !== false && alu.habilitado !== false && String(alu.estado || '').toLowerCase() !== 'deshabilitado';
+        const permitido = estaAlumnoPermitido(alu);
 
         tbody.innerHTML += `
           <tr>
@@ -985,6 +1001,7 @@
             <td style="text-align: center;">
               <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
                 <button type="button" class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="toggleAlumno(${index})">${estaHabilitado ? 'Deshabilitar' : 'Habilitar'}</button>
+                <button type="button" class="btn-secondary" style="padding: 4px 8px; font-size: 11px; color: ${permitido ? '#fbbf24' : '#4ade80'};" onclick="togglePermitirAlumno(${index})">${permitido ? 'No permitir' : 'Permitir'}</button>
                 <button type="button" class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="reiniciarAlumno(${index})">Reiniciar</button>
                 <button type="button" class="btn-secondary" style="padding: 4px 8px; font-size: 11px; color: #f87171;" onclick="eliminarAlumno(${index})">Eliminar</button>
               </div>
@@ -1020,7 +1037,8 @@
           codigo: codigoManual,
           nombres: nombreManual,
           carrera: formatearCarrera(carreraManual),
-          activo: true
+          activo: true,
+          permitido: true
         });
       }
 
@@ -1040,7 +1058,8 @@
               codigo: partes[0],
               nombres: partes[1].toUpperCase(),
               carrera: formatearCarrera(partes[2]),
-              activo: true
+              activo: true,
+              permitido: true
             });
           }
         });
@@ -1089,6 +1108,7 @@
       if (alu) {
         alu.activo = true;
         alu.habilitado = true;
+        alu.permitido = true;
         alu.estado = 'Habilitado';
         alu.rindio = false;
         alu.finalizado = false;
@@ -1253,4 +1273,4 @@
   </script>
 </body>
 </html>
-
+```[cite: 13]
