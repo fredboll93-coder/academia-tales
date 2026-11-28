@@ -965,6 +965,14 @@
       };
     }
 
+    function estaPermitidoEnSimulacro(item) {
+      if (!item || typeof item !== 'object') return true;
+      if (item.permitido === false || item.accesoPermitido === false) return false;
+      const perm = String(item.permiso || '').trim().toLowerCase();
+      if (perm === 'nopermitido' || perm === 'no permitido') return false;
+      return true;
+    }
+
     function buscarAlumnoEnSimulacros(codigoBuscado, listaSimulacros) {
       const codLim = String(codigoBuscado).trim().toLowerCase();
       if (!codLim) return null;
@@ -983,7 +991,7 @@
           const match = lista.find(item => {
             if (!item) return false;
             if (typeof item === 'object') {
-              if (item.activo === false || item.habilitado === false) return false;
+              if (!estaPermitidoEnSimulacro(item)) return false;
               return extraerCodigoAlumno(item) === codLim;
             }
             return String(item).trim().toLowerCase() === codLim;
